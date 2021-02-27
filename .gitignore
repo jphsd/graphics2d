@@ -1,0 +1,17 @@
+go.sum
+*.ngo
+
+# Project files
+.idea
+.settings
+.classpath
+.project
+*.iml
+
+# MacOS
+*.swp
+.DS_Store
+Icon?
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
