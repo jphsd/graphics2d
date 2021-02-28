@@ -1,5 +1,7 @@
 go.sum
 *.ngo
+*.jpeg
+*.jpg
 
 # Project files
 .idea
