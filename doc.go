@@ -14,7 +14,7 @@ The PathProcessor interface is where the magic happens. Given a path, a function
 a collection of paths derived from it. This allows for stoking, dashing and a variety of other possibilities.
 
 Shapes and Paths can be rendered with the render functions. Paths are forced closed when rendered.
-Convenience methods are provided for rendering with a single color and an image. The full render function
+Convenience methods are provided for rendering with a single color or an image. The full render function
 allows a clip mask to be supplied and the draw.Op to be specified.
 
 The Aff3 type provides the ability to specify affine transforms on Paths and Shapes.

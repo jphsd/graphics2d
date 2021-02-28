@@ -35,7 +35,7 @@ func main() {
 
 	// Convert to RGBA
 	rgba := image.NewRGBA(img.Bounds())
-	draw.Draw(rgba, rgba.Bounds(), img, image.Point{0, 0}, draw.Src)
+	draw.Draw(rgba, rgba.Bounds(), img, image.Point{}, draw.Src)
 
 	imgR := SwitchChannels(rgba, 1, 2)
 	imgG := SwitchChannels(rgba, 0, 2)

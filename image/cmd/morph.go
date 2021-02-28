@@ -36,7 +36,7 @@ func main() {
 
 	// Convert to Gray
 	gray := image.NewGray(img.Bounds())
-	draw.Draw(gray, gray.Bounds(), img, image.Point{0, 0}, draw.Src)
+	draw.Draw(gray, gray.Bounds(), img, image.Point{}, draw.Src)
 
 	// Invert and undo anti-aliasing and compression
 	lut := make([]uint8, 256)

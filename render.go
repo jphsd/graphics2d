@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/draw"
 
+	g2dimg "github.com/jphsd/graphics2d/image"
 	"github.com/jphsd/graphics2d/util"
 	"golang.org/x/image/vector"
 )
@@ -51,10 +52,15 @@ func RenderPathExt(dst draw.Image, path *Path, at []float32, filler image.Image,
 	rasterizer.ClosePath()
 
 	if clip != nil {
-		// TODO: Handle clip image
+		// Obtain rasterizer mask and intersect it against the clip mask
+		alpha := image.NewAlpha(image.Rect(0, 0, size.X, size.Y))
+		rasterizer.Draw(alpha, rect, image.Opaque, image.Point{})
+		alpha = g2dimg.AlphaAnd(alpha, clip)
+		draw.DrawMask(dst, rect, filler, image.Point{}, alpha, image.Point{}, op)
+	} else {
+		rasterizer.Draw(dst, rect, filler, image.Point{})
 	}
 
-	rasterizer.Draw(dst, rect, filler, image.Point{})
 	return nil
 }
 
@@ -122,10 +128,15 @@ func RenderShapeExt(dst draw.Image, shape *Shape, at []float32, filler image.Ima
 	}
 
 	if clip != nil {
-		// TODO: Handle clip image
+		// Obtain rasterizer mask and intersect it against the clip mask
+		alpha := image.NewAlpha(image.Rect(0, 0, size.X, size.Y))
+		rasterizer.Draw(alpha, rect, image.Opaque, image.Point{})
+		alpha = g2dimg.AlphaAnd(alpha, clip)
+		draw.DrawMask(dst, rect, filler, image.Point{}, alpha, image.Point{}, op)
+	} else {
+		rasterizer.Draw(dst, rect, filler, image.Point{})
 	}
 
-	rasterizer.Draw(dst, rect, filler, image.Point{})
 	return nil
 }
 
