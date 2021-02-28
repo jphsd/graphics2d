@@ -67,21 +67,19 @@ func main() {
 		prev = out
 		out = Thin(out)
 		n++
-/*
-		if n%10 == 0 {
-			saveImg(out, fmt.Sprintf("out%d", n))
-			v, n := Variance(prev, out)
-			fmt.Printf("Variance %f over %d\n", v*float64(out.Bounds().Dx()*out.Bounds().Dy())/float64(n), n)
-		}
-*/
+//		if n%10 == 0 {
+//			saveImg(out, fmt.Sprintf("out%d", n))
+//			v, n := Variance(prev, out)
+//			fmt.Printf("Variance %f over %d\n", v*float64(out.Bounds().Dx()*out.Bounds().Dy())/float64(n), n)
+//		}
 	}
-	saveImg(out, fmt.Sprintf("out-skel%d", n))
+	saveImg(Not(out), fmt.Sprintf("out-skel%d", n))
 
 	outs := LJSkeleton(gray, Z4, 32)
-	saveImg(outs[32], fmt.Sprintf("out-ljskel%d", 32))
+	saveImg(Not(outs[32]), fmt.Sprintf("out-ljskel%d", 32))
 
-	out1 := LJReconstitute(outs[:32], suppt)
-	saveImg(out1, "out-ljrecon")
+	out1 := LJReconstitute(outs[:32], Z4)
+	saveImg(Not(out1), "out-ljrecon")
 }
 
 func saveImg(img image.Image, name string) {
