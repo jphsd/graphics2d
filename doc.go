@@ -1,11 +1,11 @@
 /*
-Package graphics2d contains types and funtions for 2D graphics rendering.
+Package graphics2d contains types and functions for 2D graphics rendering.
 
 The lowest type is a Path. Paths start from a location and add steps using a number of control points. The
 number of control points determines the polynomial order of the step: 0 - line; 1 - quadratic; c - cubic;
 3 - quartic; ... A path can be closed which forces a line from the start location to the last. Once a path
-is closed, no more steps can be added. Unlike other implementations, a path represents a single stroke.
-There is no move (pen up) step.
+is closed, no more steps can be added. Unlike other implementations, a path here represents a single
+stroke (pen down). There is no move (pen up) step.
 
 The Shape type is a container for closed paths and represents something that can be filled and rendered.
 As Paths are added, if they're not already closed, they are forced closed.

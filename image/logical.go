@@ -197,7 +197,7 @@ func AlphaEquals(img1, img2 *image.Alpha) bool {
 	return Equals(g1, g2)
 }
 
-// AlphaCopy returns 1 - img.
+// AlphaCopy returns a deep copy of img.
 func AlphaCopy(img *image.Alpha) *image.Alpha {
 	g1 := AlphaToGray(img)
 	return GrayToAlpha(Copy(g1))

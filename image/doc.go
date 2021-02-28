@@ -2,7 +2,7 @@
 Package image contains functions that mostly operate on image.Gray.
 
 Logical Operations
-    And
+	And
 	Or
 	Xor
 	Not
@@ -28,7 +28,7 @@ Remap Operations
 	RemapRGBA
 
 Channel Operations
-    ExtractChannel
+	ExtractChannel
 	ReplaceChannel
 	SwitchChannels
 	CombineChannels
