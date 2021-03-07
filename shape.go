@@ -35,6 +35,16 @@ func (s *Shape) AddPath(p *Path) {
 	s.bounds = image.Rectangle{}
 }
 
+func (s *Shape) AddPaths(paths []*Path) {
+	for _, p := range paths {
+		s.AddPath(p)
+	}
+}
+
+func (s *Shape) AddShape(shape *Shape) {
+	s.AddPaths(shape.Paths())
+}
+
 func (s *Shape) Paths() []*Path {
 	return s.paths[:]
 }
