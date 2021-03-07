@@ -40,22 +40,9 @@ func NewPath(start []float64) *Path {
 	return &np
 }
 
-func (p *Path) AddStep(step []float64) error {
-	n := len(step)
-	if n%2 != 0 {
-		return fmt.Errorf("step locations must be an even number of float64")
-	}
-	n /= 2
-	tmp := make([][]float64, n)
-	for i, j := 0, 0; i < n; i, j = i+1, j+2 {
-		tmp[i] = []float64{step[j], step[j+1]}
-	}
-	return p.AddStepPoints(tmp)
-}
-
-// AddStepPoints takes an array of points and treats n-1 of them as control points and the
+// AddStep takes an array of points and treats n-1 of them as control points and the
 // last as a point on the curve.
-func (p *Path) AddStepPoints(points [][]float64) error {
+func (p *Path) AddStep(points [][]float64) error {
 	if p.closed {
 		return fmt.Errorf("path is closed, adding a step is forbidden")
 	}
