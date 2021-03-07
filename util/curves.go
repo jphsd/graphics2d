@@ -143,8 +143,8 @@ func splitCurve(pts [][]float64, nn, n int, left, right [][]float64, t float64) 
 				right[nn-n] = pts[np]
 			}
 			npts[i] = []float64{
-			omt*pts[i][0] + t*pts[i+1][0], omt*pts[i][1] + t*pts[i+1][1],
-			pts[i+1][0] - pts[i][0], pts[i+1][1] - pts[i][1]}
+				omt*pts[i][0] + t*pts[i+1][0], omt*pts[i][1] + t*pts[i+1][1],
+				pts[i+1][0] - pts[i][0], pts[i+1][1] - pts[i][1]}
 		}
 		splitCurve(npts, nn, n+1, left, right, t)
 	}

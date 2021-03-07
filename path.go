@@ -290,7 +290,7 @@ func cpSafe(points [][]float64) bool {
 	bb := util.BoundingBox(points...)
 	dx := bb[1][0] - bb[0][0]
 	dy := bb[1][1] - bb[0][1]
-	dx, dy = dx / 10, dy / 10
+	dx, dy = dx/10, dy/10
 	// Crude check v is within 10% of c based on bb size
 	return v[0] < c[0]+dx && v[0] > c[0]-dx && v[1] < c[1]+dy && v[1] > c[1]-dy
 }

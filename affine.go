@@ -214,7 +214,7 @@ func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {
 }
 
 // Apply aplies the transform to the set of supplied points.
-func (a *Aff3)Apply(pts ...[]float64) [][]float64 {
+func (a *Aff3) Apply(pts ...[]float64) [][]float64 {
 	npts := make([][]float64, len(pts))
 	for i, pt := range pts {
 		npt := make([]float64, 2)
