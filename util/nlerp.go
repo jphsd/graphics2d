@@ -232,6 +232,29 @@ func (s *NLP5) InvTransform(v float64) float64 {
 	return bsInv(v, s)
 }
 
+type NLCompound struct {
+	nl []NonLinear
+}
+
+func NewNLCompound(nl []NonLinear) *NLCompound {
+	return &NLCompound{nl}
+}
+
+func (s *NLCompound) Transform(t float64) float64 {
+	for _, f := range s.nl {
+		t = f.Transform(t)
+	}
+
+	return t
+}
+
+func (s *NLCompound) InvTransform(v float64) float64 {
+	for i := len(s.nl) - 1; i > -1; i-- {
+		v = s.nl[i].InvTransform(v)
+	}
+	return v
+}
+
 // Numerical method to find inverse
 func bsInv(v float64, f NonLinear) float64 {
 	n := 16

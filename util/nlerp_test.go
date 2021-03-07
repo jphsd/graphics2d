@@ -36,6 +36,7 @@ func init() {
 		{NewNLLogistic(100, 0.8), "Logistic 9"},
 		{&NLP3{}, "P3"},
 		{&NLP5{}, "P5"},
+		{&NLCompound{[]NonLinear{&NLCube{}, &NLSin{}}}, "Compound"},
 	}
 }
 

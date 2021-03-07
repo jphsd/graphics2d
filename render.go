@@ -43,10 +43,10 @@ func RenderPathExt(dst draw.Image, path *Path, at []float32, filler image.Image,
 	// Process path
 	ox, oy := at[0], at[1]
 	fp := path.Flatten(0.6) // tolerance 0.6
-	step := util.ToF32(fp.steps[0]...)
+	step := util.ToF32(fp.steps[0][0]...)
 	rasterizer.MoveTo(ox+step[0], oy+step[1])
 	for i, lp := 1, len(fp.steps); i < lp; i++ {
-		step = util.ToF32(fp.steps[i]...)
+		step = util.ToF32(fp.steps[i][0]...)
 		rasterizer.LineTo(ox+step[0], oy+step[1])
 	}
 	rasterizer.ClosePath()
@@ -74,10 +74,10 @@ func RenderPathAlpha(dst *image.Alpha, path *Path, at []float32, op draw.Op) {
 	// Process path
 	ox, oy := at[0], at[1]
 	fp := path.Flatten(0.6) // tolerance 0.6
-	step := util.ToF32(fp.steps[0]...)
+	step := util.ToF32(fp.steps[0][0]...)
 	rasterizer.MoveTo(ox+step[0], oy+step[1])
 	for i, lp := 1, len(fp.steps); i < lp; i++ {
-		step = util.ToF32(fp.steps[i]...)
+		step = util.ToF32(fp.steps[i][0]...)
 		rasterizer.LineTo(ox+step[0], oy+step[1])
 	}
 	rasterizer.ClosePath()
@@ -118,10 +118,10 @@ func RenderShapeExt(dst draw.Image, shape *Shape, at []float32, filler image.Ima
 	ox, oy := at[0], at[1]
 	for _, path := range shape.paths {
 		fp := path.Flatten(0.6) // tolerance 0.6
-		step := util.ToF32(fp.steps[0]...)
+		step := util.ToF32(fp.steps[0][0]...)
 		rasterizer.MoveTo(ox+step[0], oy+step[1])
 		for i, lp := 1, len(fp.steps); i < lp; i++ {
-			step = util.ToF32(fp.steps[i]...)
+			step = util.ToF32(fp.steps[i][0]...)
 			rasterizer.LineTo(ox+step[0], oy+step[1])
 		}
 		rasterizer.ClosePath()
@@ -151,10 +151,10 @@ func RenderShapeAlpha(dst *image.Alpha, shape *Shape, at []float32, op draw.Op) 
 	ox, oy := at[0], at[1]
 	for _, path := range shape.paths {
 		fp := path.Flatten(0.6) // tolerance 0.6
-		step := util.ToF32(fp.steps[0]...)
+		step := util.ToF32(fp.steps[0][0]...)
 		rasterizer.MoveTo(ox+step[0], oy+step[1])
 		for i, lp := 1, len(fp.steps); i < lp; i++ {
-			step = util.ToF32(fp.steps[i]...)
+			step = util.ToF32(fp.steps[i][0]...)
 			rasterizer.LineTo(ox+step[0], oy+step[1])
 		}
 		rasterizer.ClosePath()

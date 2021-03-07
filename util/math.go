@@ -111,3 +111,48 @@ func ToF32(pts ...float64) []float32 {
 	}
 	return res
 }
+
+// Centroid returns the centroid of a set of points.
+func Centroid(pts ...[]float64) []float64 {
+	n := len(pts)
+	d := len(pts[0])
+	res := make([]float64, d)
+
+	// Sum
+	for _, pt := range pts {
+		for i, v := range pt {
+			res[i] += v
+		}
+	}
+	// Scale
+	for i := 0; i < d; i++ {
+		res[i] /= float64(n)
+	}
+	return res
+}
+
+// BoundingBox returns the minimum and maximum demensional values in
+// a set of points.
+func BoundingBox(pts ...[]float64) [][]float64 {
+	d := len(pts[0])
+	res := make([][]float64, 2)
+	res[0] = make([]float64, d)
+	res[1] = make([]float64, d)
+
+	for i:=0; i<d; i++ {
+		res[0][i], res[1][i] = -math.MaxFloat64, math.MaxFloat64
+	}
+
+	for _, pt := range pts {
+		for i, v := range pt {
+			if v < res[0][i] {
+				res[0][i] = v
+			}
+			if v > res[1][i] {
+				res[1][i] = v
+			}
+		}
+	}
+
+	return res
+}

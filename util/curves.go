@@ -97,7 +97,8 @@ func Bezier3(pts [][]float64, t float64) []float64 {
 		omt3*pts[0][1] + bc1*pts[1][1] + bc2*pts[2][1] + t3*pts[3][1]}
 }
 
-// de Casteljau's algorithm for degree n curves
+// DeCasteljau uses de Casteljau's algorithm for degree n curves and
+// returns the point and the tangent of the line it's traversing.
 // {p1, c1, c2, c3, ..., p2}
 func DeCasteljau(pts [][]float64, t float64) []float64 {
 	if len(pts) == 1 {
@@ -107,8 +108,8 @@ func DeCasteljau(pts [][]float64, t float64) []float64 {
 	omt := 1 - t
 	for i := 0; i < len(npts); i++ {
 		npts[i] = []float64{
-			omt*pts[i][0] + t*pts[i+1][0],
-			omt*pts[i][1] + t*pts[i+1][1]}
+			omt*pts[i][0] + t*pts[i+1][0], omt*pts[i][1] + t*pts[i+1][1],
+			pts[i+1][0] - pts[i][0], pts[i+1][1] - pts[i][1]}
 	}
 	return DeCasteljau(npts, t)
 }
@@ -142,8 +143,8 @@ func splitCurve(pts [][]float64, nn, n int, left, right [][]float64, t float64) 
 				right[nn-n] = pts[np]
 			}
 			npts[i] = []float64{
-				omt*pts[i][0] + t*pts[i+1][0],
-				omt*pts[i][1] + t*pts[i+1][1]}
+			omt*pts[i][0] + t*pts[i+1][0], omt*pts[i][1] + t*pts[i+1][1],
+			pts[i+1][0] - pts[i][0], pts[i+1][1] - pts[i][1]}
 		}
 		splitCurve(npts, nn, n+1, left, right, t)
 	}

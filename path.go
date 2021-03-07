@@ -23,7 +23,8 @@ import (
  */
 
 type Path struct {
-	steps  [][]float64
+	// step, point, ordinal
+	steps  [][][]float64
 	closed bool
 	bounds image.Rectangle
 	// Caching flattened path
@@ -34,25 +35,37 @@ type Path struct {
 }
 
 func NewPath(start []float64) *Path {
-	np := Path{make([][]float64, 1), false, image.Rectangle{}, nil, 1, nil}
-	np.steps[0] = start
+	np := Path{make([][][]float64, 1), false, image.Rectangle{}, nil, 1, nil}
+	np.steps[0] = [][]float64{start}
 	return &np
 }
 
 func (p *Path) AddStep(step []float64) error {
+	n := len(step)
+	if n%2 != 0 {
+		return fmt.Errorf("step locations must be an even number of float64")
+	}
+	n /= 2
+	tmp := make([][]float64, n)
+	for i, j := 0, 0; i < n; i, j = i+1, j+2 {
+		tmp[i] = []float64{step[j], step[j+1]}
+	}
+	return p.AddStepPoints(tmp)
+}
+
+// AddStepPoints takes an array of points and treats n-1 of them as control points and the
+// last as a point on the curve.
+func (p *Path) AddStepPoints(points [][]float64) error {
 	if p.closed {
-		return fmt.Errorf("Path is closed, adding a step is forbidden")
+		return fmt.Errorf("path is closed, adding a step is forbidden")
 	}
-	if len(step)%2 != 0 {
-		return fmt.Errorf("Step locations must be an even number of float64")
-	}
-	p.steps = append(p.steps, step)
+	p.steps = append(p.steps, points)
 	p.bounds = image.Rectangle{}
 	p.flattened = nil
 	return nil
 }
 
-func (p *Path) Steps() [][]float64 {
+func (p *Path) Steps() [][][]float64 {
 	return p.steps[:]
 }
 
@@ -67,44 +80,41 @@ func (p *Path) Closed() bool {
 // Recursively subdivide path until the control points are within d of
 // the line through the end points. Emit new path.
 func (p *Path) Flatten(d float64) *Path {
-	if util.Equalsf64(d, p.tolerance) && p.flattened != nil {
+	if p.flattened != nil && util.Equalsf64(d, p.tolerance) {
 		return p.flattened
 	}
 	p.tolerance = d
 	d2 := d * d
-	res := make([][]float64, 1)
+	res := make([][][]float64, 1)
 	res[0] = p.steps[0]
-	cp := res[0]
+	cp := res[0][0]
 	// For all remaining steps in path
 	for i := 1; i < len(p.steps); i++ {
-		fp := flattenStep(0, d2, toPoints(cp, p.steps[i]))[1:]
-		cp = fp[len(fp)-1]
-		res = append(res, fp...)
+		fp := flattenStep(0, d2, toPoints(cp, p.steps[i]))
+		for _, ns := range fp {
+			res = append(res, ns[1:])
+			cp = ns[len(ns)-1]
+		}
 	}
 
 	p.flattened = &Path{res, p.closed, image.Rectangle{}, nil, 1, p}
 	return p.flattened
 }
 
-func toPoints(cp []float64, pts []float64) [][]float64 {
-	res := make([][]float64, len(pts)/2+1)
+func toPoints(cp []float64, pts [][]float64) [][]float64 {
+	res := make([][]float64, len(pts)+1)
 	res[0] = cp
-	for i, j := 1, 0; i < len(res); i++ {
-		res[i] = pts[j : j+2]
-		j += 2
-	}
+	copy(res[1:], pts)
 	return res
 }
 
-func flattenStep(n int, d2 float64, pts [][]float64) [][]float64 {
+func flattenStep(n int, d2 float64, pts [][]float64) [][][]float64 {
 	if cpWithinD2(d2, pts) {
-		return [][]float64{pts[0], pts[len(pts)-1]}
+		return [][][]float64{{pts[0], pts[len(pts)-1]}}
 	}
 	lr := util.SplitCurve(pts, 0.5)
-	res := append([][]float64{}, flattenStep(n+1, d2, lr[0])...)
-	// rhs needs reversing
-	rhs := flattenStep(n+1, d2, lr[1])[1:] // Trim off first point
-	res = append(res, rhs...)
+	res := append([][][]float64{}, flattenStep(n+1, d2, lr[0])...)
+	res = append(res, flattenStep(n+1, d2, lr[1])...)
 	return res
 }
 
@@ -130,26 +140,28 @@ func cpWithinD2(d2 float64, pts [][]float64) bool {
 func (p *Path) Bounds() image.Rectangle {
 	if p.bounds.Empty() {
 		rect := image.Rectangle{}
-		for _, s := range p.steps {
-			fx, fy := int(math.Floor(s[0])), int(math.Floor(s[1]))
-			cx, cy := int(math.Ceil(s[0])), int(math.Ceil(s[1]))
-			if rect.Empty() {
-				rect.Min.X = fx
-				rect.Min.Y = fy
-				rect.Max.X = cx
-				rect.Max.Y = cy
-			} else {
-				if rect.Min.X > fx {
+		for _, pts := range p.steps {
+			for _, s := range pts {
+				fx, fy := int(math.Floor(s[0])), int(math.Floor(s[1]))
+				cx, cy := int(math.Ceil(s[0])), int(math.Ceil(s[1]))
+				if rect.Empty() {
 					rect.Min.X = fx
-				}
-				if rect.Min.Y > fy {
 					rect.Min.Y = fy
-				}
-				if rect.Max.X < cx {
 					rect.Max.X = cx
-				}
-				if rect.Max.Y < cy {
 					rect.Max.Y = cy
+				} else {
+					if rect.Min.X > fx {
+						rect.Min.X = fx
+					}
+					if rect.Min.Y > fy {
+						rect.Min.Y = fy
+					}
+					if rect.Max.X < cx {
+						rect.Max.X = cx
+					}
+					if rect.Max.Y < cy {
+						rect.Max.Y = cy
+					}
 				}
 			}
 		}
@@ -163,7 +175,7 @@ func (p *Path) Bounds() image.Rectangle {
 
 // Deepish copy - points themselves aren't duplicated
 func (p *Path) Copy() *Path {
-	steps := make([][]float64, len(p.steps))
+	steps := make([][][]float64, len(p.steps))
 	copy(steps, p.steps)
 	return &Path{steps, p.closed, p.bounds, nil, 1, p.parent}
 }
@@ -206,8 +218,8 @@ func (p *Path) String() string {
 	str := ""
 	for _, step := range p.steps {
 		str += "S "
-		for i := 0; i < len(step); i += 2 {
-			str += fmt.Sprintf("%f %f ", step[i], step[i+1])
+		for _, pts := range step {
+			str += fmt.Sprintf("%f %f ", pts[0], pts[1])
 		}
 	}
 	if p.closed {
@@ -216,20 +228,73 @@ func (p *Path) String() string {
 	return str
 }
 
-// Apply an affine transfrom to the points in a path to
-// create a new one.
+// Apply an affine transfrom to the points in a path to create a new one.
 func (p *Path) Transform(xfm *Aff3) *Path {
-	// x' = xfm[3*0+0]*x + xfm[3*0+1]*y + xfm[3*0+2]
-	// y' = xfm[3*1+0]*x + xfm[3*1+1]*y + xfm[3*1+2]
-	steps := make([][]float64, len(p.steps))
+	steps := make([][][]float64, len(p.steps))
 	for i, step := range p.steps {
-		nstep := make([]float64, len(step))
-		for j := 0; j < len(step); j += 2 {
-			x, y := step[j+0], step[j+1]
-			nstep[j+0] = xfm[0]*x + xfm[1]*y + xfm[2]
-			nstep[j+1] = xfm[3]*x + xfm[4]*y + xfm[5]
-		}
-		steps[i] = nstep
+		steps[i] = xfm.Apply(step...)
 	}
 	return &Path{steps, p.closed, image.Rectangle{}, nil, 1, nil}
+}
+
+// Simplify breaks up a path into steps where for any step, its control points are all on the
+// same side and its midpoint is well behaved. If a step doesn't meet the criteria, it is
+// recursively subdivide in half until it does.
+func (p *Path) Simplify() *Path {
+	res := make([][][]float64, 1)
+	res[0] = p.steps[0]
+	cp := res[0][0]
+	// For all remaining steps in path
+	for i := 1; i < len(p.steps); i++ {
+		fp := simplifyStep(toPoints(cp, p.steps[i]))
+		for _, ns := range fp {
+			res = append(res, ns[1:])
+			cp = ns[len(ns)-1]
+		}
+	}
+
+	return &Path{res, p.closed, image.Rectangle{}, nil, 1, p}
+}
+
+func simplifyStep(points [][]float64) [][][]float64 {
+	if cpSafe(points) {
+		return [][][]float64{points}
+	}
+	lr := util.SplitCurve(points, 0.5)
+	res := append([][][]float64{}, simplifyStep(lr[0])...)
+	res = append(res, simplifyStep(lr[1])...)
+	return res
+}
+
+// cpSafe returns true if all the control points are on the same side of
+// the line formed by start and the last point in step, and the t=0.5 point
+// is close to the geometric center of the polygon defined by the points.
+func cpSafe(points [][]float64) bool {
+	if len(points) < 3 {
+		// Either a point or line
+		return true
+	}
+
+	n := len(points)
+	start := points[0]
+	end := points[n-1]
+	side := dotprod(start, end, points[1]) < 0
+	for i := 2; i < n-1; i++ {
+		if (dotprod(start, end, points[i]) < 0) != side {
+			return false
+		}
+	}
+
+	c := util.Centroid(points...)
+	v := util.DeCasteljau(points, 0.5)
+	bb := util.BoundingBox(points...)
+	dx := bb[1][0] - bb[0][0]
+	dy := bb[1][1] - bb[0][1]
+	dx, dy = dx / 10, dy / 10
+	// Crude check v is within 10% of c based on bb size
+	return v[0] < c[0]+dx && v[0] > c[0]-dx && v[1] < c[1]+dy && v[1] > c[1]-dy
+}
+
+func dotprod(p1, p2, p3 []float64) float64 {
+	return (p3[0]-p1[0])*(p2[1]-p1[1]) - (p3[1]-p1[1])*(p2[0]-p1[0])
 }

@@ -75,7 +75,7 @@ func (a *Aff3) QuadrantRotateAbout(n int, ax, ay float64) {
 	a.Translate(-ax, -ay)
 }
 
-// Scale adds a scaling to the transform.
+// Scale adds a scaling to the transform centered on {0, 0}.
 func (a *Aff3) Scale(sx, sy float64) {
 	a[3*0+0] *= sx
 	a[3*1+1] *= sy
@@ -91,7 +91,7 @@ func (a *Aff3) ScaleAbout(sx, sy, ax, ay float64) {
 	a.Translate(-ax, -ay)
 }
 
-// Shear adds a shear to the transform.
+// Shear adds a shear to the transform centered on {0, 0}.
 func (a *Aff3) Shear(shx, shy float64) {
 	m0, m1 := a[3*0+0], a[3*0+1]
 	a[3*0+0] = m0 + m1*shy
@@ -195,4 +195,35 @@ func (a *Aff3) Identity() bool {
 func (a *Aff3) Copy() *Aff3 {
 	res := *a
 	return &res
+}
+
+// LineTransform produces a transform that maps points needed to map {p1, p2} to {p1', p2'}.
+// Assumes neither of the point sets are degenerate.
+func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {
+	// Calculate the offset, the rotation and the scale
+	ox, oy := x1p-x1, y1p-y1
+	dx, dy, dxp, dyp := x2-x1, y2-y1, x2p-x1p, y2p-y1p
+	th := math.Atan2(dyp, dxp) - math.Atan2(dy, dx)
+	s := math.Sqrt(dxp*dxp+dyp*dyp) / math.Sqrt(dx*dx+dy*dy)
+	xfm := NewAff3()
+	// Reverse order
+	xfm.RotateAbout(th, x1p, y1p)
+	xfm.ScaleAbout(s, s, x1p, y1p)
+	xfm.Translate(ox, oy)
+	return xfm
+}
+
+// Apply aplies the transform to the set of supplied points.
+func (a *Aff3)Apply(pts ...[]float64) [][]float64 {
+	npts := make([][]float64, len(pts))
+	for i, pt := range pts {
+		npt := make([]float64, 2)
+		x, y := pt[0], pt[1]
+		// x' = a[3*0+0]*x + a[3*0+1]*y + a[3*0+2]
+		// y' = a[3*1+0]*x + a[3*1+1]*y + a[3*1+2]
+		npt[0] = a[0]*x + a[1]*y + a[2]
+		npt[1] = a[3]*x + a[4]*y + a[5]
+		npts[i] = npt
+	}
+	return npts
 }
