@@ -15,5 +15,5 @@ func TriArea(p1, p2, p3 []float64) float64 {
 // Three points are on a line if the area of the resultant triangle is 0
 func Collinear(p1, p2, p3 []float64) bool {
 	a := TriArea(p1, p2, p3)
-	return Equalsf64(0, a)
+	return Equals(0, a)
 }

@@ -67,7 +67,7 @@ func (p *Path) Closed() bool {
 // Recursively subdivide path until the control points are within d of
 // the line through the end points. Emit new path.
 func (p *Path) Flatten(d float64) *Path {
-	if p.flattened != nil && util.Equalsf64(d, p.tolerance) {
+	if p.flattened != nil && util.Equals(d, p.tolerance) {
 		return p.flattened
 	}
 	p.tolerance = d

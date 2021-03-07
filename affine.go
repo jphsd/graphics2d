@@ -151,7 +151,7 @@ func (a *Aff3) InverseOf() (*Aff3, error) {
 // Invert inverts the transform.
 func (a *Aff3) Invert() error {
 	det := a.Determinant()
-	if util.Equalsf64(math.Abs(det), 0) {
+	if util.Equals(math.Abs(det), 0) {
 		return fmt.Errorf("Determinant is zero => non-invertible")
 	}
 
@@ -170,22 +170,22 @@ func (a *Aff3) String() string {
 
 // Identity returns true if the transform is the identity.
 func (a *Aff3) Identity() bool {
-	if !util.Equalsf64(a[3*0+0], 1) {
+	if !util.Equals(a[3*0+0], 1) {
 		return false
 	}
-	if !util.Equalsf64(a[3*0+1], 0) {
+	if !util.Equals(a[3*0+1], 0) {
 		return false
 	}
-	if !util.Equalsf64(a[3*0+2], 0) {
+	if !util.Equals(a[3*0+2], 0) {
 		return false
 	}
-	if !util.Equalsf64(a[3*1+0], 0) {
+	if !util.Equals(a[3*1+0], 0) {
 		return false
 	}
-	if !util.Equalsf64(a[3*1+1], 1) {
+	if !util.Equals(a[3*1+1], 1) {
 		return false
 	}
-	if !util.Equalsf64(a[3*1+2], 0) {
+	if !util.Equals(a[3*1+2], 0) {
 		return false
 	}
 	return true

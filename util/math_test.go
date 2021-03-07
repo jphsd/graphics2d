@@ -8,7 +8,7 @@ func TestDistanceToLine(t *testing.T) {
 	c := []float64{5, 4}
 	exp := 11.731707
 	d2 := DistanceToLineSquared(a, b, c)
-	if !Equalsf64(exp, d2) {
+	if !Equals(exp, d2) {
 		t.Errorf("Expected %f got %f", exp, d2)
 	}
 }

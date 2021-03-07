@@ -223,7 +223,7 @@ func KappaC(p1, p2, p3 []float64) float64 {
 func KappaM(p1, p2, p3 []float64) float64 {
 	a := TriArea(p1, p2, p3)
 	denom := DistanceE(p1, p2) * DistanceE(p2, p3) * DistanceE(p3, p1)
-	if Equalsf64(denom, 0) {
+	if Equals(denom, 0) {
 		// p1, p2 and p3 are coincident
 		return 0
 	}

@@ -15,7 +15,7 @@ func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) ([]float64, bool)
 	y43 := y4 - y3
 
 	d := (y43 * x21) - (x43 * y21)
-	if Equalsf64(d, 0) {
+	if Equals(d, 0) {
 		return []float64{0, 0}, true // Parallel or coincident
 	}
 
@@ -39,18 +39,18 @@ func EqualsP(v1, v2 []float64) bool {
 		return false
 	}
 	for i := 0; i < v1l; i++ {
-		if !Equalsf64(v1[i], v2[i]) {
+		if !Equals(v1[i], v2[i]) {
 			return false
 		}
 	}
 	return true
 }
 
-func Equalsf64(d1, d2 float64) bool {
+func Equals(d1, d2 float64) bool {
 	return Within(d1, d2, Epsilon)
 }
 
-func Equalsf32(d1, d2 float32) bool {
+func Equals32(d1, d2 float32) bool {
 	return Within(float64(d1), float64(d2), Epsilon)
 }
 
@@ -80,7 +80,7 @@ func DistanceToLineSquared(lp1, lp2, p []float64) float64 {
 	dx := lp2[0] - lp1[0]
 	dy := lp2[1] - lp1[1]
 	// Check for line degeneracy
-	if Equalsf64(0, dx) && Equalsf64(0, dy) {
+	if Equals(0, dx) && Equals(0, dy) {
 		return DistanceESquared(lp1, p)
 	}
 	qx := p[0] + dy
