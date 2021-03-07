@@ -197,7 +197,7 @@ func (a *Aff3) Copy() *Aff3 {
 	return &res
 }
 
-// LineTransform produces a transform that maps points needed to map {p1, p2} to {p1', p2'}.
+// LineTransform produces a transform that maps the line {p1, p2} to {p1', p2'}.
 // Assumes neither of the point sets are degenerate.
 func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {
 	// Calculate the offset, the rotation and the scale
