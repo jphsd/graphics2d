@@ -86,7 +86,7 @@ func CalcExtremities(points [][]float64) []float64 {
 	return res
 }
 
-func calcRoots(f, df NREval, tmap map[string]bool) {
+func calcRoots(f, df func(float64) float64, tmap map[string]bool) {
 	// Find roots in range [0,1] via brute force
 	dt := 1.0 / 100
 	for t := 0.0; t <= 1; t += dt {
