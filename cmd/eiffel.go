@@ -17,11 +17,9 @@ import (
 func main() {
 	width, height := 360, 400
 
-	// Initialize the GLFW system
-
 	img := image.NewRGBA(width, height, color.White)
 
-	// Make shape
+	// Make Eiffel shape
 	path := NewPath([]float64{160, 80})
 	path.AddStep([][]float64{{200, 80}})
 	path.AddStep([][]float64{{200, 200}, {280, 320}})
@@ -46,8 +44,7 @@ func main() {
 	red := color.RGBA{0xff, 0, 0, 0xff}
 	RenderColoredPath(img, path, []float32{20, 20}, red)
 
-	// Display it on screen
-	// Well, in an image for the time being then
+	// Capture output
 	fDst, err := os.Create("out.png")
 	if err != nil {
 		log.Fatal(err)

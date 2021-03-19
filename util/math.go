@@ -121,6 +121,9 @@ func Centroid(pts ...[]float64) []float64 {
 	// Sum
 	for _, pt := range pts {
 		for i, v := range pt {
+			if i > d-1 {
+				break
+			}
 			res[i] += v
 		}
 	}
@@ -145,6 +148,9 @@ func BoundingBox(pts ...[]float64) [][]float64 {
 
 	for _, pt := range pts {
 		for i, v := range pt {
+			if i > d-1 {
+				break
+			}
 			if v < res[0][i] {
 				res[0][i] = v
 			}

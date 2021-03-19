@@ -2,8 +2,9 @@ package graphics2d
 
 import (
 	"fmt"
-	"github.com/jphsd/graphics2d/util"
 	"math"
+
+	. "github.com/jphsd/graphics2d/util"
 )
 
 // Aff3 is a 3x3 affine transformation matrix in row major order, where the
@@ -151,7 +152,7 @@ func (a *Aff3) InverseOf() (*Aff3, error) {
 // Invert inverts the transform.
 func (a *Aff3) Invert() error {
 	det := a.Determinant()
-	if util.Equals(math.Abs(det), 0) {
+	if Equals(math.Abs(det), 0) {
 		return fmt.Errorf("Determinant is zero => non-invertible")
 	}
 
@@ -170,22 +171,22 @@ func (a *Aff3) String() string {
 
 // Identity returns true if the transform is the identity.
 func (a *Aff3) Identity() bool {
-	if !util.Equals(a[3*0+0], 1) {
+	if !Equals(a[3*0+0], 1) {
 		return false
 	}
-	if !util.Equals(a[3*0+1], 0) {
+	if !Equals(a[3*0+1], 0) {
 		return false
 	}
-	if !util.Equals(a[3*0+2], 0) {
+	if !Equals(a[3*0+2], 0) {
 		return false
 	}
-	if !util.Equals(a[3*1+0], 0) {
+	if !Equals(a[3*1+0], 0) {
 		return false
 	}
-	if !util.Equals(a[3*1+1], 1) {
+	if !Equals(a[3*1+1], 1) {
 		return false
 	}
-	if !util.Equals(a[3*1+2], 0) {
+	if !Equals(a[3*1+2], 0) {
 		return false
 	}
 	return true
