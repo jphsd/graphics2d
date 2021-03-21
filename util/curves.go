@@ -8,7 +8,7 @@ import (
 // points for a Bezier cubic to describe it on a circle centered
 // on (0,0) with radius 1. Mid-point of the curve is (1,0)
 // Error increases for values > PI/2
-func CalcPointsForArc(theta float64) []float64 {
+func CalcPointsForArc(theta float64) [][]float64 {
 	phi := theta / 2
 	x0 := math.Cos(phi)
 	y0 := math.Sin(phi)
@@ -18,28 +18,7 @@ func CalcPointsForArc(theta float64) []float64 {
 	y1 := (1 - x0) * (3 - x0) / (3 * y0)
 	x2 := x1
 	y2 := -y1
-	return []float64{x0, y0, x1, y1, x2, y2, x3, y3}
-}
-
-// From Riskus06(373)
-// Given arc start(p1), end(p2), and center(c)
-// Find control points c1 and c2 for a Bezier cubic that approximates the arc
-// Results contains p1 and p2 for convenience
-func CalcControlsForArc(p1, p2, c []float64) []float64 {
-	dx1 := p1[0] - c[0]
-	dy1 := p1[1] - c[1]
-	dx2 := p2[0] - c[0]
-	dy2 := p2[1] - c[1]
-	q1 := dx1*dx1 + dy1*dy1
-	q2 := q1 + dx1*dx2 + dy1*dy2
-	k0 := math.Sqrt(2.0*q1*q2) - q2
-	k1 := dx1*dy2 - dx2*dy1
-	// Note (172/99)^0.5 provides a lower error than 4/3 but mid point will miss
-	k2 := 4.0 / 3.0 * k0 / k1
-	// Note errors in Riskus06 for derivation of c1 and c2
-	c1 := []float64{c[0] + dx1 - k2*dy1, c[1] + dy1 + k2*dx1}
-	c2 := []float64{c[0] + dx2 + k2*dy2, c[1] + dy2 - k2*dx2}
-	return []float64{p1[0], p1[1], c1[0], c1[1], c2[0], c2[1], p2[0], p2[1]}
+	return [][]float64{{x3, y3}, {x2, y2}, {x1, y1}, {x0, y0}}
 }
 
 // Conversion methods for cubic Bezier to CatmullRom and v.v.
@@ -203,8 +182,8 @@ func KappaC(p1, p2, p3 []float64) float64 {
 	n1 := []float64{-d1[1], d1[0]}                    // normal at s1
 	n2 := []float64{-d2[1], d2[0]}                    // normal at s2
 	// intersection of n1 and n2
-	ts, para := IntersectionTVals(s1[0], s1[1], s1[0]+n1[0], s1[1]+n1[1], s2[0], s2[1], s2[0]+n2[0], s2[1]+n2[1])
-	if para {
+	err, ts := IntersectionTVals(s1[0], s1[1], s1[0]+n1[0], s1[1]+n1[1], s2[0], s2[1], s2[0]+n2[0], s2[1]+n2[1])
+	if err != nil {
 		// p1, p2 and p3 are coincident
 		return 0
 	}

@@ -54,9 +54,32 @@ func (p *Path) AddStep(points [][]float64) error {
 	return nil
 }
 
+func (p *Path) AddSteps(steps [][][]float64) error {
+	for _, step := range steps {
+		err := p.AddStep(step)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Steps returns a shallow copy of all the steps in the path.
 func (p *Path) Steps() [][][]float64 {
 	return p.steps[:]
+}
+
+// Parts returns the steps of a path, each prepended with its start.
+func (p *Path) Parts() [][][]float64 {
+	n := len(p.steps)
+	fpts := make([][][]float64, n-1)
+	cp := p.steps[0][0]
+	for i := 1; i < n; i++ {
+		pts := toPoints(cp, p.steps[i])
+		fpts[i-1] = pts
+		cp = pts[len(pts)-1]
+	}
+	return fpts
 }
 
 // Close marks the path as closed.
@@ -67,6 +90,15 @@ func (p *Path) Close() {
 // Closed returns true if the path is closed.
 func (p *Path) Closed() bool {
 	return p.closed
+}
+
+// PartsToPath constructs a new path by concatenating the parts.
+func PartsToPath(pts [][][]float64) *Path {
+	res := NewPath(pts[0][0])
+	for _, step := range pts {
+		res.AddStep(step[1:])
+	}
+	return res
 }
 
 // Flatten works by recursively subdividing the path until the control points are within d of
@@ -305,9 +337,9 @@ func cpSafe(points [][]float64) bool {
 	n := len(points)
 	start := points[0]
 	end := points[n-1]
-	side := dotprod(start, end, points[1]) < 0
+	side := CrossProduct(start, end, points[1]) < 0
 	for i := 2; i < n-1; i++ {
-		if (dotprod(start, end, points[i]) < 0) != side {
+		if (CrossProduct(start, end, points[i]) < 0) != side {
 			return false
 		}
 	}
@@ -320,8 +352,4 @@ func cpSafe(points [][]float64) bool {
 	dx, dy = dx/40, dy/40
 	// Crude check v is within 5% of c based on bb size
 	return v[0] < c[0]+dx && v[0] > c[0]-dx && v[1] < c[1]+dy && v[1] > c[1]-dy
-}
-
-func dotprod(p1, p2, p3 []float64) float64 {
-	return (p3[0]-p1[0])*(p2[1]-p1[1]) - (p3[1]-p1[1])*(p2[0]-p1[0])
 }

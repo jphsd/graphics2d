@@ -1,8 +1,6 @@
 package main
 
 import (
-	//	glfw
-	//  glui
 	"image/color"
 
 	// For image output only

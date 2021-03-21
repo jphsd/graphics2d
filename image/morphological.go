@@ -196,7 +196,7 @@ func ThinStep(img *image.Gray, support1, support2 [][]bool) *image.Gray {
 func Skeleton(img *image.Gray) *image.Gray {
 	prev := &image.Gray{}
 	res := img
-	for !Equals(prev, img) {
+	for !Equal(prev, img) {
 		prev = res
 		res = Thin(prev)
 	}

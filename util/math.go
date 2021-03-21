@@ -1,14 +1,17 @@
 package util
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 // Obtain values of t for each line for where they intersect. Actual intersection =>
 // both are in [0,1]
-func IntersectionTValsP(p1, p2, p3, p4 []float64) ([]float64, bool) {
+func IntersectionTValsP(p1, p2, p3, p4 []float64) (error, []float64) {
 	return IntersectionTVals(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], p4[0], p4[1])
 }
 
-func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) ([]float64, bool) {
+func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) (error, []float64) {
 	x21 := x2 - x1
 	x43 := x4 - x3
 	y21 := y2 - y1
@@ -16,7 +19,7 @@ func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) ([]float64, bool)
 
 	d := (y43 * x21) - (x43 * y21)
 	if Equals(d, 0) {
-		return []float64{0, 0}, true // Parallel or coincident
+		return fmt.Errorf("parallel or coincident"), []float64{} // Parallel or coincident
 	}
 
 	x13 := x1 - x3
@@ -25,7 +28,7 @@ func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) ([]float64, bool)
 	t12 := ((x43 * y13) - (y43 * x13)) / d
 	t34 := ((x21 * y13) - (y21 * x13)) / d
 
-	return []float64{t12, t34}, false
+	return nil, []float64{t12, t34}
 }
 
 // %f formats to 6dp by default
@@ -85,14 +88,10 @@ func DistanceToLineSquared(lp1, lp2, p []float64) float64 {
 	}
 	qx := p[0] + dy
 	qy := p[1] - dx
-	ts, _ := IntersectionTVals(lp1[0], lp1[1], lp2[0], lp2[1], p[0], p[1], qx, qy)
-	dx = lerp(ts[1], p[0], qx) - p[0]
-	dy = lerp(ts[1], p[1], qy) - p[1]
+	_, ts := IntersectionTVals(lp1[0], lp1[1], lp2[0], lp2[1], p[0], p[1], qx, qy)
+	dx = Lerp(ts[1], p[0], qx) - p[0]
+	dy = Lerp(ts[1], p[1], qy) - p[1]
 	return dx*dx + dy*dy
-}
-
-func lerp(t, a, b float64) float64 {
-	return (1-t)*a + t*b
 }
 
 func ToF64(pts ...float32) []float64 {
@@ -161,4 +160,24 @@ func BoundingBox(pts ...[]float64) [][]float64 {
 	}
 
 	return res
+}
+
+func CrossProduct(p1, p2, p3 []float64) float64 {
+	return (p3[0]-p1[0])*(p2[1]-p1[1]) - (p3[1]-p1[1])*(p2[0]-p1[0])
+}
+
+func DotProduct(p1, p2, p3, p4 []float64) float64 {
+	return (p2[0]-p1[0])*(p4[0]-p3[0]) + (p2[1]-p1[1])*(p4[1]-p3[1])
+}
+
+func LineAngle(p1, p2 []float64) float64 {
+	return math.Atan2(p2[1]-p1[1], p2[0]-p1[0])
+}
+
+// AnglebetweenLines using Atan2 vs calculating the dot product (2xSqrt+Acos).
+// Retains the directionality of the rotation from l1 to l2, unlike dot product.
+func AngleBetweenLines(p1, p2, p3, p4 []float64) float64 {
+	a1 := LineAngle(p1, p2)
+	a2 := LineAngle(p3, p4)
+	return a2 - a1
 }

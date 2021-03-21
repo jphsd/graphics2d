@@ -2,7 +2,7 @@ package image
 
 import (
 	"fmt"
-	"github.com/jphsd/graphics2d/util"
+	. "github.com/jphsd/graphics2d/util"
 )
 
 // CreateLutFromValues maps a series of values in [0,1] to [0,255]
@@ -37,7 +37,7 @@ func PremulLut(lut []uint8) [][]uint8 {
 
 // NLExpansionLut generates a lut [start,end), normalized and mapped through f.
 // For example NLExpansionLut(0, 256, &NLSin{}) will generate a Sin ramp.
-func NLExpansionLut(start, end int, f util.NonLinear) []uint8 {
+func NLExpansionLut(start, end int, f NonLinear) []uint8 {
 	if start < 0 || start > 255 || end < 1 || end > 256 {
 		panic(fmt.Errorf("start or end not in range"))
 	}

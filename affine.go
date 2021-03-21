@@ -199,7 +199,7 @@ func (a *Aff3) Copy() *Aff3 {
 }
 
 // LineTransform produces a transform that maps the line {p1, p2} to {p1', p2'}.
-// Assumes neither of the point sets are degenerate.
+// Assumes neither of the lines are degenerate.
 func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {
 	// Calculate the offset, the rotation and the scale
 	ox, oy := x1p-x1, y1p-y1
@@ -211,6 +211,16 @@ func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {
 	xfm.RotateAbout(th, x1p, y1p)
 	xfm.ScaleAbout(s, s, x1p, y1p)
 	xfm.Translate(ox, oy)
+	return xfm
+}
+
+// CreateTransform returns a transform that performs the requested translation,
+// scaling and rotation based on {0, 0}.
+func CreateTransform(x, y, scale, rotation float64) *Aff3 {
+	xfm := NewAff3()
+	xfm.Translate(x, y)
+	xfm.Scale(scale, scale)
+	xfm.Rotate(rotation)
 	return xfm
 }
 

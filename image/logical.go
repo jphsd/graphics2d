@@ -107,8 +107,8 @@ func Not(img *image.Gray) *image.Gray {
 	return res
 }
 
-// Equals returns true if two images are the same.
-func Equals(img1, img2 *image.Gray) bool {
+// Equal returns true if two images are the same.
+func Equal(img1, img2 *image.Gray) bool {
 	img1R, img2R := img1.Bounds(), img2.Bounds()
 	w, h := img1R.Dx(), img1R.Dy()
 	// Bounds check
@@ -191,10 +191,10 @@ func AlphaNot(img *image.Alpha) *image.Alpha {
 	return GrayToAlpha(Not(g1))
 }
 
-// AlphaEquals returns true if two images are the same.
-func AlphaEquals(img1, img2 *image.Alpha) bool {
+// AlphaEqual returns true if two images are the same.
+func AlphaEqual(img1, img2 *image.Alpha) bool {
 	g1, g2 := AlphaToGray(img1), AlphaToGray(img2)
-	return Equals(g1, g2)
+	return Equal(g1, g2)
 }
 
 // AlphaCopy returns a deep copy of img.
