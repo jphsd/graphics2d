@@ -68,31 +68,31 @@ type NonLinear interface {
 
 type NLLinear struct{}
 
-func (s *NLLinear) Transform(t float64) float64 {
+func (nl *NLLinear) Transform(t float64) float64 {
 	return t
 }
 
-func (s *NLLinear) InvTransform(v float64) float64 {
+func (nl *NLLinear) InvTransform(v float64) float64 {
 	return v
 }
 
 type NLSquare struct{}
 
-func (s *NLSquare) Transform(t float64) float64 {
+func (nl *NLSquare) Transform(t float64) float64 {
 	return t * t
 }
 
-func (s *NLSquare) InvTransform(v float64) float64 {
+func (nl *NLSquare) InvTransform(v float64) float64 {
 	return math.Sqrt(v)
 }
 
 type NLCube struct{}
 
-func (s *NLCube) Transform(t float64) float64 {
+func (nl *NLCube) Transform(t float64) float64 {
 	return t * t * t
 }
 
-func (s *NLCube) InvTransform(v float64) float64 {
+func (nl *NLCube) InvTransform(v float64) float64 {
 	return math.Pow(v, 1/3.0)
 }
 
@@ -105,12 +105,12 @@ func NewNLExponential(k float64) *NLExponential {
 	return &NLExponential{k, 1 / (math.Exp(k) - 1)}
 }
 
-func (s *NLExponential) Transform(t float64) float64 {
-	return (math.Exp(t*s.k) - 1) * s.scale
+func (nl *NLExponential) Transform(t float64) float64 {
+	return (math.Exp(t*nl.k) - 1) * nl.scale
 }
 
-func (s *NLExponential) InvTransform(v float64) float64 {
-	return math.Log1p(v/s.scale) / s.k
+func (nl *NLExponential) InvTransform(v float64) float64 {
+	return math.Log1p(v/nl.scale) / nl.k
 }
 
 type NLLogarithmic struct {
@@ -122,33 +122,33 @@ func NewNLLogarithmic(k float64) *NLLogarithmic {
 	return &NLLogarithmic{k, 1 / math.Log1p(k)}
 }
 
-func (s *NLLogarithmic) Transform(t float64) float64 {
-	return math.Log1p(t*s.k) * s.scale
+func (nl *NLLogarithmic) Transform(t float64) float64 {
+	return math.Log1p(t*nl.k) * nl.scale
 }
 
-func (s *NLLogarithmic) InvTransform(v float64) float64 {
-	return (math.Exp(v/s.scale) - 1) / s.k
+func (nl *NLLogarithmic) InvTransform(v float64) float64 {
+	return (math.Exp(v/nl.scale) - 1) / nl.k
 }
 
 type NLSin struct{} // first derivative 0 at t=0,1
 
 // Range [-Pi/2,Pi/2]
-func (s *NLSin) Transform(t float64) float64 {
+func (nl *NLSin) Transform(t float64) float64 {
 	return (math.Sin((t-0.5)*math.Pi) + 1) / 2
 }
 
-func (s *NLSin) InvTransform(v float64) float64 {
+func (nl *NLSin) InvTransform(v float64) float64 {
 	return math.Asin((v*2)-1)/math.Pi + 0.5
 }
 
 type NLCircle struct{}
 
 // Circle bottom right quadrant
-func (s *NLCircle) Transform(t float64) float64 {
+func (nl *NLCircle) Transform(t float64) float64 {
 	return 1 - math.Sqrt(1-t*t)
 }
 
-func (s *NLCircle) InvTransform(v float64) float64 {
+func (nl *NLCircle) InvTransform(v float64) float64 {
 	return math.Sqrt(1 - (v-1)*(v-1))
 }
 
@@ -162,19 +162,19 @@ func NewNLGauss(k float64) *NLGauss {
 	return &NLGauss{k, offs, scale}
 }
 
-func (s *NLGauss) Transform(t float64) float64 {
-	x := s.k * (t - 1)
+func (nl *NLGauss) Transform(t float64) float64 {
+	x := nl.k * (t - 1)
 	x *= -0.5 * x
-	return (math.Exp(x) - s.offs) * s.scale
+	return (math.Exp(x) - nl.offs) * nl.scale
 }
 
-func (s *NLGauss) InvTransform(v float64) float64 {
-	v /= s.scale
-	v += s.offs
+func (nl *NLGauss) InvTransform(v float64) float64 {
+	v /= nl.scale
+	v += nl.offs
 	v = math.Log(v)
 	v *= -2
 	v = math.Sqrt(v)
-	return 1 - v/s.k
+	return 1 - v/nl.k
 }
 
 type NLLogistic struct {
@@ -190,16 +190,16 @@ func NewNLLogistic(k, mp float64) *NLLogistic {
 	return &NLLogistic{k, mp, v0, 1 / (v1 - v0)}
 }
 
-func (s *NLLogistic) Transform(t float64) float64 {
-	t = (t - s.mp) * s.k
-	return (logisticTransform(t) - s.offs) * s.scale
+func (nl *NLLogistic) Transform(t float64) float64 {
+	t = (t - nl.mp) * nl.k
+	return (logisticTransform(t) - nl.offs) * nl.scale
 }
 
-func (s *NLLogistic) InvTransform(v float64) float64 {
-	v /= s.scale
-	v += s.offs
+func (nl *NLLogistic) InvTransform(v float64) float64 {
+	v /= nl.scale
+	v += nl.offs
 	v = logisticInvTransform(v)
-	return v/s.k + s.mp
+	return v/nl.k + nl.mp
 }
 
 // L = 1, k = 1, mp = 0
@@ -214,22 +214,22 @@ func logisticInvTransform(v float64) float64 {
 
 type NLP3 struct{} // first derivative 0 at t=0,1
 
-func (s *NLP3) Transform(t float64) float64 {
+func (nl *NLP3) Transform(t float64) float64 {
 	return t * t * (3 - 2*t)
 }
 
-func (s *NLP3) InvTransform(v float64) float64 {
-	return bsInv(v, s)
+func (nl *NLP3) InvTransform(v float64) float64 {
+	return bsInv(v, nl)
 }
 
 type NLP5 struct{} // first and second derivatives 0 at t=0,1
 
-func (s *NLP5) Transform(t float64) float64 {
+func (nl *NLP5) Transform(t float64) float64 {
 	return t * t * t * (t*(t*6.0-15.0) + 10.0)
 }
 
-func (s *NLP5) InvTransform(v float64) float64 {
-	return bsInv(v, s)
+func (nl *NLP5) InvTransform(v float64) float64 {
+	return bsInv(v, nl)
 }
 
 type NLCompound struct {
@@ -240,17 +240,17 @@ func NewNLCompound(nl []NonLinear) *NLCompound {
 	return &NLCompound{nl}
 }
 
-func (s *NLCompound) Transform(t float64) float64 {
-	for _, f := range s.nl {
+func (nl *NLCompound) Transform(t float64) float64 {
+	for _, f := range nl.nl {
 		t = f.Transform(t)
 	}
 
 	return t
 }
 
-func (s *NLCompound) InvTransform(v float64) float64 {
-	for i := len(s.nl) - 1; i > -1; i-- {
-		v = s.nl[i].InvTransform(v)
+func (nl *NLCompound) InvTransform(v float64) float64 {
+	for i := len(nl.nl) - 1; i > -1; i-- {
+		v = nl.nl[i].InvTransform(v)
 	}
 	return v
 }
