@@ -67,11 +67,11 @@ func main() {
 		prev = out
 		out = Thin(out)
 		n++
-//		if n%10 == 0 {
-//			saveImg(out, fmt.Sprintf("out%d", n))
-//			v, n := Variance(prev, out)
-//			fmt.Printf("Variance %f over %d\n", v*float64(out.Bounds().Dx()*out.Bounds().Dy())/float64(n), n)
-//		}
+		//		if n%10 == 0 {
+		//			saveImg(out, fmt.Sprintf("out%d", n))
+		//			v, n := Variance(prev, out)
+		//			fmt.Printf("Variance %f over %d\n", v*float64(out.Bounds().Dx()*out.Bounds().Dy())/float64(n), n)
+		//		}
 	}
 	saveImg(Not(out), fmt.Sprintf("out-skel%d", n))
 

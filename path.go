@@ -9,7 +9,7 @@ import (
 )
 
 /*
- * Path is a simple path - continous without interruption, and may be closed.
+ * Path is a simple path - continuous without interruption, and may be closed.
  * It's created with an initial starting point via NewPath() and then steps are
  * added to it with AddStep(). Steps can be single points or sets of control points.
  * For a given step size, the following curve is generated -
@@ -257,7 +257,7 @@ func (p *Path) String() string {
 	return str
 }
 
-// Transform applies an affine transfrom to the points in a path to create a new one.
+// Transform applies an affine transform to the points in a path to create a new one.
 func (p *Path) Transform(xfm *Aff3) *Path {
 	steps := make([][][]float64, len(p.steps))
 	for i, step := range p.steps {

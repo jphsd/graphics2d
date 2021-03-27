@@ -41,7 +41,7 @@ func Histogram(img *image.Gray) ([]int, int, int) {
 	return res, first, last
 }
 
-// CDF computes the normalized cummulative distribution funtion of the
+// CDF computes the normalized cummulative distribution function of the
 // histogram.
 func CDF(hist []int) []float64 {
 	res := make([]float64, len(hist))
