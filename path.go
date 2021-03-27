@@ -240,13 +240,15 @@ func (p *Path) CompoundProcess(procs []PathProcessor) []*Path {
 	return paths
 }
 
-// String lists out the steps in a path.
+// String converts a path into a string.
 func (p *Path) String() string {
-	str := ""
-	for _, step := range p.steps {
+	step := p.steps[0]
+	str := fmt.Sprintf("P %f,%f ", step[0][0], step[0][1])
+	for i := 1; i < len(p.steps); i++ {
+		step = p.steps[i]
 		str += "S "
 		for _, pts := range step {
-			str += fmt.Sprintf("%f %f ", pts[0], pts[1])
+			str += fmt.Sprintf("%f,%f ", pts[0], pts[1])
 		}
 	}
 	if p.closed {

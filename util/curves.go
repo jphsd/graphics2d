@@ -182,7 +182,7 @@ func KappaC(p1, p2, p3 []float64) float64 {
 	n1 := []float64{-d1[1], d1[0]}                    // normal at s1
 	n2 := []float64{-d2[1], d2[0]}                    // normal at s2
 	// intersection of n1 and n2
-	err, ts := IntersectionTVals(s1[0], s1[1], s1[0]+n1[0], s1[1]+n1[1], s2[0], s2[1], s2[0]+n2[0], s2[1]+n2[1])
+	ts, err := IntersectionTVals(s1[0], s1[1], s1[0]+n1[0], s1[1]+n1[1], s2[0], s2[1], s2[0]+n2[0], s2[1]+n2[1])
 	if err != nil {
 		// p1, p2 and p3 are coincident
 		return 0

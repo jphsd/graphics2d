@@ -1,6 +1,9 @@
 package graphics2d
 
-import "image"
+import (
+	"fmt"
+	"image"
+)
 
 /*
  * A Shape is a fillable collection of paths. For a path to be fillable,
@@ -92,4 +95,13 @@ func (s *Shape) CompoundProcess(procs []PathProcessor) *Shape {
 	}
 
 	return &Shape{np, image.Rectangle{}}
+}
+
+// String converts a shape into a string.
+func (s *Shape) String() string {
+	str := fmt.Sprintf("SH %d ", len(s.paths))
+	for _, path := range s.paths {
+		str += path.String() + " "
+	}
+	return str
 }

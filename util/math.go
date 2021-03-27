@@ -7,11 +7,11 @@ import (
 
 // Obtain values of t for each line for where they intersect. Actual intersection =>
 // both are in [0,1]
-func IntersectionTValsP(p1, p2, p3, p4 []float64) (error, []float64) {
+func IntersectionTValsP(p1, p2, p3, p4 []float64) ([]float64, error) {
 	return IntersectionTVals(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], p4[0], p4[1])
 }
 
-func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) (error, []float64) {
+func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) ([]float64, error) {
 	x21 := x2 - x1
 	x43 := x4 - x3
 	y21 := y2 - y1
@@ -19,7 +19,7 @@ func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) (error, []float64
 
 	d := (y43 * x21) - (x43 * y21)
 	if Equals(d, 0) {
-		return fmt.Errorf("parallel or coincident"), []float64{} // Parallel or coincident
+		return []float64{}, fmt.Errorf("parallel or coincident")
 	}
 
 	x13 := x1 - x3
@@ -28,7 +28,7 @@ func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) (error, []float64
 	t12 := ((x43 * y13) - (y43 * x13)) / d
 	t34 := ((x21 * y13) - (y21 * x13)) / d
 
-	return nil, []float64{t12, t34}
+	return []float64{t12, t34}, nil
 }
 
 // %f formats to 6dp by default
@@ -88,7 +88,10 @@ func DistanceToLineSquared(lp1, lp2, p []float64) float64 {
 	}
 	qx := p[0] + dy
 	qy := p[1] - dx
-	_, ts := IntersectionTVals(lp1[0], lp1[1], lp2[0], lp2[1], p[0], p[1], qx, qy)
+	ts, err := IntersectionTVals(lp1[0], lp1[1], lp2[0], lp2[1], p[0], p[1], qx, qy)
+	if err != nil {
+		return DistanceESquared(lp1, p)
+	}
 	dx = Lerp(ts[1], p[0], qx) - p[0]
 	dy = Lerp(ts[1], p[1], qy) - p[1]
 	return dx*dx + dy*dy
@@ -179,5 +182,11 @@ func LineAngle(p1, p2 []float64) float64 {
 func AngleBetweenLines(p1, p2, p3, p4 []float64) float64 {
 	a1 := LineAngle(p1, p2)
 	a2 := LineAngle(p3, p4)
-	return a2 - a1
+	da := a2 - a1
+	if da < -math.Pi {
+		da += 2 * math.Pi
+	} else if da > math.Pi {
+		da -= 2 * math.Pi
+	}
+	return da
 }
