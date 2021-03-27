@@ -164,6 +164,17 @@ func (nl *NLCircle) InvTransform(v float64) float64 {
 	return math.Sqrt(1 - (v-1)*(v-1))
 }
 
+// NLCatenary v = cosh(t)
+type NLCatenary struct{}
+
+func (nl *NLCatenary) Transform(t float64) float64 {
+	return (math.Cosh(t) - 1) / (math.Cosh(1) - 1)
+}
+
+func (nl *NLCatenary) InvTransform(v float64) float64 {
+	return math.Acosh(v*(math.Cosh(1)-1) + 1)
+}
+
 // NLGauss v = gauss(t, k)
 type NLGauss struct {
 	k, offs, scale float64

@@ -16,6 +16,7 @@ func init() {
 		{&NLCube{}, "Cube"},
 		{&NLCircle{}, "Circle"},
 		{&NLSin{}, "Sin"},
+		{&NLCatenary{}, "Catenary"},
 		{NewNLExponential(1), "Exponential 1"},
 		{NewNLExponential(10), "Exponential 2"},
 		{NewNLExponential(100), "Exponential 3"},
