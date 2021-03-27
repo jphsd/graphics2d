@@ -82,7 +82,7 @@ func DistanceESquared(p1, p2 []float64) float64 {
 	return sum
 }
 
-// DistanceEreturns the Euclidean distance between two points.
+// DistanceE returns the Euclidean distance between two points.
 func DistanceE(p1, p2 []float64) float64 {
 	return math.Sqrt(DistanceESquared(p1, p2))
 }

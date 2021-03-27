@@ -13,7 +13,7 @@ type BezierCurve struct {
 	WeightsDt3 [][]float64
 }
 
-// NewBezierCurve creates a new BezierCurve with the weigths of the first, second
+// NewBezierCurve creates a new BezierCurve with the weights of the first, second
 // and third order derivatives of the supplied curve.
 func NewBezierCurve(weights [][]float64) *BezierCurve {
 	bc := BezierCurve{}
@@ -34,32 +34,32 @@ func (bc *BezierCurve) CurveY(t float64) float64 {
 	return DeCasteljau(bc.Weights, t)[1]
 }
 
-// CurveX returns the X value for the derivative of the curve at t.
+// CurveDtX returns the X value for the derivative of the curve at t.
 func (bc *BezierCurve) CurveDtX(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt, t)[0]
 }
 
-// CurveY returns the Y value for the derivative of the curve at t.
+// CurveDtY returns the Y value for the derivative of the curve at t.
 func (bc *BezierCurve) CurveDtY(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt, t)[1]
 }
 
-// CurveX returns the X value for the second order derivative of the curve at t.
+// CurveDt2X returns the X value for the second order derivative of the curve at t.
 func (bc *BezierCurve) CurveDt2X(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt2, t)[0]
 }
 
-// CurveY returns the Y value for the second order derivative of the curve at t.
+// CurveDt2Y returns the Y value for the second order derivative of the curve at t.
 func (bc *BezierCurve) CurveDt2Y(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt2, t)[1]
 }
 
-// CurveX returns the X value for the third order derivative of the curve at t.
+// CurveDt3X returns the X value for the third order derivative of the curve at t.
 func (bc *BezierCurve) CurveDt3X(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt3, t)[0]
 }
 
-// CurveY returns the Y value for the third order derivative of the curve at t.
+// CurveDt3Y returns the Y value for the third order derivative of the curve at t.
 func (bc *BezierCurve) CurveDt3Y(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt3, t)[1]
 }

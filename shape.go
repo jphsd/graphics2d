@@ -86,7 +86,7 @@ func (s *Shape) Process(proc PathProcessor) *Shape {
 	return &Shape{np, image.Rectangle{}}
 }
 
-// CompundProcess applies a collection of PathProcessors to the shape and
+// CompoundProcess applies a collection of PathProcessors to the shape and
 // returns the result in a new shape.
 func (s *Shape) CompoundProcess(procs []PathProcessor) *Shape {
 	np := make([]*Path, 0)

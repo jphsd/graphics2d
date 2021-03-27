@@ -49,7 +49,7 @@ var (
 		{true, false, false, false, true},
 	}
 
-	// Start5x5 5x5 star
+	// Star5x5 5x5 star
 	Star5x5 = [][]bool{
 		{true, false, true, false, true},
 		{false, true, true, true, false},
