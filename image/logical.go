@@ -207,15 +207,13 @@ func AlphaCopy(img *image.Alpha) *image.Alpha {
 func min(a, b uint8) uint8 {
 	if a > b {
 		return b
-	} else {
-		return a
 	}
+	return a
 }
 
 func max(a, b uint8) uint8 {
 	if b > a {
 		return b
-	} else {
-		return a
 	}
+	return a
 }

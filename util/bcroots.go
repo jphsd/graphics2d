@@ -5,6 +5,7 @@ import (
 	"sort"
 )
 
+// BezierCurve stores the derivative curve weights.
 type BezierCurve struct {
 	Weights    [][]float64
 	WeightsDt  [][]float64
@@ -12,6 +13,8 @@ type BezierCurve struct {
 	WeightsDt3 [][]float64
 }
 
+// NewBezierCurve creates a new BezierCurve with the weigths of the first, second
+// and third order derivatives of the supplied curve.
 func NewBezierCurve(weights [][]float64) *BezierCurve {
 	bc := BezierCurve{}
 	bc.Weights = weights
@@ -21,34 +24,42 @@ func NewBezierCurve(weights [][]float64) *BezierCurve {
 	return &bc
 }
 
+// CurveX returns the X value for the curve at t.
 func (bc *BezierCurve) CurveX(t float64) float64 {
 	return DeCasteljau(bc.Weights, t)[0]
 }
 
+// CurveY returns the Y value for the curve at t.
 func (bc *BezierCurve) CurveY(t float64) float64 {
 	return DeCasteljau(bc.Weights, t)[1]
 }
 
+// CurveX returns the X value for the derivative of the curve at t.
 func (bc *BezierCurve) CurveDtX(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt, t)[0]
 }
 
+// CurveY returns the Y value for the derivative of the curve at t.
 func (bc *BezierCurve) CurveDtY(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt, t)[1]
 }
 
+// CurveX returns the X value for the second order derivative of the curve at t.
 func (bc *BezierCurve) CurveDt2X(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt2, t)[0]
 }
 
+// CurveY returns the Y value for the second order derivative of the curve at t.
 func (bc *BezierCurve) CurveDt2Y(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt2, t)[1]
 }
 
+// CurveX returns the X value for the third order derivative of the curve at t.
 func (bc *BezierCurve) CurveDt3X(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt3, t)[0]
 }
 
+// CurveY returns the Y value for the third order derivative of the curve at t.
 func (bc *BezierCurve) CurveDt3Y(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt3, t)[1]
 }
@@ -78,7 +89,7 @@ func CalcExtremities(points [][]float64) []float64 {
 	// Convert t values back to float64
 	res := make([]float64, len(tmap))
 	i := 0
-	for k, _ := range tmap {
+	for k := range tmap {
 		fmt.Sscanf(k, "%f", &res[i])
 		i++
 	}
@@ -90,7 +101,7 @@ func calcRoots(f, df func(float64) float64, tmap map[string]bool) {
 	// Find roots in range [0,1] via brute force
 	dt := 1.0 / 100
 	for t := 0.0; t <= 1; t += dt {
-		e, r := NRM(t, f, df)
+		r, e := NRM(t, f, df)
 		if e != nil {
 			continue
 		}
@@ -100,13 +111,13 @@ func calcRoots(f, df func(float64) float64, tmap map[string]bool) {
 
 // NRM is a modified Newton-Raphson root search that bails if t falls outside
 // of the range [0,1] since the curve isn't defined there.
-func NRM(start float64, f, df func(float64) float64) (error, float64) {
+func NRM(start float64, f, df func(float64) float64) (float64, error) {
 	t := start
 
 	for true {
 		d := df(t)
 		if Equals(d, 0) {
-			return fmt.Errorf("zero derivative at %f", t), 0
+			return 0, fmt.Errorf("zero derivative at %f", t)
 		}
 
 		dt := f(t) / d
@@ -115,8 +126,8 @@ func NRM(start float64, f, df func(float64) float64) (error, float64) {
 		}
 		t = t - dt
 		if t < 0 || t > 1 {
-			return fmt.Errorf("t %f outside of [0,1]", t), 0
+			return 0, fmt.Errorf("t %f outside of [0,1]", t)
 		}
 	}
-	return nil, t
+	return t, nil
 }

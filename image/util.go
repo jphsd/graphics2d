@@ -30,7 +30,7 @@ func NewAlphaVal(w, h int, a uint8) *image.Alpha {
 	return res
 }
 
-// NewGray is a wrapper for image.Gray which returns a new image of the desired size filled with color.
+// NewGrayVal is a wrapper for image.Gray which returns a new image of the desired size filled with color.
 func NewGrayVal(w, h int, g uint8) *image.Gray {
 	res := image.NewGray(image.Rect(0, 0, w, h))
 	bg := image.NewUniform(color.Gray{g})

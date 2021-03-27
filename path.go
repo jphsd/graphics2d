@@ -54,6 +54,7 @@ func (p *Path) AddStep(points [][]float64) error {
 	return nil
 }
 
+// AddSteps adds multiple steps to the path.
 func (p *Path) AddSteps(steps [][][]float64) error {
 	for _, step := range steps {
 		err := p.AddStep(step)

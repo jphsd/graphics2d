@@ -5,12 +5,14 @@ import (
 	"math"
 )
 
-// Obtain values of t for each line for where they intersect. Actual intersection =>
+// IntersectionTValsP obtains values of t for each line for where they intersect. Actual intersection =>
 // both are in [0,1]
 func IntersectionTValsP(p1, p2, p3, p4 []float64) ([]float64, error) {
 	return IntersectionTVals(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1], p4[0], p4[1])
 }
 
+// IntersectionTVals obtains values of t for each line for where they intersect. Actual intersection =>
+// both are in [0,1]
 func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) ([]float64, error) {
 	x21 := x2 - x1
 	x43 := x4 - x3
@@ -36,6 +38,7 @@ const (
 	Epsilon float64 = 0.000001 // 1:1,000,000
 )
 
+// EqualsP returns true if two points are equal.
 func EqualsP(v1, v2 []float64) bool {
 	v1l := len(v1)
 	if v1l != len(v2) {
@@ -49,14 +52,17 @@ func EqualsP(v1, v2 []float64) bool {
 	return true
 }
 
+// Equals returns true if two values are within Epsilon of each other.
 func Equals(d1, d2 float64) bool {
 	return Within(d1, d2, Epsilon)
 }
 
+// Equals32 is the float32 version of Equals.
 func Equals32(d1, d2 float32) bool {
 	return Within(float64(d1), float64(d2), Epsilon)
 }
 
+// Within returns true if the two values are within e of each other.
 func Within(d1, d2, e float64) bool {
 	d := d1 - d2
 	if d < 0.0 {
@@ -65,6 +71,7 @@ func Within(d1, d2, e float64) bool {
 	return d < e
 }
 
+// DistanceESquared returns the squared Euclidean distance between two points.
 func DistanceESquared(p1, p2 []float64) float64 {
 	var sum float64
 	for i := 0; i < len(p1); i++ {
@@ -75,10 +82,13 @@ func DistanceESquared(p1, p2 []float64) float64 {
 	return sum
 }
 
+// DistanceEreturns the Euclidean distance between two points.
 func DistanceE(p1, p2 []float64) float64 {
 	return math.Sqrt(DistanceESquared(p1, p2))
 }
 
+// DistanceToLineSquared calculates the squared Euclidean length of the normal from a point to
+// the line.
 func DistanceToLineSquared(lp1, lp2, p []float64) float64 {
 	dx := lp2[0] - lp1[0]
 	dy := lp2[1] - lp1[1]
@@ -97,6 +107,7 @@ func DistanceToLineSquared(lp1, lp2, p []float64) float64 {
 	return dx*dx + dy*dy
 }
 
+// ToF64 casts a slice of float32 to float64.
 func ToF64(pts ...float32) []float64 {
 	res := make([]float64, len(pts))
 	for i, v := range pts {
@@ -105,7 +116,7 @@ func ToF64(pts ...float32) []float64 {
 	return res
 }
 
-// Possible loss of resolution
+// ToF32 casts a slice of float64 to float32. Possible loss of resolution.
 func ToF32(pts ...float64) []float32 {
 	res := make([]float32, len(pts))
 	for i, v := range pts {
@@ -165,19 +176,22 @@ func BoundingBox(pts ...[]float64) [][]float64 {
 	return res
 }
 
+// CrossProduct returns the cross product of the three points.
 func CrossProduct(p1, p2, p3 []float64) float64 {
 	return (p3[0]-p1[0])*(p2[1]-p1[1]) - (p3[1]-p1[1])*(p2[0]-p1[0])
 }
 
+// DotProduct returns the dot product of the two lines, p1-p2 and p3-p4.
 func DotProduct(p1, p2, p3, p4 []float64) float64 {
 	return (p2[0]-p1[0])*(p4[0]-p3[0]) + (p2[1]-p1[1])*(p4[1]-p3[1])
 }
 
+// LineAngle returns the angle of a line.
 func LineAngle(p1, p2 []float64) float64 {
 	return math.Atan2(p2[1]-p1[1], p2[0]-p1[0])
 }
 
-// AnglebetweenLines using Atan2 vs calculating the dot product (2xSqrt+Acos).
+// AngleBetweenLines using Atan2 vs calculating the dot product (2xSqrt+Acos).
 // Retains the directionality of the rotation from l1 to l2, unlike dot product.
 func AngleBetweenLines(p1, p2, p3, p4 []float64) float64 {
 	a1 := LineAngle(p1, p2)

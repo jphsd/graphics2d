@@ -5,33 +5,33 @@ import "image"
 var (
 	// Various supports
 
-	// The point itself
+	// Z0 the point itself
 	Z0 = [][]bool{
 		{true},
 	}
 
-	// 3x3 Von Neumann 4-way
+	// Z4 3x3 Von Neumann 4-way
 	Z4 = [][]bool{
 		{false, true, false},
 		{true, true, true},
 		{false, true, false},
 	}
 
-	// 3x3 X
+	// X3 3x3 X
 	X3 = [][]bool{
 		{true, false, true},
 		{false, true, false},
 		{true, false, true},
 	}
 
-	// 3x3 Moore 8-way
+	// Z8 3x3 Moore 8-way
 	Z8 = [][]bool{
 		{true, true, true},
 		{true, true, true},
 		{true, true, true},
 	}
 
-	// 5x5 Cross
+	// Cross5x5 5x5 cross
 	Cross5x5 = [][]bool{
 		{false, false, true, false, false},
 		{false, false, true, false, false},
@@ -40,7 +40,7 @@ var (
 		{false, false, true, false, false},
 	}
 
-	// 5x5 X
+	// X5 5x5 X
 	X5 = [][]bool{
 		{true, false, false, false, true},
 		{false, true, false, true, false},
@@ -49,7 +49,7 @@ var (
 		{true, false, false, false, true},
 	}
 
-	// 5x5 Star
+	// Start5x5 5x5 star
 	Star5x5 = [][]bool{
 		{true, false, true, false, true},
 		{false, true, true, true, false},
@@ -58,7 +58,7 @@ var (
 		{true, false, true, false, true},
 	}
 
-	// 5x5 Diamond
+	// Diamond5x5 5x5 diamond
 	Diamond5x5 = [][]bool{
 		{false, false, true, false, false},
 		{false, true, true, true, false},
@@ -67,7 +67,7 @@ var (
 		{false, false, true, false, false},
 	}
 
-	// 5x5 Ball
+	// Ball5x5 5x5 ball
 	Ball5x5 = [][]bool{
 		{false, true, true, true, false},
 		{true, true, true, true, true},
@@ -76,7 +76,7 @@ var (
 		{false, true, true, true, false},
 	}
 
-	// 5x5 All
+	// All5x5 5x5 block
 	All5x5 = [][]bool{
 		{true, true, true, true, true},
 		{true, true, true, true, true},
@@ -86,7 +86,7 @@ var (
 	}
 
 	// HitOrMiss support pairs {C1, D1} and {C2, D2} for thinning, and their rotations.
-	// 3x3 C11, D11
+
 	C11 = [][]bool{
 		{false, false, false},
 		{false, true, false},
@@ -97,7 +97,7 @@ var (
 		{false, false, false},
 		{false, false, false},
 	}
-	// 3x3 C12, 3x3 D12
+
 	C12 = [][]bool{
 		{true, false, false},
 		{true, true, false},
@@ -108,7 +108,7 @@ var (
 		{false, false, true},
 		{false, false, true},
 	}
-	// 3x3 C13, 3x3 D13
+
 	C13 = [][]bool{
 		{true, true, true},
 		{false, true, false},
@@ -119,7 +119,7 @@ var (
 		{false, false, false},
 		{true, true, true},
 	}
-	// 3x3 C14, 3x3 D14
+
 	C14 = [][]bool{
 		{false, false, true},
 		{false, true, true},
@@ -131,7 +131,6 @@ var (
 		{true, false, false},
 	}
 
-	// 3x3 C21, D21
 	C21 = [][]bool{
 		{false, false, false},
 		{true, true, false},
@@ -142,7 +141,7 @@ var (
 		{false, false, true},
 		{false, false, false},
 	}
-	// 3x3 C22, 3x3 D22
+
 	C22 = [][]bool{
 		{true, true, false},
 		{true, true, false},
@@ -153,7 +152,7 @@ var (
 		{false, false, true},
 		{false, true, true},
 	}
-	// 3x3 C23, 3x3 D23
+
 	C23 = [][]bool{
 		{false, true, true},
 		{false, true, true},
@@ -164,7 +163,7 @@ var (
 		{true, false, false},
 		{true, true, false},
 	}
-	// 3x3 C24, 3x3 D24
+
 	C24 = [][]bool{
 		{false, false, false},
 		{false, true, true},

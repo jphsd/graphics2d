@@ -67,7 +67,7 @@ func (a *Aff3) QuadrantRotate(n int) {
 	}
 }
 
-// QuadrantRotate adds a rotation (n * 90 degrees) about a point to the transform.
+// QuadrantRotateAbout adds a rotation (n * 90 degrees) about a point to the transform.
 // It avoids rounding issues with the trig functions.
 func (a *Aff3) QuadrantRotateAbout(n int, ax, ay float64) {
 	// Reverse order

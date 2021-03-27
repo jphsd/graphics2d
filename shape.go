@@ -5,16 +5,14 @@ import (
 	"image"
 )
 
-/*
- * A Shape is a fillable collection of paths. For a path to be fillable,
- * it must be closed, so paths added to the shape are forced closed.
- */
-
+// Shape is a fillable collection of paths. For a path to be fillable,
+// it must be closed, so paths added to the shape are forced closed.
 type Shape struct {
 	paths  []*Path
 	bounds image.Rectangle
 }
 
+// Bounds calculates the union of the bounds of the paths the shape contains.
 func (s *Shape) Bounds() image.Rectangle {
 	if s.bounds.Empty() && s.paths != nil {
 		rect := s.paths[0].Bounds()
@@ -26,6 +24,7 @@ func (s *Shape) Bounds() image.Rectangle {
 	return s.bounds
 }
 
+// AddPath adds a path to the shape and closes it if not already closed.
 func (s *Shape) AddPath(p *Path) {
 	lp := p.Copy()
 	lp.Close()
@@ -38,28 +37,32 @@ func (s *Shape) AddPath(p *Path) {
 	s.bounds = image.Rectangle{}
 }
 
+// AddPaths adds a collection of paths to the shape.
 func (s *Shape) AddPaths(paths []*Path) {
 	for _, p := range paths {
 		s.AddPath(p)
 	}
 }
 
+// AddShape adds the paths from the supplied shape to this shape.
 func (s *Shape) AddShape(shape *Shape) {
 	s.AddPaths(shape.Paths())
 }
 
+// Paths returns a shallow copy of the paths contained by this shape.
 func (s *Shape) Paths() []*Path {
 	return s.paths[:]
 }
 
+// Copy creates a new instance of this shape with a shallow copy of its paths.
 func (s *Shape) Copy() *Shape {
 	np := make([]*Path, len(s.paths))
 	copy(np, s.paths)
 	return &Shape{np, s.bounds}
 }
 
-// Apply an affine transform to all the paths in a shape
-// and return a new shape
+// Transform applies an affine transform to all the paths in the shape
+// and returns a new shape.
 func (s *Shape) Transform(xfm *Aff3) *Shape {
 	np := make([]*Path, len(s.paths))
 	for i, path := range s.paths {
@@ -68,8 +71,8 @@ func (s *Shape) Transform(xfm *Aff3) *Shape {
 	return &Shape{np, image.Rectangle{}}
 }
 
-// Apply a processor to a shape and force close on
-// the processed paths
+// Process applies a processor to the shape and
+// returns a new shape containing the processed paths.
 func (s *Shape) Process(proc PathProcessor) *Shape {
 	np := make([]*Path, 0)
 	for _, p := range s.paths {
@@ -83,7 +86,8 @@ func (s *Shape) Process(proc PathProcessor) *Shape {
 	return &Shape{np, image.Rectangle{}}
 }
 
-// Applies a collection of PathProcessors to a shape
+// CompundProcess applies a collection of PathProcessors to the shape and
+// returns the result in a new shape.
 func (s *Shape) CompoundProcess(procs []PathProcessor) *Shape {
 	np := make([]*Path, 0)
 	for _, p := range s.paths {

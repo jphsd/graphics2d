@@ -4,10 +4,10 @@ import (
 	"math"
 )
 
-// Given an arc angle (less than or equal to PI), calculate the
+// CalcPointsForArc takes an arc angle (less than or equal to Pi), and calculates the
 // points for a Bezier cubic to describe it on a circle centered
 // on (0,0) with radius 1. Mid-point of the curve is (1,0)
-// Error increases for values > PI/2
+// Error increases for values > Pi/2
 func CalcPointsForArc(theta float64) [][]float64 {
 	phi := theta / 2
 	x0 := math.Cos(phi)
@@ -23,6 +23,8 @@ func CalcPointsForArc(theta float64) [][]float64 {
 
 // Conversion methods for cubic Bezier to CatmullRom and v.v.
 // From https://pomax.github.io/bezierinfo/#catmullconv
+
+// Bezier3ToCatmul converts a cubic bezier to a catmul curve.
 // p1, c1, c2, p2 => t1, p1, p2, t2
 func Bezier3ToCatmul(p1, p2, p3, p4 []float64) []float64 {
 	dx12 := 6 * (p1[0] - p2[0])
@@ -32,6 +34,7 @@ func Bezier3ToCatmul(p1, p2, p3, p4 []float64) []float64 {
 	return []float64{p4[0] + dx12, p4[1] + dy12, p1[0], p1[1], p4[0], p4[1], p1[0] + dx43, p1[1] + dy43}
 }
 
+// CatmulToBezier3 converts a catmul curve to a cubic bezier.
 // t1, p1, p2, t2 => p1, c1, c2, p2
 func CatmulToBezier3(tau float64, p1, p2, p3, p4 []float64) []float64 {
 	tau *= 6
@@ -42,7 +45,7 @@ func CatmulToBezier3(tau float64, p1, p2, p3, p4 []float64) []float64 {
 	return []float64{p2[0], p2[1], p2[0] + dx31, p2[1] + dy31, p3[0] - dx42, p3[1] - dy42, p3[0], p3[1]}
 }
 
-// B1 (flat curve) {p1, p2}
+// Bezier1 (flat curve) {p1, p2}
 func Bezier1(pts [][]float64, t float64) []float64 {
 	omt := 1 - t
 	return []float64{
@@ -50,7 +53,7 @@ func Bezier1(pts [][]float64, t float64) []float64 {
 		omt*pts[0][1] + t*pts[1][1]}
 }
 
-// B2 (quad curve) {p1, c1, p2}
+// Bezier2 (quad curve) {p1, c1, p2}
 func Bezier2(pts [][]float64, t float64) []float64 {
 	t2 := t * t
 	omt := 1 - t
@@ -61,7 +64,7 @@ func Bezier2(pts [][]float64, t float64) []float64 {
 		omt2*pts[0][1] + omt2t*pts[1][1] + t2*pts[2][1]}
 }
 
-// B3 (cubic curve) {p1, c1, c2, p2}
+// Bezier3 (cubic curve) {p1, c1, c2, p2}
 func Bezier3(pts [][]float64, t float64) []float64 {
 	t2 := t * t
 	t3 := t2 * t
@@ -93,7 +96,7 @@ func DeCasteljau(pts [][]float64, t float64) []float64 {
 	return DeCasteljau(npts, t)
 }
 
-// Split curve at t into two new curves such that the end of the lhs is the
+// SplitCurve splits curve at t into two new curves such that the end of the lhs is the
 // start of the rhs
 // {p1, c1, c2, c3, ..., p2}
 func SplitCurve(pts [][]float64, t float64) [][][]float64 {
@@ -129,6 +132,7 @@ func splitCurve(pts [][]float64, nn, n int, left, right [][]float64, t float64) 
 	}
 }
 
+// CalcDerivativeWeights calculates the derivative of the supplied curve.
 // Bezier gradient (differentiation): Order of curve drops by one and new weights
 // are the difference of the original weights scaled by the original order
 func CalcDerivativeWeights(w [][]float64) [][]float64 {
@@ -142,7 +146,8 @@ func CalcDerivativeWeights(w [][]float64) [][]float64 {
 	return res
 }
 
-// Bezier curve order promotion e.g. b2 to b3. Note, there's no inverse.
+// CalcNextOrderWeights calculates the weights necessary to represent the supplied curve
+// at next highest order, i.e. curve promotion b2 to b3. Note, there's no inverse.
 func CalcNextOrderWeights(w [][]float64) [][]float64 {
 	n := len(w)
 	k := n + 1
@@ -160,7 +165,7 @@ func CalcNextOrderWeights(w [][]float64) [][]float64 {
 	return res
 }
 
-// Calculate curvature - note curve must have 2nd order derivative
+// Kappa1 calculates curvature - note curve must have 2nd order derivative.
 // Radius of curvature at t is 1/kappa(t)
 func Kappa1(dw, d2w [][]float64, t float64) float64 {
 	dpt := DeCasteljau(dw, t)
@@ -168,12 +173,12 @@ func Kappa1(dw, d2w [][]float64, t float64) float64 {
 	return Kappa(dpt, d2pt)
 }
 
-// Kappa/curvature from first and second derivatives at a point
+// Kappa from first and second derivatives at a point.
 func Kappa(dpt, d2pt []float64) float64 {
 	return (dpt[0]*d2pt[1] - d2pt[0]*dpt[1]) / math.Pow(dpt[0]*dpt[0]+dpt[1]*dpt[1], 1.5)
 }
 
-// Estimate kappa from three points by calculating the center of the circumcircle
+// KappaC estimates kappa from three points by calculating the center of the circumcircle.
 func KappaC(p1, p2, p3 []float64) float64 {
 	d1 := []float64{p2[0] - p1[0], p2[1] - p1[1]}
 	s1 := []float64{p1[0] + d1[0]/2, p1[1] + d1[1]/2} // mid point p1-p2
@@ -197,8 +202,8 @@ func KappaC(p1, p2, p3 []float64) float64 {
 	return 1 / r
 }
 
-// Menger curvature: 4*area / (d(p1, p2).d(p2s, p3).d(p3, p1))
-// Same result as above but with more square roots...
+// KappaM calculates Menger curvature: 4*area / (d(p1, p2).d(p2s, p3).d(p3, p1))
+// Same result as KappaC but with more square roots...
 func KappaM(p1, p2, p3 []float64) float64 {
 	a := TriArea(p1, p2, p3)
 	denom := DistanceE(p1, p2) * DistanceE(p2, p3) * DistanceE(p3, p1)
