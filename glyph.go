@@ -22,10 +22,11 @@ for i:=0; i<fonts.NumFonts(); i++ {
 	name, _ := f.Name(&b, sfnt.NameIDFull)
 	fmt.Printf("Font %d: %s\n", i, name)
 }
-f, _ := fonts.Font(0)
+f := fonts.Font(0)
 */
 
-// Points are in font units
+// GlyphToShape returns a shape containing the paths for rune r as found in the font. The path is in
+// font units. Use font.UnitsPerEm() to calculate scale factors.
 func GlyphToShape(font *sfnt.Font, r rune) (*Shape, error) {
 	shape := &Shape{}
 
