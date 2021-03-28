@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"math"
 	"sort"
 )
 
@@ -62,6 +63,13 @@ func (bc *BezierCurve) CurveDt3X(t float64) float64 {
 // CurveDt3Y returns the Y value for the third order derivative of the curve at t.
 func (bc *BezierCurve) CurveDt3Y(t float64) float64 {
 	return DeCasteljau(bc.WeightsDt3, t)[1]
+}
+
+// Kappa calculates the curvature at t. Radius of curvature at t is 1/kappa(t)
+func (bc *BezierCurve) Kappa(t float64) float64 {
+	dpt := DeCasteljau(bc.WeightsDt, t)
+	d2pt := DeCasteljau(bc.WeightsDt2, t)
+	return (dpt[0]*d2pt[1] - d2pt[0]*dpt[1]) / math.Pow(dpt[0]*dpt[0] + dpt[1]*dpt[1], 1.5)
 }
 
 // CalcExtremities finds the extremes of a curve in terms of t.

@@ -65,6 +65,29 @@ func (p *Path) AddSteps(steps [][][]float64) error {
 	return nil
 }
 
+// Concatenate adds the path to this path. If either path is closed then an error
+// is returned. If the paths aren't coincident, then they are joind with a line.
+func (p *Path) Concatenate(path *Path) error {
+	if p.closed {
+		return fmt.Errorf("path is closed, adding a step is forbidden")
+	}
+	if path.closed {
+		return fmt.Errorf("can't add a closed path")
+	}
+	lstep := p.steps[len(p.steps)-1]
+	last := lstep[len(lstep)-1]
+
+	steps := path.Steps()
+	if EqualsP(last, steps[0][0]) {
+		// End of p is coincident with sep[0][0] of path
+		p.AddSteps(steps[1:])
+	} else {
+		// Line to steps[0][0]
+		p.AddSteps(steps)
+	}
+	return nil
+}
+
 // Steps returns a shallow copy of all the steps in the path.
 func (p *Path) Steps() [][][]float64 {
 	return p.steps[:]
