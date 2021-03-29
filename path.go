@@ -246,24 +246,6 @@ func (p *Path) Process(proc PathProcessor) []*Path {
 	return paths
 }
 
-// CompoundProcess applies a collection of PathProcessors to a path.
-func (p *Path) CompoundProcess(procs []PathProcessor) []*Path {
-	paths := []*Path{p}
-	if len(procs) == 0 {
-		return paths
-	}
-
-	for _, proc := range procs {
-		npaths := []*Path{}
-		for _, path := range paths {
-			npaths = append(npaths, proc.Process(path)...)
-		}
-		paths = npaths
-	}
-
-	return paths
-}
-
 // String converts a path into a string.
 func (p *Path) String() string {
 	step := p.steps[0]

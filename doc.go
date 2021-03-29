@@ -2,7 +2,7 @@
 Package graphics2d contains types and functions for 2D graphics rendering.
 
 The lowest type is a Path. Paths start from a location and add steps using a number of control points. The
-number of control points determines the polynomial order of the step: 0 - line; 1 - quadratic; c - cubic;
+number of control points determines the polynomial order of the step: 0 - line; 1 - quadratic; 2 - cubic;
 3 - quartic; ... A path can be closed which forces a line from the start location to the last. Once a path
 is closed, no more steps can be added. Unlike other implementations, a path here represents a single
 stroke (pen down). There is no move (pen up) step.
@@ -19,7 +19,7 @@ allows a clip mask to be supplied and the draw.Op to be specified.
 
 The Aff3 type provides the ability to specify affine transforms on Paths and Shapes.
 
-Utility functions are provided to generate commmon forms of paths:
+Utility functions are provided to generate common forms of paths:
   Point
   Line
   PolyLine
@@ -32,5 +32,8 @@ Utility functions are provided to generate commmon forms of paths:
   EllipticalArc
   EllipticalArcFromPoint
   RegularPolygon
+
+A shape function is provided to capture glyphs:
+  GlyphToShape
 */
 package graphics2d

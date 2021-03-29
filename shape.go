@@ -86,21 +86,6 @@ func (s *Shape) Process(proc PathProcessor) *Shape {
 	return &Shape{np, image.Rectangle{}}
 }
 
-// CompoundProcess applies a collection of PathProcessors to the shape and
-// returns the result in a new shape.
-func (s *Shape) CompoundProcess(procs []PathProcessor) *Shape {
-	np := make([]*Path, 0)
-	for _, p := range s.paths {
-		npaths := p.CompoundProcess(procs)
-		for _, pp := range npaths {
-			pp.Close()
-			np = append(np, pp)
-		}
-	}
-
-	return &Shape{np, image.Rectangle{}}
-}
-
 // String converts a shape into a string.
 func (s *Shape) String() string {
 	str := fmt.Sprintf("SH %d ", len(s.paths))
