@@ -14,7 +14,8 @@ import (
 
 // Stroke defines the width, join and cap types of the stroke.
 type Stroke struct {
-	Width, hw    float64 // hw - half width
+	Width
+	hw           float64 // hw - half width
 	PointFunc    func([]float64, float64) [][][]float64
 	JoinFunc     func([]float64, []float64, []float64) [][][]float64
 	CapFunc      func([]float64, []float64, []float64) [][][]float64
@@ -321,7 +322,7 @@ func (mj *MiterJoin) JoinMiter(e1, p, s2 []float64) [][][]float64 {
 	j := []float64{px, py}
 	return [][][]float64{{e1, j}, {j, s2}}
 }
- 
+
 // TODO - ArcJoin and MiterLimitJoin per
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linejoin
 

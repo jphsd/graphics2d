@@ -9,7 +9,7 @@ type PathProcessor interface {
 	Process(p *Path) []*Path
 }
 
-// CompoundProcess applies a collection of PathProcessors to a path.
+// CompoundProcessor applies a collection of PathProcessors to a path.
 type CompoundProcessor struct {
 	Procs []PathProcessor
 }

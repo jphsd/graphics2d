@@ -153,15 +153,26 @@ func (nl *NLSin) InvTransform(v float64) float64 {
 	return math.Asin((v*2)-1)/math.Pi + 0.5
 }
 
-// NLCircle v = 1 - sqrt(1-t^2)
-type NLCircle struct{}
+// NLCircle1 v = 1 - sqrt(1-t^2)
+type NLCircle1 struct{}
 
-func (nl *NLCircle) Transform(t float64) float64 {
+func (nl *NLCircle1) Transform(t float64) float64 {
 	return 1 - math.Sqrt(1-t*t)
 }
 
-func (nl *NLCircle) InvTransform(v float64) float64 {
+func (nl *NLCircle1) InvTransform(v float64) float64 {
 	return math.Sqrt(1 - (v-1)*(v-1))
+}
+
+// NLCircle2 v = sqrt(2t-t^2)
+type NLCircle2 struct{}
+
+func (nl *NLCircle2) Transform(t float64) float64 {
+	return math.Sqrt(t * (2 - t))
+}
+
+func (nl *NLCircle2) InvTransform(v float64) float64 {
+	return 1 - math.Sqrt(1-v*v)
 }
 
 // NLCatenary v = cosh(t)
