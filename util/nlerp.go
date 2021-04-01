@@ -142,7 +142,7 @@ func (nl *NLLogarithmic) InvTransform(v float64) float64 {
 	return (math.Exp(v/nl.scale) - 1) / nl.k
 }
 
-// NLSin v = sin(t) with t mapped to [-Pi,Pi]
+// NLSin v = sin(t) with t mapped to [-Pi/2,Pi/2]
 type NLSin struct{} // first derivative 0 at t=0,1
 
 func (nl *NLSin) Transform(t float64) float64 {
@@ -151,6 +151,28 @@ func (nl *NLSin) Transform(t float64) float64 {
 
 func (nl *NLSin) InvTransform(v float64) float64 {
 	return math.Asin((v*2)-1)/math.Pi + 0.5
+}
+
+// NLSin1 v = sin(t) with t mapped to [0,Pi/2]
+type NLSin1 struct{} // first derivative 0 at t=1
+
+func (nl *NLSin1) Transform(t float64) float64 {
+	return math.Sin(t * math.Pi / 2)
+}
+
+func (nl *NLSin1) InvTransform(v float64) float64 {
+	return math.Asin(v) / math.Pi * 2
+}
+
+// NLSin2 v = sin(t) with t mapped to [-Pi/2,0]
+type NLSin2 struct{} // first derivative 0 at t=0,1
+
+func (nl *NLSin2) Transform(t float64) float64 {
+	return math.Sin((t-1)*math.Pi/2) + 1
+}
+
+func (nl *NLSin2) InvTransform(v float64) float64 {
+	return math.Asin(v-1)*2/math.Pi + 1
 }
 
 // NLCircle1 v = 1 - sqrt(1-t^2)
