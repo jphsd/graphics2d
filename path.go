@@ -128,7 +128,8 @@ func PartsToPath(pts [][][]float64) *Path {
 // Flatten works by recursively subdividing the path until the control points are within d of
 // the line through the end points.
 func (p *Path) Flatten(d float64) *Path {
-	if p.flattened != nil && Equals(d, p.tolerance) {
+	if p.flattened != nil && d >= p.tolerance {
+		// Path has already been flattened at least to the degree we're looking for
 		return p.flattened
 	}
 	p.tolerance = d

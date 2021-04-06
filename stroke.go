@@ -14,7 +14,7 @@ import (
 
 // Stroke defines the width, join and cap types of the stroke.
 type Stroke struct {
-	Width
+	Width        float64
 	hw           float64 // hw - half width
 	PointFunc    func([]float64, float64) [][][]float64
 	JoinFunc     func([]float64, []float64, []float64) [][][]float64
