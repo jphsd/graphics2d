@@ -96,12 +96,19 @@ func (p *Path) Steps() [][][]float64 {
 // Parts returns the steps of a path, each prepended with its start.
 func (p *Path) Parts() [][][]float64 {
 	n := len(p.steps)
-	fpts := make([][][]float64, n-1)
+	if n == 1 {
+		// This is a point
+		return [][][]float64{{p.steps[0][0]}}
+	}
+	fpts := make([][][]float64, n-1, n)
 	cp := p.steps[0][0]
 	for i := 1; i < n; i++ {
 		pts := toPoints(cp, p.steps[i])
 		fpts[i-1] = pts
 		cp = pts[len(pts)-1]
+	}
+	if p.closed && !EqualsP(cp, p.steps[0][0]) {
+		fpts = append(fpts, [][]float64{cp, p.steps[0][0]})
 	}
 	return fpts
 }
@@ -117,12 +124,18 @@ func (p *Path) Closed() bool {
 }
 
 // PartsToPath constructs a new path by concatenating the parts.
-func PartsToPath(pts [][][]float64) *Path {
+func PartsToPath(pts [][][]float64) (*Path, error) {
 	res := NewPath(pts[0][0])
-	for _, step := range pts {
-		res.AddStep(step[1:])
+	if len(pts[0]) == 1 {
+		return res, nil
 	}
-	return res
+	for _, part := range pts {
+		if EqualsP(part[0], part[len(part)-1]) {
+			return nil, fmt.Errorf("part start and end are coincident")
+		}
+		res.AddStep(part[1:])
+	}
+	return res, nil
 }
 
 // Flatten works by recursively subdividing the path until the control points are within d of
@@ -133,13 +146,12 @@ func (p *Path) Flatten(d float64) *Path {
 		return p.flattened
 	}
 	p.tolerance = d
-	d2 := d * d
 	res := make([][][]float64, 1)
 	res[0] = p.steps[0]
 	cp := res[0][0]
 	// For all remaining steps in path
 	for i := 1; i < len(p.steps); i++ {
-		fp := flattenStep(0, d2, toPoints(cp, p.steps[i]))
+		fp := flattenPart(d*d, toPoints(cp, p.steps[i]))
 		for _, ns := range fp {
 			res = append(res, ns[1:])
 			cp = ns[len(ns)-1]
@@ -157,13 +169,13 @@ func toPoints(cp []float64, pts [][]float64) [][]float64 {
 	return res
 }
 
-func flattenStep(n int, d2 float64, pts [][]float64) [][][]float64 {
+func flattenPart(d2 float64, pts [][]float64) [][][]float64 {
 	if cpWithinD2(d2, pts) {
 		return [][][]float64{{pts[0], pts[len(pts)-1]}}
 	}
 	lr := SplitCurve(pts, 0.5)
-	res := append([][][]float64{}, flattenStep(n+1, d2, lr[0])...)
-	res = append(res, flattenStep(n+1, d2, lr[1])...)
+	res := append([][][]float64{}, flattenPart(d2, lr[0])...)
+	res = append(res, flattenPart(d2, lr[1])...)
 	return res
 }
 
@@ -183,6 +195,12 @@ func cpWithinD2(d2 float64, pts [][]float64) bool {
 	}
 
 	return true
+}
+
+// FlattenPart works by subdividing the curve until its control points are within d2 (d squared)
+// of the line through the end points.
+func FlattenPart(d float64, pts [][]float64) [][][]float64 {
+	return flattenPart(d*d, pts)
 }
 
 // Bounds calculates a rectangle that the Path is guaranteed to fit within. It's unlikely to
@@ -229,6 +247,13 @@ func (p *Path) Copy() *Path {
 	steps := make([][][]float64, len(p.steps))
 	copy(steps, p.steps)
 	return &Path{steps, p.closed, p.bounds, nil, 1, p.parent}
+}
+
+// Open performs a Deepish copy like Copy() but leaves the path open.
+func (p *Path) Open() *Path {
+	steps := make([][][]float64, len(p.steps))
+	copy(steps, p.steps)
+	return &Path{steps, false, p.bounds, nil, 1, p.parent}
 }
 
 // Parent returns the path's parent

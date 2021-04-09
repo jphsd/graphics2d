@@ -2,15 +2,15 @@ package util
 
 import "testing"
 
-type testRow struct {
+type testNLRow struct {
 	nl   NonLinear
 	name string
 }
 
-var table []testRow
+var tableNL []testNLRow
 
 func init() {
-	table = []testRow{
+	tableNL = []testNLRow{
 		{&NLLinear{}, "Linear"},
 		{&NLSquare{}, "Square"},
 		{&NLCube{}, "Cube"},
@@ -67,7 +67,7 @@ func Equalf32(a, b float32) bool {
 }
 
 func TestNLFuncs(t *testing.T) {
-	for _, row := range table {
+	for _, row := range tableNL {
 		vp := -epsilon
 		ttp := -epsilon
 		for t1 := 0.; t1 <= 1; t1 += 1 / 100. {
@@ -103,7 +103,7 @@ func TestNLFuncs(t *testing.T) {
 
 func TestNLerp(t *testing.T) {
 	start, end := float64(10), float64(90)
-	for _, row := range table {
+	for _, row := range tableNL {
 		vp := start
 		var t1 float64
 		for t1 = 0; t1 <= 1; t1 += 1 / 100. {
@@ -134,7 +134,7 @@ func TestNLerp(t *testing.T) {
 
 func TestInvNLerp(t *testing.T) {
 	start, end := float64(10), float64(90)
-	for _, row := range table {
+	for _, row := range tableNL {
 		vp := -epsilon
 		var t1 float64
 		for t1 = 10; t1 < end; t1 += 7 {
@@ -168,7 +168,7 @@ func TestRemapNL(t *testing.T) {
 	ostart, oend := float64(-10), float64(-90)
 	iv := (istart + iend) / 2
 	ov := (ostart + oend) / 2
-	for _, row := range table {
+	for _, row := range tableNL {
 		v := RemapNL(iv, istart, iend, ostart, oend, row.nl, row.nl)
 		if !Equalf64(v, ov) {
 			t.Errorf("%s %f -> %f expected %f", row.name, iv, v, ov)
@@ -178,7 +178,7 @@ func TestRemapNL(t *testing.T) {
 
 func TestNLerp32(t *testing.T) {
 	start, end := float32(10), float32(90)
-	for _, row := range table {
+	for _, row := range tableNL {
 		vp := start
 		var t1 float32
 		for t1 = 0; t1 <= 1; t1 += 1 / 100. {
@@ -209,7 +209,7 @@ func TestNLerp32(t *testing.T) {
 
 func TestInvNLerp32(t *testing.T) {
 	start, end := float32(10), float32(90)
-	for _, row := range table {
+	for _, row := range tableNL {
 		vp := float32(-epsilon)
 		var t1 float32
 		for t1 = 10; t1 < end; t1 += 7 {
@@ -243,7 +243,7 @@ func TestRemapNL32(t *testing.T) {
 	ostart, oend := float32(-10), float32(-90)
 	iv := (istart + iend) / 2
 	ov := (ostart + oend) / 2
-	for _, row := range table {
+	for _, row := range tableNL {
 		v := RemapNL32(iv, istart, iend, ostart, oend, row.nl, row.nl)
 		if !Equalf32(v, ov) {
 			t.Errorf("%s %f -> %f expected %f", row.name, iv, v, ov)
