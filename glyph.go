@@ -28,23 +28,22 @@ f := fonts.Font(0)
 // GlyphToShape returns a shape containing the paths for rune r as found in the font. The path is in
 // font units. Use font.UnitsPerEm() to calculate scale factors.
 func GlyphToShape(font *sfnt.Font, r rune) (*Shape, error) {
-	shape := &Shape{}
-
 	var buffer sfnt.Buffer
 	x, err := font.GlyphIndex(&buffer, r)
 	if err != nil {
-		return shape, err
+		return nil, err
 	}
 	if x == 0 {
-		return shape, fmt.Errorf("rune %c not found in font", r)
+		return nil, fmt.Errorf("rune %c not found in font", r)
 	}
 	// LoadGlyph(b *Buffer, x GlyphIndex, ppem fixed.Int26_6, opts *LoadGlyphOptions) (Segments, error)
 	segments, err := font.LoadGlyph(&buffer, x, fixed.Int26_6(font.UnitsPerEm()), nil)
 	if err != nil {
-		return shape, err
+		return nil, err
 	}
 
 	var cp *Path
+	shape := &Shape{}
 	for _, seg := range segments {
 		// The divisions by 64 below are because the seg.Args values have type
 		// fixed.Int26_6, a 26.6 fixed point number, and 1<<6 == 64.

@@ -145,8 +145,11 @@ func (a *Aff3) PreConcatenate(aff Aff3) {
 // InverseOf returns the inverse of the transform.
 func (a *Aff3) InverseOf() (*Aff3, error) {
 	res := a.Copy()
-	err := res.Invert()
-	return res, err
+	if err := res.Invert(); err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 // Invert inverts the transform.

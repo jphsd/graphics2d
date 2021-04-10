@@ -21,7 +21,7 @@ func IntersectionTVals(x1, y1, x2, y2, x3, y3, x4, y4 float64) ([]float64, error
 
 	d := (y43 * x21) - (x43 * y21)
 	if Equals(d, 0) {
-		return []float64{}, fmt.Errorf("parallel or coincident")
+		return nil, fmt.Errorf("parallel or coincident")
 	}
 
 	x13 := x1 - x3

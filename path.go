@@ -129,9 +129,9 @@ func PartsToPath(pts [][][]float64) (*Path, error) {
 	if len(pts[0]) == 1 {
 		return res, nil
 	}
-	for _, part := range pts {
+	for i, part := range pts {
 		if EqualsP(part[0], part[len(part)-1]) {
-			return nil, fmt.Errorf("part start and end are coincident")
+			return nil, fmt.Errorf("part %d start and end are coincident", i)
 		}
 		res.AddStep(part[1:])
 	}

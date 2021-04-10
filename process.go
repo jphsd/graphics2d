@@ -15,7 +15,7 @@ type CompoundProcessor struct {
 }
 
 // NewCompoundProcessor creates a new CompundProcessor with the supplied path processors.
-func NewCompoundProcessor(procs []PathProcessor) *CompoundProcessor {
+func NewCompoundProcessor(procs ...PathProcessor) *CompoundProcessor {
 	return &CompoundProcessor{procs}
 }
 

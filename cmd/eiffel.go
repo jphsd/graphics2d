@@ -27,8 +27,7 @@ func main() {
 	path.AddStep([][]float64{{160, 200}, {160, 80}})
 	path.Close()
 
-	shape := &Shape{}
-	shape.AddPath(path)
+	shape := NewShape(path)
 
 	// Render the shape in blue
 	blue := color.RGBA{0, 0, 0xff, 0xff}

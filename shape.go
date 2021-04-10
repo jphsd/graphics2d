@@ -24,6 +24,13 @@ func (s *Shape) Bounds() image.Rectangle {
 	return s.bounds
 }
 
+// NewShape constructs a shape from the supplied paths.
+func NewShape(paths ...*Path) *Shape {
+	res := &Shape{}
+	res.AddPaths(paths)
+	return res
+}
+
 // AddPath adds a path to the shape and closes it if not already closed.
 func (s *Shape) AddPath(p *Path) {
 	lp := p.Copy()
