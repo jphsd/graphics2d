@@ -139,7 +139,7 @@ func PolyArcFromPoint(pt []float64, cs [][]float64, angs []float64) *Path {
 	return res
 }
 
-// Ellipse returns a path describing an ellipse with rx and ry rotated by xang from the x axis.
+// Ellipse returns a closed path describing an ellipse with rx and ry rotated by xang from the x axis.
 func Ellipse(c []float64, rx, ry, xang float64) *Path {
 	ax, ay := c[0], c[1]
 	np, _ := PartsToPath(MakeArcParts(ax, ay, rx, 0, 2*math.Pi))
@@ -189,7 +189,7 @@ func EllipticalArcFromPoint(pt, c []float64, rxy, ang, xang float64, s ArcStyle)
 	return EllipticalArc(c, rx, ry, offs, ang, xang, s)
 }
 
-// RegularPolygon returns a path describing an n-sided polygon given the initial edge.
+// RegularPolygon returns a closed path describing an n-sided polygon given the initial edge.
 func RegularPolygon(pt1, pt2 []float64, n int) *Path {
 	da := 2 * math.Pi / float64(n)
 	cosDa, sinDa := math.Cos(da), math.Sin(da)
