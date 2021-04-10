@@ -30,7 +30,7 @@ func NewSnip(n int, pattern []float64, offs float64) *Snip {
 
 	// Default flattening value is 1
 	res := &Snip{n, pat, 1, 0, s, 0, 0}
-	res.SetOffset(offs)
+	res.Offset(offs)
 
 	/*
 		neg := offs < 0
@@ -94,8 +94,8 @@ func sum(l []float64) float64 {
 	return s
 }
 
-// SetOffset determines where in the pattern the path processor will start.
-func (s *Snip) SetOffset(offs float64) {
+// Offset determines where in the pattern the path processor will start.
+func (s *Snip) Offset(offs float64) {
 	neg := offs < 0
 	if neg {
 		offs = -offs
