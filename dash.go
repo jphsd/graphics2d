@@ -7,8 +7,8 @@ type Dash struct {
 	Snip *Snip
 }
 
-// NewDash creates a new dash with the supplied pattern and offset. If the pattern is odd in length
-// then it is replicated to create an even length pattern.
+// NewDash creates a new dash path processor with the supplied pattern and offset. If the pattern is
+// odd in length then it is replicated to create an even length pattern.
 func NewDash(pattern []float64, offs float64) *Dash {
 	return &Dash{NewSnip(2, pattern, offs)}
 }

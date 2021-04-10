@@ -23,7 +23,7 @@ type Stroke struct {
 	CapEndFunc   func([]float64, []float64, []float64) [][][]float64
 }
 
-// NewStroke creates a stroke with width w, the bevel join and butt cap types.
+// NewStroke creates a stroke path processor with width w, the bevel join and butt cap types.
 func NewStroke(w float64) *Stroke {
 	if w < 0 {
 		w = 1
@@ -308,9 +308,8 @@ func (mj *MiterJoin) JoinMiter(e1, p, s2 []float64) [][][]float64 {
 		// miter limit exceeded
 		if mj.MiterAltFunc != nil {
 			return mj.MiterAltFunc(e1, p, s2)
-		} else {
-			return JoinBevel(e1, p, s2)
 		}
+		return JoinBevel(e1, p, s2)
 	}
 	// tangent -dy, dx
 	ts, err := IntersectionTVals(e1[0], e1[1], e1[0]-dy1, e1[1]+dx1,
