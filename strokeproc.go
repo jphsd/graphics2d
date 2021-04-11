@@ -111,7 +111,7 @@ func (s *Stroke) Process(p *Path) []*Path {
 
 	// Flip the steps and s/e offsets
 	stepoffs = reverseOffs(stepoffs)
-	fpts = reverseParts(fpts)
+	fpts = ReverseParts(fpts)
 
 	// Calculate the LHS path by LineTransforming the steps and handling the joins
 	lhs := make([][][]float64, n)
@@ -223,28 +223,6 @@ func reverseOffs(parts [][][]float64) [][][]float64 {
 		// flip dx and dy
 		res[i][0][2], res[i][0][3] = -res[i][0][2], -res[i][0][3]
 		res[i][1][2], res[i][1][3] = -res[i][1][2], -res[i][1][3]
-		j--
-	}
-	return res
-}
-
-// [part][pts][x/y]
-func reverseParts(pts [][][]float64) [][][]float64 {
-	n := len(pts)
-	res := make([][][]float64, n)
-	for i, j := 0, n-1; i < n; i++ {
-		res[i] = reversePoints(pts[j])
-		j--
-	}
-	return res
-}
-
-// [pts][x/y]
-func reversePoints(cp [][]float64) [][]float64 {
-	n := len(cp)
-	res := make([][]float64, n)
-	for i, j := 0, n-1; i < n; i++ {
-		res[i] = cp[j]
 		j--
 	}
 	return res

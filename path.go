@@ -387,3 +387,31 @@ func cpSafe(points [][]float64) bool {
 	// Crude check v is within 5% of c based on bb size
 	return v[0] < c[0]+dx && v[0] > c[0]-dx && v[1] < c[1]+dy && v[1] > c[1]-dy
 }
+
+// ReversePath returns a new path describing the current path in reverse order (i.e start and end switched).
+func (p *Path) ReversePath() *Path {
+	path, _ := PartsToPath(ReverseParts(p.Parts()))
+	return path
+}
+
+// ReverseParts reverses the order (and points) of the supplied part slice.
+func ReverseParts(pts [][][]float64) [][][]float64 {
+	n := len(pts)
+	res := make([][][]float64, n)
+	for i, j := 0, n-1; i < n; i++ {
+		res[i] = reversePoints(pts[j])
+		j--
+	}
+	return res
+}
+
+// [pts][x/y]
+func reversePoints(cp [][]float64) [][]float64 {
+	n := len(cp)
+	res := make([][]float64, n)
+	for i, j := 0, n-1; i < n; i++ {
+		res[i] = cp[j]
+		j--
+	}
+	return res
+}
