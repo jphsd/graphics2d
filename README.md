@@ -12,3 +12,5 @@ The top level Path and Shape types are complete, and the following PathProcessor
 Package documentation [here](https://pkg.go.dev/github.com/jphsd/graphics2d)
 
 Wiki entries [here](https://github.com/jphsd/graphics2d/wiki)
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/jphsd/graphics2d)](https://goreportcard.com/report/github.com/jphsd/graphics2d)
