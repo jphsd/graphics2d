@@ -10,3 +10,4 @@ The top level Path and Shape types are complete, and the following PathProcessor
 > dashedstroke := NewCompoundProcessor(NewDash(pattern, offs), NewStroke(1))
 
 Package documentation [here](https://pkg.go.dev/github.com/jphsd/graphics2d)
+Wiki entries [here](https://github.com/jphsd/graphics2d/wiki)
