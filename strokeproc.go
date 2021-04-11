@@ -28,7 +28,7 @@ func NewStroke(w float64) *Stroke {
 	if w < 0 {
 		w = 1
 	}
-	return &Stroke{w, w / 2, PointSquare, JoinBevel, CapButt, nil, nil} // 10 degrees
+	return &Stroke{w, w / 2, PointCircle, JoinBevel, CapButt, nil, nil} // 10 degrees
 }
 
 // Process implements the PathProcessor interface and will return either one or two paths
