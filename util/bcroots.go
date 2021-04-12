@@ -122,7 +122,7 @@ func calcRoots(f, df func(float64) float64, tmap map[string]bool) {
 func NRM(start float64, f, df func(float64) float64) (float64, error) {
 	t := start
 
-	for true {
+	for i:=0; i<1000; i++ {
 		d := df(t)
 		if Equals(d, 0) {
 			return 0, fmt.Errorf("zero derivative at %f", t)
@@ -130,12 +130,12 @@ func NRM(start float64, f, df func(float64) float64) (float64, error) {
 
 		dt := f(t) / d
 		if Equals(dt, 0) {
-			break
+			return t, nil
 		}
 		t = t - dt
 		if t < 0 || t > 1 {
 			return 0, fmt.Errorf("t %f outside of [0,1]", t)
 		}
 	}
-	return t, nil
+	return 0, fmt.Errorf("failed to converge on root")
 }

@@ -1,0 +1,53 @@
+package main
+
+import (
+	"image"
+	"image/color"
+
+	// For image output only
+	"fmt"
+	"image/png"
+	"log"
+	"os"
+
+	. "github.com/jphsd/graphics2d"
+	g2dimg "github.com/jphsd/graphics2d/image"
+)
+
+func main() {
+	// Create image to write into
+	width, height := 400, 400
+	img := g2dimg.NewRGBA(width, height, color.White)
+
+	// Define points
+	p1 := []float64{100, 100}
+	p2 := []float64{300, 100}
+	p3 := []float64{300, 300}
+	p4 := []float64{100, 300}
+	red := color.RGBA{0xff, 0, 0, 0xff}
+
+	// Draw lines
+	DrawLine(img, p1, p2, red)
+	DrawLine(img, p2, p3, red)
+	DrawLine(img, p3, p4, red)
+	DrawLine(img, p4, p1, red)
+
+	// Capture image output
+	err := saveImage(img, "out")
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func saveImage(img *image.RGBA, name string) error {
+	fDst, err := os.Create(fmt.Sprintf("%s.png", name))
+	if err != nil {
+		return err
+	}
+	defer fDst.Close()
+	err = png.Encode(fDst, img)
+	if err != nil {
+		return err
+	}
+	return nil
+}

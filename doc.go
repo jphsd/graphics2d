@@ -2,7 +2,7 @@
 Package graphics2d contains types and functions for 2D graphics rendering.
 
 If all you want to do is render a point, line, arc or path of a particular color into an image, then
-use the draw functions which hides all of the mechanics described below from you:
+use the draw functions which hide all of the mechanics described below from you:
   DrawPoint
   DrawLine
   DrawArc
