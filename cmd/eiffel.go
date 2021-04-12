@@ -28,18 +28,20 @@ func main() {
 	path.Close()
 
 	shape := NewShape(path)
+	shape1 := shape.Transform(CreateTransform(-20, -20, 1, 0))
+	path1 := path.Transform(CreateTransform(20, 20, 1, 0))
 
 	// Render the shape in blue
 	blue := color.RGBA{0, 0, 0xff, 0xff}
-	RenderColoredShape(img, shape, []float32{-20, -20}, blue)
+	RenderColoredShape(img, shape1, blue)
 
 	// and again offset in green
 	green := color.RGBA{0, 0xff, 0, 0xff}
-	RenderColoredShape(img, shape, []float32{0, 0}, green)
+	RenderColoredShape(img, shape, green)
 
 	// and again offset in red
 	red := color.RGBA{0xff, 0, 0, 0xff}
-	RenderColoredPath(img, path, []float32{20, 20}, red)
+	RenderColoredPath(img, path1, red)
 
 	// Capture output
 	fDst, err := os.Create("out.png")
