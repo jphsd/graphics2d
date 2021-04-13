@@ -36,7 +36,7 @@ func main() {
 	path := PartsToPath([][][]float64{[][]float64{p1, c1, c2, p2}})
 	*/
 
-	// Draw lines
+	// Draw curve
 	DrawPath(img, path, red)
 
 	// Capture image output

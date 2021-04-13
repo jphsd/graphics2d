@@ -25,8 +25,11 @@ func main() {
 	c := []float64{200, 200}
 	red := color.RGBA{0xff, 0, 0, 0xff}
 
-	// Draw lines
+	// Draw circle
 	DrawArc(img, p1, c, math.Pi*2, red)
+
+	// Draw point at center in black
+	DrawPoint(img, c, 1, color.Black)
 
 	// Capture image output
 	err := saveImage(img, "out")
