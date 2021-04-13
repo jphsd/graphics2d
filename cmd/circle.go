@@ -29,7 +29,7 @@ func main() {
 	DrawArc(img, p1, c, math.Pi*2, red)
 
 	// Draw point at center in black
-	DrawPoint(img, c, 1, color.Black)
+	DrawPoint(img, c, color.Black)
 
 	// Capture image output
 	err := saveImage(img, "out")
