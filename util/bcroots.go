@@ -122,7 +122,7 @@ func calcRoots(f, df func(float64) float64, tmap map[string]bool) {
 func NRM(start float64, f, df func(float64) float64) (float64, error) {
 	t := start
 
-	for i:=0; i<1000; i++ {
+	for i := 0; i < 100; i++ {
 		d := df(t)
 		if Equals(d, 0) {
 			return 0, fmt.Errorf("zero derivative at %f", t)
