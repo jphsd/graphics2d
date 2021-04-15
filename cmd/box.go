@@ -1,8 +1,8 @@
 package main
 
 import (
-	"image"
 	"image/color"
+	"image/draw"
 
 	// For image output only
 	"fmt"
@@ -11,13 +11,13 @@ import (
 	"os"
 
 	. "github.com/jphsd/graphics2d"
-	g2dimg "github.com/jphsd/graphics2d/image"
+	"github.com/jphsd/graphics2d/image"
 )
 
 func main() {
 	// Create image to write into
 	width, height := 400, 400
-	img := g2dimg.NewRGBA(width, height, color.White)
+	img := image.NewRGBA(width, height, color.White)
 
 	// Define points
 	p1 := []float64{100, 100}
@@ -39,7 +39,7 @@ func main() {
 	}
 }
 
-func saveImage(img *image.RGBA, name string) error {
+func saveImage(img draw.Image, name string) error {
 	fDst, err := os.Create(fmt.Sprintf("%s.png", name))
 	if err != nil {
 		return err

@@ -2,8 +2,10 @@ package main
 
 import (
 	"image/color"
+	"image/draw"
 
 	// For image output only
+	"fmt"
 	"image/png"
 	"log"
 	"os"
@@ -43,14 +45,21 @@ func main() {
 	red := color.RGBA{0xff, 0, 0, 0xff}
 	RenderColoredPath(img, path1, red)
 
-	// Capture output
-	fDst, err := os.Create("out.png")
+	err := saveImage(img, "out")
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func saveImage(img draw.Image, name string) error {
+	fDst, err := os.Create(fmt.Sprintf("%s.png", name))
+	if err != nil {
+		return err
 	}
 	defer fDst.Close()
 	err = png.Encode(fDst, img)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
