@@ -51,7 +51,7 @@ func GlyphToShape(font *sfnt.Font, r rune) (*Shape, error) {
 		case sfnt.SegmentOpMoveTo:
 			if cp != nil {
 				cp.Close()
-				shape.AddPath(cp)
+				shape.AddPaths(cp)
 			}
 			cp = NewPath([]float64{float64(seg.Args[0].X) / 64, float64(seg.Args[0].Y) / 64})
 		case sfnt.SegmentOpLineTo:
@@ -66,6 +66,6 @@ func GlyphToShape(font *sfnt.Font, r rune) (*Shape, error) {
 		}
 	}
 	cp.Close()
-	shape.AddPath(cp)
+	shape.AddPaths(cp)
 	return shape, nil
 }

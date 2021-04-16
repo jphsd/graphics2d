@@ -27,33 +27,28 @@ func (s *Shape) Bounds() image.Rectangle {
 // NewShape constructs a shape from the supplied paths.
 func NewShape(paths ...*Path) *Shape {
 	res := &Shape{}
-	res.AddPaths(paths)
+	res.AddPaths(paths...)
 	return res
 }
 
-// AddPath adds a path to the shape and closes it if not already closed.
-func (s *Shape) AddPath(p *Path) {
-	lp := p.Copy()
-	lp.Close()
-	if s.paths == nil {
-		s.paths = make([]*Path, 1)
-		s.paths[0] = lp
-	} else {
-		s.paths = append(s.paths, lp)
+// AddPaths adds paths to the shape and closes them if not already closed.
+func (s *Shape) AddPaths(paths ...*Path) {
+	for _, p := range paths {
+		lp := p.Copy()
+		lp.Close()
+		if s.paths == nil {
+			s.paths = make([]*Path, 1)
+			s.paths[0] = lp
+		} else {
+			s.paths = append(s.paths, lp)
+		}
 	}
 	s.bounds = image.Rectangle{}
 }
 
-// AddPaths adds a collection of paths to the shape.
-func (s *Shape) AddPaths(paths []*Path) {
-	for _, p := range paths {
-		s.AddPath(p)
-	}
-}
-
 // AddShape adds the paths from the supplied shape to this shape.
 func (s *Shape) AddShape(shape *Shape) {
-	s.AddPaths(shape.Paths())
+	s.AddPaths(shape.Paths()...)
 }
 
 // Paths returns a shallow copy of the paths contained by this shape.

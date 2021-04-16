@@ -388,8 +388,8 @@ func cpSafe(points [][]float64) bool {
 	return v[0] < c[0]+dx && v[0] > c[0]-dx && v[1] < c[1]+dy && v[1] > c[1]-dy
 }
 
-// ReversePath returns a new path describing the current path in reverse order (i.e start and end switched).
-func (p *Path) ReversePath() *Path {
+// Reverse returns a new path describing the current path in reverse order (i.e start and end switched).
+func (p *Path) Reverse() *Path {
 	path, _ := PartsToPath(ReverseParts(p.Parts()))
 	return path
 }
