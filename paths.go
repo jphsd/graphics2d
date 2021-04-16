@@ -148,6 +148,14 @@ func PolyArcFromPoint(pt []float64, cs [][]float64, angs []float64) *Path {
 	return res
 }
 
+// Circle returns a closed path describing a circle centered on c with radius r.
+func Circle(c []float64, r float64) *Path {
+	ax, ay := c[0], c[1]
+	np, _ := PartsToPath(MakeArcParts(ax, ay, r, 0, 2*math.Pi)...)
+	np.Close()
+	return np
+}
+
 // Ellipse returns a closed path describing an ellipse with rx and ry rotated by xang from the x axis.
 func Ellipse(c []float64, rx, ry, xang float64) *Path {
 	ax, ay := c[0], c[1]

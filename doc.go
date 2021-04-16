@@ -38,6 +38,7 @@ Utility functions are provided to generate common forms of paths:
   Arc
   ArcFromPoint
   PolyArcFromPoint
+  Circle
   Ellipse
   EllipticalArc
   EllipticalArcFromPoint

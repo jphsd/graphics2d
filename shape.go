@@ -46,9 +46,11 @@ func (s *Shape) AddPaths(paths ...*Path) {
 	s.bounds = image.Rectangle{}
 }
 
-// AddShape adds the paths from the supplied shape to this shape.
-func (s *Shape) AddShape(shape *Shape) {
-	s.AddPaths(shape.Paths()...)
+// AddShapes adds the paths from the supplied shapes to this shape.
+func (s *Shape) AddShapes(shapes ...*Shape) {
+	for _, shape := range shapes {
+		s.AddPaths(shape.Paths()...)
+	}
 }
 
 // Paths returns a shallow copy of the paths contained by this shape.
