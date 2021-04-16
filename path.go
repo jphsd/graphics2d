@@ -44,7 +44,10 @@ func NewPath(start []float64) *Path {
 
 // AddStep takes an array of points and treats n-1 of them as control points and the
 // last as a point on the curve.
-func (p *Path) AddStep(points [][]float64) error {
+func (p *Path) AddStep(points ...[]float64) error {
+	if len(points) == 0 {
+		return nil
+	}
 	if p.closed {
 		return fmt.Errorf("path is closed, adding a step is forbidden")
 	}
@@ -55,9 +58,9 @@ func (p *Path) AddStep(points [][]float64) error {
 }
 
 // AddSteps adds multiple steps to the path.
-func (p *Path) AddSteps(steps [][][]float64) error {
+func (p *Path) AddSteps(steps ...[][]float64) error {
 	for _, step := range steps {
-		err := p.AddStep(step)
+		err := p.AddStep(step...)
 		if err != nil {
 			return err
 		}
@@ -65,27 +68,48 @@ func (p *Path) AddSteps(steps [][][]float64) error {
 	return nil
 }
 
-// Concatenate adds the path to this path. If either path is closed then an error
-// is returned. If the paths aren't coincident, then they are joind with a line.
-func (p *Path) Concatenate(path *Path) error {
+// Concatenate adds the paths to this path. If any path is closed then an error
+// is returned. If the paths aren't coincident, then they are joined with a line.
+func (p *Path) Concatenate(paths ...*Path) error {
 	if p.closed {
 		return fmt.Errorf("path is closed, adding a step is forbidden")
 	}
-	if path.closed {
-		return fmt.Errorf("can't add a closed path")
+	for _, path := range paths {
+		if path.closed {
+			return fmt.Errorf("can't add a closed path")
+		}
 	}
+
 	lstep := p.steps[len(p.steps)-1]
 	last := lstep[len(lstep)-1]
-
-	steps := path.Steps()
-	if EqualsP(last, steps[0][0]) {
-		// End of p is coincident with sep[0][0] of path
-		p.AddSteps(steps[1:])
-	} else {
-		// Line to steps[0][0]
-		p.AddSteps(steps)
+	for _, path := range paths {
+		steps := path.Steps()
+		if EqualsP(last, steps[0][0]) {
+			// End of p is coincident with sep[0][0] of path
+			p.AddSteps(steps[1:]...)
+		} else {
+			// Line to steps[0][0]
+			p.AddSteps(steps...)
+		}
+		lstep = steps[len(steps)-1]
+		last = lstep[len(lstep)-1]
 	}
 	return nil
+}
+
+// ConcatenatePaths concatenates all the paths int a new path. If any path is closed then an error
+// is returned. If the paths aren't coincident, then they are joined with a line.
+func ConcatenatePaths(paths ...*Path) (*Path, error) {
+	if len(paths) == 0 {
+		return nil, nil
+	}
+
+	path := paths[0].Copy()
+	err := path.Concatenate(paths[1:]...)
+	if err != nil {
+		return nil, err
+	}
+	return path, nil
 }
 
 // Steps returns a shallow copy of all the steps in the path.
@@ -124,16 +148,21 @@ func (p *Path) Closed() bool {
 }
 
 // PartsToPath constructs a new path by concatenating the parts.
-func PartsToPath(pts [][][]float64) (*Path, error) {
-	res := NewPath(pts[0][0])
-	if len(pts[0]) == 1 {
+func PartsToPath(parts ...[][]float64) (*Path, error) {
+	if len(parts) == 0 {
+		return nil, nil
+	}
+
+	res := NewPath(parts[0][0])
+	if len(parts[0]) == 1 {
 		return res, nil
 	}
-	for i, part := range pts {
+
+	for i, part := range parts {
 		if EqualsP(part[0], part[len(part)-1]) {
 			return nil, fmt.Errorf("part %d start and end are coincident", i)
 		}
-		res.AddStep(part[1:])
+		res.AddStep(part[1:]...)
 	}
 	return res, nil
 }
@@ -390,7 +419,7 @@ func cpSafe(points [][]float64) bool {
 
 // Reverse returns a new path describing the current path in reverse order (i.e start and end switched).
 func (p *Path) Reverse() *Path {
-	path, _ := PartsToPath(ReverseParts(p.Parts()))
+	path, _ := PartsToPath(ReverseParts(p.Parts())...)
 	return path
 }
 

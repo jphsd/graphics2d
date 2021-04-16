@@ -55,14 +55,14 @@ func GlyphToShape(font *sfnt.Font, r rune) (*Shape, error) {
 			}
 			cp = NewPath([]float64{float64(seg.Args[0].X) / 64, float64(seg.Args[0].Y) / 64})
 		case sfnt.SegmentOpLineTo:
-			cp.AddStep([][]float64{{float64(seg.Args[0].X) / 64, float64(seg.Args[0].Y) / 64}})
+			cp.AddStep([]float64{float64(seg.Args[0].X) / 64, float64(seg.Args[0].Y) / 64})
 		case sfnt.SegmentOpQuadTo:
-			cp.AddStep([][]float64{{float64(seg.Args[0].X) / 64, float64(seg.Args[0].Y) / 64},
-				{float64(seg.Args[1].X) / 64, float64(seg.Args[1].Y) / 64}})
+			cp.AddStep([]float64{float64(seg.Args[0].X) / 64, float64(seg.Args[0].Y) / 64},
+				[]float64{float64(seg.Args[1].X) / 64, float64(seg.Args[1].Y) / 64})
 		case sfnt.SegmentOpCubeTo:
-			cp.AddStep([][]float64{{float64(seg.Args[0].X) / 64, float64(seg.Args[0].Y) / 64},
-				{float64(seg.Args[1].X) / 64, float64(seg.Args[1].Y) / 64},
-				{float64(seg.Args[2].X) / 64, float64(seg.Args[2].Y) / 64}})
+			cp.AddStep([]float64{float64(seg.Args[0].X) / 64, float64(seg.Args[0].Y) / 64},
+				[]float64{float64(seg.Args[1].X) / 64, float64(seg.Args[1].Y) / 64},
+				[]float64{float64(seg.Args[2].X) / 64, float64(seg.Args[2].Y) / 64})
 		}
 	}
 	cp.Close()

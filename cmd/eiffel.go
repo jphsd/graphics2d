@@ -21,12 +21,12 @@ func main() {
 
 	// Make Eiffel shape
 	path := NewPath([]float64{160, 80})
-	path.AddStep([][]float64{{200, 80}})
-	path.AddStep([][]float64{{200, 200}, {280, 320}})
-	path.AddStep([][]float64{{220, 320}})
-	path.AddStep([][]float64{{220, 240}, {140, 240}, {140, 320}})
-	path.AddStep([][]float64{{80, 320}})
-	path.AddStep([][]float64{{160, 200}, {160, 80}})
+	path.AddStep([]float64{200, 80})
+	path.AddStep([]float64{200, 200}, []float64{280, 320})
+	path.AddStep([]float64{220, 320})
+	path.AddStep([]float64{220, 240}, []float64{140, 240}, []float64{140, 320})
+	path.AddStep([]float64{80, 320})
+	path.AddStep([]float64{160, 200}, []float64{160, 80})
 	path.Close()
 
 	shape := NewShape(path)

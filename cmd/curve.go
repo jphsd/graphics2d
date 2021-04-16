@@ -27,13 +27,13 @@ func main() {
 	red := color.RGBA{0xff, 0, 0, 0xff}
 
 	path := NewPath(p1)
-	err := path.AddStep([][]float64{c1, c2, p2})
+	err := path.AddStep(c1, c2, p2)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	/* We could have written this, this way too
-	path := PartsToPath([][][]float64{[][]float64{p1, c1, c2, p2}})
+	path := PartsToPath([][]float64{p1, c1, c2, p2}})
 	*/
 
 	// Draw curve

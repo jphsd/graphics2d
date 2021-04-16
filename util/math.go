@@ -128,6 +128,9 @@ func ToF32(pts ...float64) []float32 {
 // Centroid returns the centroid of a set of points.
 func Centroid(pts ...[]float64) []float64 {
 	n := len(pts)
+	if n == 0 {
+		return nil
+	}
 	d := len(pts[0])
 	res := make([]float64, d)
 
@@ -150,6 +153,9 @@ func Centroid(pts ...[]float64) []float64 {
 // BoundingBox returns the minimum and maximum demensional values in
 // a set of points.
 func BoundingBox(pts ...[]float64) [][]float64 {
+	if len(pts) == 0 {
+		return nil
+	}
 	d := len(pts[0])
 	res := make([][]float64, 2)
 	res[0] = make([]float64, d)

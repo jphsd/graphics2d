@@ -39,7 +39,7 @@ func (s *Stroke) Process(p *Path) []*Path {
 
 	// Points are their own special case
 	if len(steps) == 1 {
-		np, _ := PartsToPath(s.PointFunc(steps[0][0], s.Width))
+		np, _ := PartsToPath(s.PointFunc(steps[0][0], s.Width)...)
 		np.Close()
 		return []*Path{np}
 	}
@@ -147,9 +147,9 @@ func (s *Stroke) Process(p *Path) []*Path {
 		if !EqualsP(lhsl[len(lhsl)-1], lhs[0][0]) {
 			lhs = append(lhs, s.JoinFunc(lhsl[len(lhsl)-1], stepoffs[0][0], lhs[0][0])...)
 		}
-		rhsp, _ := PartsToPath(rhs)
+		rhsp, _ := PartsToPath(rhs...)
 		rhsp.Close()
-		lhsp, _ := PartsToPath(lhs)
+		lhsp, _ := PartsToPath(lhs...)
 		lhsp.Close()
 		res = []*Path{rhsp, lhsp}
 	} else {
@@ -167,7 +167,7 @@ func (s *Stroke) Process(p *Path) []*Path {
 		both = append(both, lhs...)
 		lhsl := lhs[len(lhs)-1]
 		both = append(both, s.CapStartFunc(lhsl[len(lhsl)-1], stepoffs[len(stepoffs)-1][1], rhs[0][0])...)
-		bp, _ := PartsToPath(both)
+		bp, _ := PartsToPath(both...)
 		bp.Close()
 		res = []*Path{bp}
 	}

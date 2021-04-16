@@ -52,31 +52,40 @@ func Point(pt []float64) *Path {
 // Line returns a path describing the line.
 func Line(pt1, pt2 []float64) *Path {
 	np := NewPath(pt1)
-	np.AddStep([][]float64{pt2})
+	np.AddStep(pt2)
 	return np
 }
 
 // PolyLine returns a path with lines joining successive points.
 func PolyLine(pts ...[]float64) *Path {
+	if len(pts) == 0 {
+		return nil
+	}
 	np := NewPath(pts[0])
 	for i := 1; i < len(pts); i++ {
-		np.AddStep([][]float64{pts[i]})
+		np.AddStep(pts[i])
 	}
 	return np
 }
 
 // Curve returns a path describing the polynomial curve.
 func Curve(pts ...[]float64) *Path {
+	if len(pts) == 0 {
+		return nil
+	}
 	np := NewPath(pts[0])
-	np.AddStep(pts[1:])
+	np.AddStep(pts[1:]...)
 	return np
 }
 
 // PolyCurve returns a path describing the polynomial curves.
 func PolyCurve(pts ...[][]float64) *Path {
+	if len(pts) == 0 {
+		return nil
+	}
 	np := NewPath(pts[0][0])
 	for i := 0; i < len(pts); i++ {
-		np.AddStep(pts[i][1:])
+		np.AddStep(pts[i][1:]...)
 	}
 	return np
 }
@@ -93,13 +102,13 @@ const (
 // Arc returns a path with an arc centered on c with radius r from offs in the direction and length of ang.
 func Arc(c []float64, r, offs, ang float64, s ArcStyle) *Path {
 	parts := MakeArcParts(c[0], c[1], r, offs, ang)
-	np, _ := PartsToPath(parts)
+	np, _ := PartsToPath(parts...)
 	switch s {
 	case ArcChord:
 		np.Close()
 		return np
 	case ArcPie:
-		np.AddStep([][]float64{c})
+		np.AddStep(c)
 		np.Close()
 		return np
 	}
@@ -135,14 +144,14 @@ func PolyArcFromPoint(pt []float64, cs [][]float64, angs []float64) *Path {
 		parts = append(parts, tmp...)
 	}
 
-	res, _ := PartsToPath(parts)
+	res, _ := PartsToPath(parts...)
 	return res
 }
 
 // Ellipse returns a closed path describing an ellipse with rx and ry rotated by xang from the x axis.
 func Ellipse(c []float64, rx, ry, xang float64) *Path {
 	ax, ay := c[0], c[1]
-	np, _ := PartsToPath(MakeArcParts(ax, ay, rx, 0, 2*math.Pi))
+	np, _ := PartsToPath(MakeArcParts(ax, ay, rx, 0, 2*math.Pi)...)
 	np.Close()
 	xfm := NewAff3()
 	// Reverse order
@@ -156,13 +165,13 @@ func Ellipse(c []float64, rx, ry, xang float64) *Path {
 // EllipticalArc returns a path describing an ellipse arc with rx and ry rotated by xang from the x axis.
 func EllipticalArc(c []float64, rx, ry, offs, ang, xang float64, s ArcStyle) *Path {
 	ax, ay := c[0], c[1]
-	np, _ := PartsToPath(MakeArcParts(ax, ay, rx, offs-xang, ang))
+	np, _ := PartsToPath(MakeArcParts(ax, ay, rx, offs-xang, ang)...)
 
 	switch s {
 	case ArcChord:
 		np.Close()
 	case ArcPie:
-		np.AddStep([][]float64{c})
+		np.AddStep(c)
 		np.Close()
 	}
 
@@ -196,10 +205,10 @@ func RegularPolygon(pt1, pt2 []float64, n int) *Path {
 	dx, dy := pt2[0]-pt1[0], pt2[1]-pt1[1]
 	np := NewPath(pt1)
 	cp := pt2
-	np.AddStep([][]float64{cp})
+	np.AddStep(cp)
 	for i := 1; i < n-1; i++ {
 		ncp := []float64{cp[0] + dx*cosDa - dy*sinDa, cp[1] + dx*sinDa + dy*cosDa}
-		np.AddStep([][]float64{ncp})
+		np.AddStep(ncp)
 		dx, dy = ncp[0]-cp[0], ncp[1]-cp[1]
 		cp = ncp
 	}
