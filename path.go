@@ -28,16 +28,17 @@ type Path struct {
 	steps  [][][]float64
 	closed bool
 	bounds image.Rectangle
-	// Caching flattened path
-	flattened *Path
-	tolerance float64
+	// Caching flattened and simplified paths
+	flattened  *Path
+	tolerance  float64
+	simplified *Path
 	// Processed from
 	parent *Path
 }
 
 // NewPath creates a new path starting at start.
 func NewPath(start []float64) *Path {
-	np := Path{make([][][]float64, 1), false, image.Rectangle{}, nil, 1, nil}
+	np := Path{make([][][]float64, 1), false, image.Rectangle{}, nil, 1, nil, nil}
 	np.steps[0] = [][]float64{start}
 	return &np
 }
@@ -45,15 +46,22 @@ func NewPath(start []float64) *Path {
 // AddStep takes an array of points and treats n-1 of them as control points and the
 // last as a point on the curve.
 func (p *Path) AddStep(points ...[]float64) error {
-	if len(points) == 0 {
+	n := len(points)
+	if n == 0 {
 		return nil
 	}
 	if p.closed {
 		return fmt.Errorf("path is closed, adding a step is forbidden")
 	}
+	lastStep := p.steps[len(p.steps)-1]
+	last := lastStep[len(lastStep)-1]
+	if EqualsP(last, points[n-1]) {
+		return fmt.Errorf("zero length step")
+	}
 	p.steps = append(p.steps, points)
 	p.bounds = image.Rectangle{}
 	p.flattened = nil
+	p.simplified = nil
 	return nil
 }
 
@@ -187,7 +195,7 @@ func (p *Path) Flatten(d float64) *Path {
 		}
 	}
 
-	p.flattened = &Path{res, p.closed, image.Rectangle{}, nil, 1, p}
+	p.flattened = &Path{res, p.closed, image.Rectangle{}, nil, 1, nil, p}
 	return p.flattened
 }
 
@@ -275,14 +283,14 @@ func (p *Path) Bounds() image.Rectangle {
 func (p *Path) Copy() *Path {
 	steps := make([][][]float64, len(p.steps))
 	copy(steps, p.steps)
-	return &Path{steps, p.closed, p.bounds, nil, 1, p.parent}
+	return &Path{steps, p.closed, p.bounds, nil, 1, nil, p.parent}
 }
 
 // Open performs a Deepish copy like Copy() but leaves the path open.
 func (p *Path) Open() *Path {
 	steps := make([][][]float64, len(p.steps))
 	copy(steps, p.steps)
-	return &Path{steps, false, p.bounds, nil, 1, p.parent}
+	return &Path{steps, false, p.bounds, nil, 1, nil, p.parent}
 }
 
 // Parent returns the path's parent
@@ -324,13 +332,16 @@ func (p *Path) Transform(xfm *Aff3) *Path {
 	for i, step := range p.steps {
 		steps[i] = xfm.Apply(step...)
 	}
-	return &Path{steps, p.closed, image.Rectangle{}, nil, 1, nil}
+	return &Path{steps, p.closed, image.Rectangle{}, nil, 1, nil, p}
 }
 
 // Simplify breaks up a path into steps where for any step, its control points are all on the
 // same side and its midpoint is well behaved. If a step doesn't meet the criteria, it is
 // recursively subdivide in half until it does.
 func (p *Path) Simplify() *Path {
+	if p.simplified != nil {
+		return p.simplified
+	}
 	res := make([][][]float64, 1)
 	res[0] = p.steps[0]
 	cp := res[0][0]
@@ -355,7 +366,8 @@ func (p *Path) Simplify() *Path {
 		}
 	}
 
-	return &Path{res, p.closed, image.Rectangle{}, nil, 1, p}
+	p.simplified = &Path{res, p.closed, image.Rectangle{}, nil, 1, nil, p}
+	return p.simplified
 }
 
 // Chop curve into pieces based on maxima, minima and inflections in x and y.
@@ -443,4 +455,25 @@ func reversePoints(cp [][]float64) [][]float64 {
 		j--
 	}
 	return res
+}
+
+// Line reduces a path to a line between its endpoints. For a closed path or one where the
+// start and endpoints are coincident, a single point is returned.
+func (p *Path) Line() *Path {
+	n := len(p.steps)
+
+	if n == 1 || p.closed {
+		return p.Copy()
+	}
+
+	first := p.steps[0][0]
+	lastStep := p.steps[n-1]
+	last := lastStep[len(lastStep)-1]
+
+	path := NewPath(first)
+	if EqualsP(first, last) {
+		return path
+	}
+	path.AddStep(last)
+	return path
 }

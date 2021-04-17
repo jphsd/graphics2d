@@ -6,10 +6,10 @@ import (
 	. "github.com/jphsd/graphics2d/util"
 )
 
-// Snip contains the snip pattern and offset. The snip pattern represents lengths of state0, state1,
+// SnipProc contains the snip pattern and offset. The snip pattern represents lengths of state0, state1,
 // ... stateN-1, and is in the same coordinate system as the path. The offset provides the ability to
 // start from anywhere in the pattern.
-type Snip struct {
+type SnipProc struct {
 	N       int
 	Pattern []float64
 	D       float64
@@ -21,7 +21,7 @@ type Snip struct {
 
 // NewSnip creates a new snip path processor with the supplied pattern and offset. If the pattern is
 // not N in length then it is replicated to create a mod N length pattern.
-func NewSnip(n int, pattern []float64, offs float64) *Snip {
+func NewSnipProc(n int, pattern []float64, offs float64) *SnipProc {
 	pat := pattern[:]
 	for len(pat)%n != 0 {
 		pat = append(pat, pattern...)
@@ -29,60 +29,8 @@ func NewSnip(n int, pattern []float64, offs float64) *Snip {
 	s := sum(pat)
 
 	// Default flattening value is 1
-	res := &Snip{n, pat, 1, 0, s, 0, 0}
+	res := &SnipProc{n, pat, 1, 0, s, 0, 0}
 	res.Offset(offs)
-
-	/*
-		neg := offs < 0
-		if neg {
-			offs = -offs
-		}
-		f := offs / s
-		if f > 1 {
-			f = math.Floor(f)
-			offs -= f * s
-		}
-		if neg {
-			offs = s - offs
-		}
-
-		// Figure out initial state, pattern index and delta based on offset.
-		state := 0
-		patind := 0          // which part of the pattern we're on
-		delta := pat[patind] // distance to the next state change
-
-		// Walk to offset in pattern
-		for true {
-			if offs > delta {
-				offs -= delta
-				patind++
-				state++
-				if state == n {
-					state = 0
-				}
-				delta = pat[patind]
-				continue
-			}
-			// offs is > 0 and < delta
-			delta -= offs
-			break
-		}
-
-		if Equals(delta, 0) {
-			state++
-			if state == n {
-				state = 0
-			}
-			patind++
-			if patind == len(pat) {
-				patind = 0
-			}
-			delta = pat[patind]
-		}
-
-		// Default flattening value is 1
-		return &Snip{n, pat, 1, state, s, patind, delta}
-	*/
 	return res
 }
 
@@ -95,24 +43,24 @@ func sum(l []float64) float64 {
 }
 
 // Offset determines where in the pattern the path processor will start.
-func (s *Snip) Offset(offs float64) {
+func (sp *SnipProc) Offset(offs float64) {
 	neg := offs < 0
 	if neg {
 		offs = -offs
 	}
-	f := offs / s.length
+	f := offs / sp.length
 	if f > 1 {
 		f = math.Floor(f)
-		offs -= f * s.length
+		offs -= f * sp.length
 	}
 	if neg {
-		offs = s.length - offs
+		offs = sp.length - offs
 	}
 
 	// Figure out initial state, pattern index and delta based on offset.
 	state := 0
-	patind := 0                // which part of the pattern we're on
-	delta := s.Pattern[patind] // distance to the next state change
+	patind := 0                 // which part of the pattern we're on
+	delta := sp.Pattern[patind] // distance to the next state change
 
 	// Walk to offset in pattern
 	for true {
@@ -120,10 +68,10 @@ func (s *Snip) Offset(offs float64) {
 			offs -= delta
 			patind++
 			state++
-			if state == s.N {
+			if state == sp.N {
 				state = 0
 			}
-			delta = s.Pattern[patind]
+			delta = sp.Pattern[patind]
 			continue
 		}
 		// offs is > 0 and < delta
@@ -133,23 +81,23 @@ func (s *Snip) Offset(offs float64) {
 
 	if Equals(delta, 0) {
 		state++
-		if state == s.N {
+		if state == sp.N {
 			state = 0
 		}
 		patind++
-		if patind == len(s.Pattern) {
+		if patind == len(sp.Pattern) {
 			patind = 0
 		}
-		delta = s.Pattern[patind]
+		delta = sp.Pattern[patind]
 	}
 
-	s.State = state
-	s.patind = patind
-	s.delta = delta
+	sp.State = state
+	sp.patind = patind
+	sp.delta = delta
 }
 
 // Process implements the PathProcessor interface.
-func (s *Snip) Process(p *Path) []*Path {
+func (sp *SnipProc) Process(p *Path) []*Path {
 	// Flatten the path parts to D
 	parts := p.Parts()
 	np := len(parts)
@@ -158,13 +106,13 @@ func (s *Snip) Process(p *Path) []*Path {
 	}
 	fparts := make([][][][]float64, np) // part:subparts:points:xy
 	for i, part := range parts {
-		fparts[i] = FlattenPart(s.D, part)
+		fparts[i] = FlattenPart(sp.D, part)
 	}
 	lparts := getLengths(fparts)
 
 	// Use flattened parts to build list of parts and their t values where there's a state change
-	patind := s.patind
-	delta := s.delta
+	patind := sp.patind
+	delta := sp.delta
 	chind := []int{}
 	cht := []float64{}
 
@@ -196,10 +144,10 @@ func (s *Snip) Process(p *Path) []*Path {
 				cht = append(cht, tlen)
 
 				patind++
-				if patind == len(s.Pattern) {
+				if patind == len(sp.Pattern) {
 					patind = 0
 				}
-				delta = s.Pattern[patind]
+				delta = sp.Pattern[patind]
 				length = rem
 			}
 			delta -= length
@@ -301,4 +249,57 @@ func convTVals(chind []int, cht []float64) []float64 {
 		ll -= d
 	}
 	return res
+}
+
+// DashProc contains the dash pattern and offset. The dash pattern represents lengths of pen down, pen up,
+// ... and is in the same coordinate system as the path. The offset provides the ability to start from
+// anywhere in the pattern.
+type DashProc struct {
+	Snip *SnipProc
+}
+
+// NewDashProc creates a new dash path processor with the supplied pattern and offset. If the pattern is
+// odd in length then it is replicated to create an even length pattern.
+func NewDashProc(pattern []float64, offs float64) *DashProc {
+	return &DashProc{NewSnipProc(2, pattern, offs)}
+}
+
+// Process implements the PathProcessor interface.
+func (d *DashProc) Process(p *Path) []*Path {
+	paths := d.Snip.Process(p)
+	np := len(paths)
+	dp := np / 2
+	res1 := make([]*Path, 0, dp+1)
+	res2 := make([]*Path, 0, dp+1)
+	for i := 0; i < np; i++ {
+		if i%2 == 0 {
+			res1 = append(res1, paths[i])
+		} else {
+			res2 = append(res2, paths[i])
+		}
+	}
+	if d.Snip.State == 0 {
+		return res1
+	}
+	return res2
+}
+
+// MunchProc contains the length.
+type MunchProc struct {
+	Munch *CompoundProc
+}
+
+// NewMunchProc creates a munching path processor. It calculates points along a path spaced l apart
+// and creates new paths that join the points with lines.
+func NewMunchProc(l float64) *MunchProc {
+	if l < 0 {
+		l = -l
+	}
+
+	return &MunchProc{NewCompoundProc(NewSnipProc(2, []float64{l, l}, 0), &LineProc{})}
+}
+
+// Process implements the PathProcessor interface.
+func (mp *MunchProc) Process(p *Path) []*Path {
+	return p.Process(mp.Munch)
 }

@@ -10,17 +10,17 @@ type PathProcessor interface {
 }
 
 // CompoundProcessor applies a collection of PathProcessors to a path.
-type CompoundProcessor struct {
+type CompoundProc struct {
 	Procs []PathProcessor
 }
 
-// NewCompoundProcessor creates a new CompundProcessor with the supplied path processors.
-func NewCompoundProcessor(procs ...PathProcessor) *CompoundProcessor {
-	return &CompoundProcessor{procs}
+// NewCompoundProc creates a new CompundProcessor with the supplied path processors.
+func NewCompoundProc(procs ...PathProcessor) *CompoundProc {
+	return &CompoundProc{procs}
 }
 
 // Process implements the PathProcessor interface.
-func (cp *CompoundProcessor) Process(p *Path) []*Path {
+func (cp *CompoundProc) Process(p *Path) []*Path {
 	paths := []*Path{p}
 	if len(cp.Procs) == 0 {
 		return paths
@@ -35,4 +35,33 @@ func (cp *CompoundProcessor) Process(p *Path) []*Path {
 	}
 
 	return paths
+}
+
+// PathProcessor wrappers for Flatten, Simplify and Linepath functions
+
+// Flatten contains the minimum required distance to the controa points.
+type FlattenProc struct {
+	D float64
+}
+
+// Process implements the PathProcessor interface.
+func (fp *FlattenProc) Process(p *Path) []*Path {
+	path := p.Flatten(fp.D)
+	return []*Path{path}
+}
+
+type LineProc struct{}
+
+// Process implements the PathProcessor interface.
+func (lp *LineProc) Process(p *Path) []*Path {
+	path := p.Line()
+	return []*Path{path}
+}
+
+type SimplifyProc struct{}
+
+// Process implements the PathProcessor interface.
+func (sp *SimplifyProc) Process(p *Path) []*Path {
+	path := p.Simplify()
+	return []*Path{path}
 }

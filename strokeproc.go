@@ -12,8 +12,8 @@ import (
 // Cap types - butt [default], round, square
 // Join types - round, bevel [default], miter
 
-// Stroke defines the width, join and cap types of the stroke.
-type Stroke struct {
+// StrokeProc defines the width, join and cap types of the stroke.
+type StrokeProc struct {
 	Width        float64
 	hw           float64 // hw - half width
 	PointFunc    func([]float64, float64) [][][]float64
@@ -23,23 +23,23 @@ type Stroke struct {
 	CapEndFunc   func([]float64, []float64, []float64) [][][]float64
 }
 
-// NewStroke creates a stroke path processor with width w, the bevel join and butt cap types.
-func NewStroke(w float64) *Stroke {
+// NewStrokeProc creates a stroke path processor with width w, the bevel join and butt cap types.
+func NewStrokeProc(w float64) *StrokeProc {
 	if w < 0 {
-		w = 1
+		w = -w
 	}
-	return &Stroke{w, w / 2, PointCircle, JoinBevel, CapButt, nil, nil} // 10 degrees
+	return &StrokeProc{w, w / 2, PointCircle, JoinBevel, CapButt, nil, nil} // 10 degrees
 }
 
 // Process implements the PathProcessor interface and will return either one or two paths
 // depending on whether the path is open or closed. Note that inside joins have a tie inside
 // the stroke.
-func (s *Stroke) Process(p *Path) []*Path {
+func (sp *StrokeProc) Process(p *Path) []*Path {
 	steps := p.Steps()
 
 	// Points are their own special case
 	if len(steps) == 1 {
-		np, _ := PartsToPath(s.PointFunc(steps[0][0], s.Width)...)
+		np, _ := PartsToPath(sp.PointFunc(steps[0][0], sp.Width)...)
 		np.Close()
 		return []*Path{np}
 	}
@@ -64,9 +64,9 @@ func (s *Stroke) Process(p *Path) []*Path {
 		tmp := make([][]float64, 2)
 		tmp[0], tmp[1] = DeCasteljau(pts, 0), DeCasteljau(pts, 1)
 		dx, dy := norm(tmp[0][3], -tmp[0][2])
-		tmp[0][2], tmp[0][3] = dx*s.hw, dy*s.hw
+		tmp[0][2], tmp[0][3] = dx*sp.hw, dy*sp.hw
 		dx, dy = norm(tmp[1][3], -tmp[1][2])
-		tmp[1][2], tmp[1][3] = dx*s.hw, dy*s.hw
+		tmp[1][2], tmp[1][3] = dx*sp.hw, dy*sp.hw
 		stepoffs[i-1] = tmp
 		fpts[i-1] = pts
 		cp = tmp[1]
@@ -77,9 +77,9 @@ func (s *Stroke) Process(p *Path) []*Path {
 			tmp := make([][]float64, 2)
 			tmp[0], tmp[1] = DeCasteljau(pts, 0), DeCasteljau(pts, 1)
 			dx, dy := norm(tmp[0][3], -tmp[0][2])
-			tmp[0][2], tmp[0][3] = dx*s.hw, dy*s.hw
+			tmp[0][2], tmp[0][3] = dx*sp.hw, dy*sp.hw
 			dx, dy = norm(tmp[1][3], -tmp[1][2])
-			tmp[1][2], tmp[1][3] = dx*s.hw, dy*s.hw
+			tmp[1][2], tmp[1][3] = dx*sp.hw, dy*sp.hw
 			stepoffs = append(stepoffs, tmp)
 			fpts = append(fpts, pts)
 		}
@@ -103,7 +103,7 @@ func (s *Stroke) Process(p *Path) []*Path {
 	for i := 1; i < n; i++ {
 		last := rhs[i-1][len(rhs[i-1])-1]
 		if !EqualsP(last, rhs[i][0]) {
-			nrhs = append(nrhs, s.JoinFunc(last, stepoffs[i][0], rhs[i][0])...)
+			nrhs = append(nrhs, sp.JoinFunc(last, stepoffs[i][0], rhs[i][0])...)
 		}
 		nrhs = append(nrhs, rhs[i])
 	}
@@ -130,7 +130,7 @@ func (s *Stroke) Process(p *Path) []*Path {
 	for i := 1; i < n; i++ {
 		last := lhs[i-1][len(lhs[i-1])-1]
 		if !EqualsP(last, lhs[i][0]) {
-			nlhs = append(nlhs, s.JoinFunc(last, stepoffs[i][0], lhs[i][0])...)
+			nlhs = append(nlhs, sp.JoinFunc(last, stepoffs[i][0], lhs[i][0])...)
 		}
 		nlhs = append(nlhs, lhs[i])
 	}
@@ -141,11 +141,11 @@ func (s *Stroke) Process(p *Path) []*Path {
 		// Close the RHS and LHS paths and return them
 		rhsl := rhs[len(rhs)-1]
 		if !EqualsP(rhsl[len(rhsl)-1], rhs[0][0]) {
-			rhs = append(rhs, s.JoinFunc(rhsl[len(rhsl)-1], stepoffs[0][0], rhs[0][0])...)
+			rhs = append(rhs, sp.JoinFunc(rhsl[len(rhsl)-1], stepoffs[0][0], rhs[0][0])...)
 		}
 		lhsl := lhs[len(lhs)-1]
 		if !EqualsP(lhsl[len(lhsl)-1], lhs[0][0]) {
-			lhs = append(lhs, s.JoinFunc(lhsl[len(lhsl)-1], stepoffs[0][0], lhs[0][0])...)
+			lhs = append(lhs, sp.JoinFunc(lhsl[len(lhsl)-1], stepoffs[0][0], lhs[0][0])...)
 		}
 		rhsp, _ := PartsToPath(rhs...)
 		rhsp.Close()
@@ -153,20 +153,20 @@ func (s *Stroke) Process(p *Path) []*Path {
 		lhsp.Close()
 		res = []*Path{rhsp, lhsp}
 	} else {
-		if s.CapEndFunc == nil {
-			s.CapEndFunc = s.CapFunc
+		if sp.CapEndFunc == nil {
+			sp.CapEndFunc = sp.CapFunc
 		}
-		if s.CapStartFunc == nil {
-			s.CapStartFunc = s.CapFunc
+		if sp.CapStartFunc == nil {
+			sp.CapStartFunc = sp.CapFunc
 		}
 		// Path is open, construct end caps and concatenate RHS with LHS, return it
 		both := make([][][]float64, 0, len(rhs)+len(lhs)+2)
 		both = append(both, rhs...)
 		rhsl := rhs[len(rhs)-1]
-		both = append(both, s.CapEndFunc(rhsl[len(rhsl)-1], stepoffs[0][0], lhs[0][0])...)
+		both = append(both, sp.CapEndFunc(rhsl[len(rhsl)-1], stepoffs[0][0], lhs[0][0])...)
 		both = append(both, lhs...)
 		lhsl := lhs[len(lhs)-1]
-		both = append(both, s.CapStartFunc(lhsl[len(lhsl)-1], stepoffs[len(stepoffs)-1][1], rhs[0][0])...)
+		both = append(both, sp.CapStartFunc(lhsl[len(lhsl)-1], stepoffs[len(stepoffs)-1][1], rhs[0][0])...)
 		bp, _ := PartsToPath(both...)
 		bp.Close()
 		res = []*Path{bp}

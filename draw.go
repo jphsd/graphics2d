@@ -15,7 +15,7 @@ func DrawPoint(img draw.Image, at []float64, color color.Color) {
 // DrawPointW renders a point of size width into img.
 func DrawPointW(img draw.Image, at []float64, width float64, color color.Color) {
 	RenderColoredShape(img, NewShape(
-		Point(at).Process(NewStroke(width))...),
+		Point(at).Process(NewStrokeProc(width))...),
 		color)
 }
 
@@ -27,7 +27,7 @@ func DrawLine(img draw.Image, start, end []float64, color color.Color) {
 // DrawLineW renders a line of size width into img.
 func DrawLineW(img draw.Image, start, end []float64, width float64, color color.Color) {
 	RenderColoredShape(img, NewShape(
-		Line(start, end).Process(NewStroke(width))...),
+		Line(start, end).Process(NewStrokeProc(width))...),
 		color)
 }
 
@@ -40,7 +40,7 @@ func DrawArc(img draw.Image, start, center []float64, radians float64, color col
 // DrawArcW renders an arc of size width into img.
 func DrawArcW(img draw.Image, start, center []float64, radians float64, width float64, color color.Color) {
 	RenderColoredShape(img, NewShape(
-		ArcFromPoint(start, center, radians, ArcOpen).Process(NewStroke(width))...),
+		ArcFromPoint(start, center, radians, ArcOpen).Process(NewStrokeProc(width))...),
 		color)
 }
 
@@ -52,6 +52,6 @@ func DrawPath(img draw.Image, path *Path, color color.Color) {
 // DrawPathW renders a path of size width into img.
 func DrawPathW(img draw.Image, path *Path, width float64, color color.Color) {
 	RenderColoredShape(img, NewShape(
-		path.Process(NewStroke(width))...),
+		path.Process(NewStrokeProc(width))...),
 		color)
 }
