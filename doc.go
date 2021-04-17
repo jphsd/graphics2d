@@ -34,7 +34,8 @@ of other possibilities:
   ShapesProc - distributes shapes along a path separated by some distance
   SnipProc - cuts up a path into smaller pieces according to a pattern
   SplitProc - splits each step into its own path
-  StrokeProc - creates a fixed width outline of a path with options for the cap and join styles
+  StrokeProc - creates a fixed width outline of a path with options for the cap and
+  join styles
 
 Shapes and Paths are be rendered with the render functions. Paths are forced closed when rendered.
 Convenience methods are provided for rendering with a single color or an image. The full render function
