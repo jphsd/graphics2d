@@ -19,7 +19,7 @@ type SnipProc struct {
 	delta   float64
 }
 
-// NewSnip creates a new snip path processor with the supplied pattern and offset. If the pattern is
+// NewSnipProc creates a new snip path processor with the supplied pattern and offset. If the pattern is
 // not N in length then it is replicated to create a mod N length pattern.
 func NewSnipProc(n int, pattern []float64, offs float64) *SnipProc {
 	pat := pattern[:]

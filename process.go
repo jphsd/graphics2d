@@ -9,7 +9,7 @@ type PathProcessor interface {
 	Process(p *Path) []*Path
 }
 
-// CompoundProcessor applies a collection of PathProcessors to a path.
+// CompoundProc applies a collection of PathProcessors to a path.
 type CompoundProc struct {
 	Procs []PathProcessor
 }
@@ -39,7 +39,8 @@ func (cp *CompoundProc) Process(p *Path) []*Path {
 
 // PathProcessor wrappers for Flatten, Simplify and Linepath functions
 
-// Flatten contains the minimum required distance to the controa points.
+// FlattenProc is a wrapper around Path.Flatten() and contains the minimum required
+// distance to the control points.
 type FlattenProc struct {
 	D float64
 }
@@ -50,6 +51,7 @@ func (fp *FlattenProc) Process(p *Path) []*Path {
 	return []*Path{path}
 }
 
+// LineProc replaces a path with a single line.
 type LineProc struct{}
 
 // Process implements the PathProcessor interface.
@@ -58,6 +60,7 @@ func (lp *LineProc) Process(p *Path) []*Path {
 	return []*Path{path}
 }
 
+// SimplifyProc is a wrpper around Path.Simplify().
 type SimplifyProc struct{}
 
 // Process implements the PathProcessor interface.
