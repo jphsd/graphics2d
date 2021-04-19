@@ -63,7 +63,7 @@ func main() {
 	out = gray
 	prev := &image.Gray{}
 	n := 0
-	for !Equals(prev, out) {
+	for !Equal(prev, out) {
 		prev = out
 		out = Thin(out)
 		n++

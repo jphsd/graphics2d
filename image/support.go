@@ -201,7 +201,7 @@ func GrayToSupport(img *image.Gray) [][]bool {
 	res := make([][]bool, h)
 	for i := 0; i < h; i++ {
 		res[i] = make([]bool, w)
-		so := img.PixOffset(0, i)
+		so := img.PixOffset(0+imgR.Min.X, i+imgR.Min.Y)
 		for j := 0; j < w; j++ {
 			res[i][j] = img.Pix[so+j] >= 128
 		}

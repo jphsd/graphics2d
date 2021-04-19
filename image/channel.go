@@ -48,7 +48,8 @@ func ExtractChannel(img *image.RGBA, ch int) *image.Gray {
 		// Scan line at a time
 		if ch != 3 {
 			for i := 0; i < h; i++ {
-				so, do := img.PixOffset(0, i), res.PixOffset(0, i)
+				so := img.PixOffset(0+imgR.Min.X, i+imgR.Min.Y)
+				do := res.PixOffset(0, i)
 				for j := 0; j < w; j++ {
 					dp[do] = invPremult[sp[so+ch]][sp[so+3]]
 					so += 4
@@ -57,7 +58,8 @@ func ExtractChannel(img *image.RGBA, ch int) *image.Gray {
 			}
 		} else { // Alpha
 			for i := 0; i < h; i++ {
-				so, do := img.PixOffset(0, i)+3, res.PixOffset(0, i)
+				so := img.PixOffset(0+imgR.Min.X, i+imgR.Min.Y) + 3
+				do := res.PixOffset(0, i)
 				for j := 0; j < w; j++ {
 					dp[do] = sp[so]
 					so += 4
@@ -76,10 +78,10 @@ func ReplaceChannel(img *image.RGBA, ch int, rep *image.Gray) *image.RGBA {
 	if ch < 0 || ch > 3 {
 		panic(fmt.Errorf("Requested channel not in range"))
 	}
-
 	imgR := img.Bounds()
+	repR := rep.Bounds()
 	w, h := imgR.Dx(), imgR.Dy()
-	if rep.Rect.Dx() != w || rep.Rect.Dy() != h {
+	if repR.Dx() != w || repR.Dy() != h {
 		panic(fmt.Errorf("images are different sizes"))
 	}
 
@@ -129,7 +131,9 @@ func ReplaceChannel(img *image.RGBA, ch int, rep *image.Gray) *image.RGBA {
 	} else {
 		// Scan line at a time
 		for i := 0; i < h; i++ {
-			so, do, ro := img.PixOffset(0, i), res.PixOffset(0, i), rep.PixOffset(0, i)
+			so := img.PixOffset(0+imgR.Min.X, i+imgR.Min.Y)
+			do := res.PixOffset(0, i)
+			ro := img.PixOffset(0+repR.Min.X, i+repR.Min.Y)
 			for k := 0; k < w; k++ {
 				j := k * 4
 				sj, dj := so+j, do+j
@@ -207,7 +211,8 @@ func SwitchChannels(img *image.RGBA, ch1, ch2 int) *image.RGBA {
 	} else {
 		// Scan line at a time
 		for i := 0; i < h; i++ {
-			so, do := img.PixOffset(0, i), res.PixOffset(0, i)
+			so := img.PixOffset(0+imgR.Min.X, i+imgR.Min.Y)
+			do := res.PixOffset(0, i)
 			for j := 0; j < w; j++ {
 				switch ooo {
 				case 0:
@@ -260,7 +265,11 @@ func CombineChannels(chR, chG, chB, chA *image.Gray, scale bool) *image.RGBA {
 		} else {
 			// Scan line at a time
 			for i := 0; i < h; i++ {
-				ro, ggo, bo, ao, do := chR.PixOffset(0, i), chG.PixOffset(0, i), chB.PixOffset(0, i), chA.PixOffset(0, i), res.PixOffset(0, i)
+				ro := chR.PixOffset(0+chRR.Min.X, i+chRR.Min.Y)
+				ggo := chG.PixOffset(0+chGR.Min.X, i+chGR.Min.Y)
+				bo := chB.PixOffset(0+chBR.Min.X, i+chBR.Min.Y)
+				ao := chA.PixOffset(0+chAR.Min.X, i+chAR.Min.Y)
+				do := res.PixOffset(0, i)
 				for j := 0; j < w; j++ {
 					k := do + j*4
 					a := chA.Pix[ao+j]
@@ -285,7 +294,11 @@ func CombineChannels(chR, chG, chB, chA *image.Gray, scale bool) *image.RGBA {
 		} else {
 			// Scan line at a time
 			for i := 0; i < h; i++ {
-				ro, ggo, bo, ao, do := chR.PixOffset(0, i), chG.PixOffset(0, i), chB.PixOffset(0, i), chA.PixOffset(0, i), res.PixOffset(0, i)
+				ro := chR.PixOffset(0+chRR.Min.X, i+chRR.Min.Y)
+				ggo := chG.PixOffset(0+chGR.Min.X, i+chGR.Min.Y)
+				bo := chB.PixOffset(0+chBR.Min.X, i+chBR.Min.Y)
+				ao := chA.PixOffset(0+chAR.Min.X, i+chAR.Min.Y)
+				do := res.PixOffset(0, i)
 				for j := 0; j < w; j++ {
 					k := do + j*4
 					res.Pix[k] = chR.Pix[ro+j]

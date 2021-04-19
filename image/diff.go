@@ -17,8 +17,8 @@ func Variance(img1, img2 *image.Gray) (float64, int) {
 	n := 0
 	sum := float64(0)
 	for y := 0; y < h; y++ {
-		i1 := img1.PixOffset(0, y)
-		i2 := img2.PixOffset(0, y)
+		i1 := img1.PixOffset(0+img1R.Min.X, y+img1R.Min.Y)
+		i2 := img2.PixOffset(0+img2R.Min.X, y+img2R.Min.Y)
 		for x := 0; x < w; x, i1, i2 = x+1, i1+1, i2+1 {
 			v1, v2 := img1.Pix[i1], img2.Pix[i2]
 			if v1 != v2 {

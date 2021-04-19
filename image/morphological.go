@@ -96,6 +96,7 @@ func Morphological(img *image.Gray, op func([][]uint8, [][]bool) uint8, support 
 }
 
 func morphHelper(x, y, sw, sh, iw, ih int, img *image.Gray, def uint8) [][]uint8 {
+	imgR := img.Bounds()
 	// if entire value set is within the image, create new slice references
 	// else copy def and valid values
 	res := make([][]uint8, sh)
@@ -104,7 +105,7 @@ func morphHelper(x, y, sw, sh, iw, ih int, img *image.Gray, def uint8) [][]uint8
 	if x1 > -1 && y1 > -1 && x2 < iw && y2 < ih {
 		// We can construct new slices using the image
 		for i := 0; i < sh; i++ {
-			so := img.PixOffset(x1, y1+i)
+			so := img.PixOffset(x1+imgR.Min.X, y1+i+imgR.Min.Y)
 			res[i] = img.Pix[so : so+sw]
 		}
 		return res
@@ -120,12 +121,12 @@ func morphHelper(x, y, sw, sh, iw, ih int, img *image.Gray, def uint8) [][]uint8
 			continue
 		}
 		if x1 > -1 && x2 < iw {
-			so := img.PixOffset(x1, y1+i)
+			so := img.PixOffset(x1+imgR.Min.X, y1+i+imgR.Min.Y)
 			res[i] = img.Pix[so : so+sw]
 			continue
 		}
 		res[i] = make([]uint8, sw)
-		so := img.PixOffset(0, y1+i)
+		so := img.PixOffset(0+imgR.Min.X, y1+i+imgR.Min.Y)
 		for j := x1; j < x1+sw; j++ {
 			if j < 0 || j >= iw {
 				res[i][j-x1] = def

@@ -19,7 +19,7 @@ func Histogram(img *image.Gray) ([]int, int, int) {
 	} else {
 		// Scan line at a time
 		for i := 0; i < h; i++ {
-			so := img.PixOffset(0, i)
+			so := img.PixOffset(0+imgR.Min.X, i+imgR.Min.Y)
 			for j := 0; j < w; j++ {
 				res[sp[so+j]]++
 			}

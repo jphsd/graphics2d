@@ -10,6 +10,7 @@ func RemapGray(img *image.Gray, lut []uint8) *image.Gray {
 	if len(lut) != 256 {
 		panic(fmt.Errorf("lut must be 256 long"))
 	}
+	imgR := img.Bounds()
 
 	w, h := img.Rect.Dx(), img.Rect.Dy()
 	res := image.NewGray(image.Rect(0, 0, w, h))
@@ -23,7 +24,8 @@ func RemapGray(img *image.Gray, lut []uint8) *image.Gray {
 	} else {
 		// Scan line at a time
 		for i := 0; i < h; i++ {
-			so, do := img.PixOffset(0, i), res.PixOffset(0, i)
+			so := img.PixOffset(0+imgR.Min.X, i+imgR.Min.Y)
+			do := res.PixOffset(0, i)
 			for j := 0; j < w; j++ {
 				dp[do] = lut[sp[so]]
 				so++
@@ -40,6 +42,7 @@ func RemapRGB(img *image.RGBA, lutR, lutG, lutB []uint8) *image.RGBA {
 	if len(lutR) != 256 || len(lutG) != 256 || len(lutB) != 256 {
 		panic(fmt.Errorf("luts must be 256 long"))
 	}
+	imgR := img.Bounds()
 	// Convert luts to alpha pre-multiplied
 	lRA := PremulLut(lutR)
 	lGA := PremulLut(lutG)
@@ -61,7 +64,8 @@ func RemapRGB(img *image.RGBA, lutR, lutG, lutB []uint8) *image.RGBA {
 	} else {
 		// Scan line at a time
 		for i := 0; i < h; i++ {
-			so, do := img.PixOffset(0, i), res.PixOffset(0, i)
+			so := img.PixOffset(0+imgR.Min.X, i+imgR.Min.Y)
+			do := res.PixOffset(0, i)
 			for j := 0; j < w; j++ {
 				sj, dj := so+j, do+j
 				a := sp[sj+3]
@@ -81,6 +85,7 @@ func RemapRGBSingle(img *image.RGBA, lut []uint8) *image.RGBA {
 	if len(lut) != 256 {
 		panic(fmt.Errorf("lut must be 256 long"))
 	}
+	imgR := img.Bounds()
 	// Convert lut to alpha pre-multiplied
 	lA := PremulLut(lut)
 
@@ -100,7 +105,8 @@ func RemapRGBSingle(img *image.RGBA, lut []uint8) *image.RGBA {
 	} else {
 		// Scan line at a time
 		for i := 0; i < h; i++ {
-			so, do := img.PixOffset(0, i), res.PixOffset(0, i)
+			so := img.PixOffset(0+imgR.Min.X, i+imgR.Min.Y)
+			do := res.PixOffset(0, i)
 			for j := 0; j < w; j++ {
 				sj, dj := so+j, do+j
 				a := sp[sj+3]

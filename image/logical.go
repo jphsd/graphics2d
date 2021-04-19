@@ -16,8 +16,8 @@ func And(img1, img2 *image.Gray) *image.Gray {
 	}
 	res := image.NewGray(image.Rect(0, 0, w, h))
 	for y := 0; y < h; y++ {
-		i1 := img1.PixOffset(0, y)
-		i2 := img2.PixOffset(0, y)
+		i1 := img1.PixOffset(0+img1R.Min.X, y+img1R.Min.Y)
+		i2 := img2.PixOffset(0+img2R.Min.X, y+img2R.Min.Y)
 		d := res.Stride * y
 		for x := 0; x < w; x, i1, i2, d = x+1, i1+1, i2+1, d+1 {
 			res.Pix[d] = min(img1.Pix[i1], img2.Pix[i2])
@@ -37,8 +37,8 @@ func Or(img1, img2 *image.Gray) *image.Gray {
 	}
 	res := image.NewGray(image.Rect(0, 0, w, h))
 	for y := 0; y < h; y++ {
-		i1 := img1.PixOffset(0, y)
-		i2 := img2.PixOffset(0, y)
+		i1 := img1.PixOffset(0+img1R.Min.X, y+img1R.Min.Y)
+		i2 := img2.PixOffset(0+img2R.Min.X, y+img2R.Min.Y)
 		d := res.Stride * y
 		for x := 0; x < w; x, i1, i2, d = x+1, i1+1, i2+1, d+1 {
 			res.Pix[d] = max(img1.Pix[i1], img2.Pix[i2])
@@ -58,8 +58,8 @@ func Xor(img1, img2 *image.Gray) *image.Gray {
 	}
 	res := image.NewGray(image.Rect(0, 0, w, h))
 	for y := 0; y < h; y++ {
-		i1 := img1.PixOffset(0, y)
-		i2 := img2.PixOffset(0, y)
+		i1 := img1.PixOffset(0+img1R.Min.X, y+img1R.Min.Y)
+		i2 := img2.PixOffset(0+img2R.Min.X, y+img2R.Min.Y)
 		d := res.Stride * y
 		for x := 0; x < w; x, i1, i2, d = x+1, i1+1, i2+1, d+1 {
 			p1 := img1.Pix[i1]
@@ -81,8 +81,8 @@ func Sub(img1, img2 *image.Gray) *image.Gray {
 	}
 	res := image.NewGray(image.Rect(0, 0, w, h))
 	for y := 0; y < h; y++ {
-		i1 := img1.PixOffset(0, y)
-		i2 := img2.PixOffset(0, y)
+		i1 := img1.PixOffset(0+img1R.Min.X, y+img1R.Min.Y)
+		i2 := img2.PixOffset(0+img2R.Min.X, y+img2R.Min.Y)
 		d := res.Stride * y
 		for x := 0; x < w; x, i1, i2, d = x+1, i1+1, i2+1, d+1 {
 			// img1 intersected with not(img2)
@@ -98,7 +98,7 @@ func Not(img *image.Gray) *image.Gray {
 	w, h := imgR.Dx(), imgR.Dy()
 	res := image.NewGray(image.Rect(0, 0, w, h))
 	for y := 0; y < h; y++ {
-		i1 := img.PixOffset(0, y)
+		i1 := img.PixOffset(0+imgR.Min.X, y+imgR.Min.Y)
 		d := res.Stride * y
 		for x := 0; x < w; x, i1, d = x+1, i1+1, d+1 {
 			res.Pix[d] = 0xff - img.Pix[i1]
@@ -116,8 +116,8 @@ func Equal(img1, img2 *image.Gray) bool {
 		return false
 	}
 	for y := 0; y < h; y++ {
-		i1 := img1.PixOffset(0, y)
-		i2 := img2.PixOffset(0, y)
+		i1 := img1.PixOffset(0+img1R.Min.X, y+img1R.Min.Y)
+		i2 := img2.PixOffset(0+img2R.Min.X, y+img2R.Min.Y)
 		for x := 0; x < w; x, i1, i2 = x+1, i1+1, i2+1 {
 			if img1.Pix[i1] != img2.Pix[i2] {
 				return false
@@ -138,7 +138,7 @@ func Copy(img *image.Gray) *image.Gray {
 	} else {
 		// Scan line at a time
 		for i := 0; i < h; i++ {
-			start := img.PixOffset(0, i)
+			start := img.PixOffset(0+imgR.Min.X, i+imgR.Min.Y)
 			os := res.Pix[0:w]
 			is := img.Pix[start : start+w]
 			copy(is, os)

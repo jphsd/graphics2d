@@ -22,10 +22,26 @@ func NewRGBAVal(w, h int, r, g, b, a uint8) *image.RGBA {
 	return res
 }
 
+// NewAlpha is a wrapper for image.Alpha which returns a new image of the desired size filled with color.
+func NewAlpha(w, h int, col color.Color) *image.Alpha {
+	res := image.NewAlpha(image.Rect(0, 0, w, h))
+	bg := image.NewUniform(col)
+	draw.Draw(res, res.Bounds(), bg, image.Point{}, draw.Src)
+	return res
+}
+
 // NewAlphaVal is a wrapper for image.Alpha which returns a new image of the desired size filled with color.
 func NewAlphaVal(w, h int, a uint8) *image.Alpha {
 	res := image.NewAlpha(image.Rect(0, 0, w, h))
 	bg := image.NewUniform(color.Alpha{a})
+	draw.Draw(res, res.Bounds(), bg, image.Point{}, draw.Src)
+	return res
+}
+
+// NewGray is a wrapper for image.Gray which returns a new image of the desired size filled with color.
+func NewGray(w, h int, col color.Color) *image.Gray {
+	res := image.NewGray(image.Rect(0, 0, w, h))
+	bg := image.NewUniform(col)
 	draw.Draw(res, res.Bounds(), bg, image.Point{}, draw.Src)
 	return res
 }
