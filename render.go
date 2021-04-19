@@ -30,11 +30,8 @@ func RenderPathExt(dst draw.Image, path *Path, at []float32, filler image.Image,
 	rect := dst.Bounds()
 	size := rect.Size()
 
-	if clip != nil {
-		crect := clip.Bounds()
-		if !crect.Empty() && !crect.Size().Eq(size) {
-			return fmt.Errorf("clip image must have same size as destination image")
-		}
+	if clip != nil && !size.Eq(clip.Bounds().Size()) {
+		return fmt.Errorf("clip image must have same size as destination image")
 	}
 
 	rasterizer := vector.NewRasterizer(size.X, size.Y)
@@ -53,9 +50,10 @@ func RenderPathExt(dst draw.Image, path *Path, at []float32, filler image.Image,
 
 	if clip != nil {
 		// Obtain rasterizer mask and intersect it against the clip mask
-		alpha := image.NewAlpha(image.Rect(0, 0, size.X, size.Y))
+		alpha := image.NewAlpha(rect)
 		rasterizer.Draw(alpha, rect, image.Opaque, image.Point{})
 		alpha = g2dimg.AlphaAnd(alpha, clip)
+		// alpha now has {0, 0} origin
 		draw.DrawMask(dst, rect, filler, image.Point{}, alpha, image.Point{}, op)
 	} else {
 		rasterizer.Draw(dst, rect, filler, image.Point{})
@@ -104,11 +102,8 @@ func RenderShapeExt(dst draw.Image, shape *Shape, at []float32, filler image.Ima
 	rect := dst.Bounds()
 	size := rect.Size()
 
-	if clip != nil {
-		crect := clip.Bounds()
-		if !crect.Empty() && !crect.Size().Eq(size) {
-			return fmt.Errorf("clip image must have same size as destination image")
-		}
+	if clip != nil && !size.Eq(clip.Bounds().Size()) {
+		return fmt.Errorf("clip image must have same size as destination image")
 	}
 
 	rasterizer := vector.NewRasterizer(size.X, size.Y)
@@ -129,9 +124,10 @@ func RenderShapeExt(dst draw.Image, shape *Shape, at []float32, filler image.Ima
 
 	if clip != nil {
 		// Obtain rasterizer mask and intersect it against the clip mask
-		alpha := image.NewAlpha(image.Rect(0, 0, size.X, size.Y))
+		alpha := image.NewAlpha(rect)
 		rasterizer.Draw(alpha, rect, image.Opaque, image.Point{})
 		alpha = g2dimg.AlphaAnd(alpha, clip)
+		// alpha now has origin {0, 0}
 		draw.DrawMask(dst, rect, filler, image.Point{}, alpha, image.Point{}, op)
 	} else {
 		rasterizer.Draw(dst, rect, filler, image.Point{})
@@ -161,4 +157,47 @@ func RenderShapeAlpha(dst *image.Alpha, shape *Shape, at []float32, op draw.Op) 
 	}
 
 	rasterizer.Draw(dst, rect, image.Opaque, image.Point{})
+}
+
+// The following functions use a pre-rendered mask of the shape to draw to the destination image.
+// Note that the offsets are Points and not []float32 as previous.
+
+// DrawColoredShape utilizes the supplied shape's mask to draw into the destination image at an offset
+// with the fill color.
+func DrawColoredShape(dst draw.Image, shape *Shape, at image.Point, fill color.Color) {
+	filler := image.NewUniform(fill)
+	DrawShapeExt(dst, shape, at, filler, image.Point{}, nil, draw.Over)
+}
+
+// DrawShape utilizes the supplied shape's mask to draw into the destination image at an offset with
+// the filler image.
+func DrawShape(dst draw.Image, shape *Shape, at image.Point, filler image.Image) {
+	DrawShapeExt(dst, shape, at, filler, image.Point{}, nil, draw.Over)
+}
+
+// DrawShapeExt utilizes the supplied shape's mask to draw into the destination image at an offset with
+// the filler, also offset, and clip images using op.
+func DrawShapeExt(dst draw.Image, shape *Shape, at image.Point, filler image.Image, fat image.Point, clip *image.Alpha, op draw.Op) error {
+	rect := dst.Bounds()
+	size := rect.Size()
+
+	if clip != nil && !size.Eq(clip.Bounds().Size()) {
+		return fmt.Errorf("clip image must have same size as destination image")
+	}
+
+	mask := shape.Mask()
+	srect := mask.Bounds()
+	drect := image.Rectangle{at, image.Point{at.X + srect.Dx(), at.Y + srect.Dy()}}
+
+	if clip != nil {
+		// Obtain clip mask subimage and intersect it against the shape mask
+		sub := clip.SubImage(drect).(*image.Alpha)
+		mask = g2dimg.AlphaAnd(mask, sub)
+		// mask now has origin {0, 0}
+		draw.DrawMask(dst, drect, filler, fat, mask, image.Point{}, op)
+	} else {
+		draw.DrawMask(dst, drect, filler, fat, mask, srect.Min, op)
+	}
+
+	return nil
 }

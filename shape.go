@@ -3,6 +3,8 @@ package graphics2d
 import (
 	"fmt"
 	"image"
+	"image/draw"
+	"math"
 )
 
 // Shape is a fillable collection of paths. For a path to be fillable,
@@ -10,6 +12,7 @@ import (
 type Shape struct {
 	paths  []*Path
 	bounds image.Rectangle
+	mask   *image.Alpha
 }
 
 // Bounds calculates the union of the bounds of the paths the shape contains.
@@ -22,6 +25,39 @@ func (s *Shape) Bounds() image.Rectangle {
 		s.bounds = rect
 	}
 	return s.bounds
+}
+
+// Mask returns an Alpha image, the size of the shape bounds, containing the result
+// of rendering the shape.
+func (s *Shape) Mask() *image.Alpha {
+	if s.mask != nil {
+		return s.mask
+	}
+	s.mask = image.NewAlpha(s.Bounds())
+	min := s.Bounds().Min
+	RenderShapeAlpha(s.mask, s, []float32{float32(-min.X), float32(-min.Y)}, draw.Over)
+	return s.mask
+}
+
+// Contains returns true if the points are contained within the shape, false otherwise.
+func (s *Shape) Contains(pts ...[]float64) bool {
+	rect := s.Bounds()
+	mask := s.Mask()
+	ox, oy := rect.Min.X, rect.Min.Y
+	mx, my := rect.Max.X, rect.Max.Y
+	for _, pt := range pts {
+		x := int(math.Floor(pt[0] + 0.5))
+		y := int(math.Floor(pt[1] + 0.5))
+		// Bounding box test
+		if x < ox || x >= mx || y < oy || y >= my {
+			return false
+		}
+		// Mask test
+		if mask.AlphaAt(x, y).A < 128 {
+			return false
+		}
+	}
+	return true
 }
 
 // NewShape constructs a shape from the supplied paths.
@@ -44,6 +80,7 @@ func (s *Shape) AddPaths(paths ...*Path) {
 		}
 	}
 	s.bounds = image.Rectangle{}
+	s.mask = nil
 }
 
 // AddShapes adds the paths from the supplied shapes to this shape.
@@ -62,7 +99,7 @@ func (s *Shape) Paths() []*Path {
 func (s *Shape) Copy() *Shape {
 	np := make([]*Path, len(s.paths))
 	copy(np, s.paths)
-	return &Shape{np, s.bounds}
+	return &Shape{np, s.bounds, s.mask}
 }
 
 // Transform applies an affine transform to all the paths in the shape
@@ -72,7 +109,7 @@ func (s *Shape) Transform(xfm *Aff3) *Shape {
 	for i, path := range s.paths {
 		np[i] = path.Transform(xfm)
 	}
-	return &Shape{np, image.Rectangle{}}
+	return &Shape{np, image.Rectangle{}, nil}
 }
 
 // Process applies a processor to the shape and
@@ -87,7 +124,7 @@ func (s *Shape) Process(proc PathProcessor) *Shape {
 		}
 	}
 
-	return &Shape{np, image.Rectangle{}}
+	return &Shape{np, image.Rectangle{}, nil}
 }
 
 // String converts a shape into a string.
