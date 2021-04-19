@@ -15,13 +15,13 @@ import (
 // into the destination image.
 func RenderColoredPath(dst draw.Image, path *Path, fill color.Color) {
 	filler := image.NewUniform(fill)
-	RenderPathExt(dst, path, []float32{0, 0}, filler, nil, draw.Over)
+	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, nil, draw.Over)
 }
 
 // RenderPath renders the specified path (forced closed) at an offset with the fill image
 // into the destination image.
 func RenderPath(dst draw.Image, path *Path, filler image.Image) {
-	RenderPathExt(dst, path, []float32{0, 0}, filler, nil, draw.Over)
+	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, nil, draw.Over)
 }
 
 // RenderPathExt renders the specified path (forced closed) at an offset with the fill and clip images
@@ -87,13 +87,13 @@ func RenderPathAlpha(dst *image.Alpha, path *Path, at []float32, op draw.Op) {
 // into the destination image.
 func RenderColoredShape(dst draw.Image, shape *Shape, fill color.Color) {
 	filler := image.NewUniform(fill)
-	RenderShapeExt(dst, shape, []float32{0, 0}, filler, nil, draw.Over)
+	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, nil, draw.Over)
 }
 
 // RenderShape renders the supplied shape at an offset with the fill image into
 // the destination image.
 func RenderShape(dst draw.Image, shape *Shape, filler image.Image) {
-	RenderShapeExt(dst, shape, []float32{0, 0}, filler, nil, draw.Over)
+	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, nil, draw.Over)
 }
 
 // RenderShapeExt renders the supplied shape at an offset with the fill and clip images into
@@ -166,13 +166,13 @@ func RenderShapeAlpha(dst *image.Alpha, shape *Shape, at []float32, op draw.Op) 
 // with the fill color.
 func DrawColoredShape(dst draw.Image, shape *Shape, at image.Point, fill color.Color) {
 	filler := image.NewUniform(fill)
-	DrawShapeExt(dst, shape, at, filler, image.Point{}, nil, draw.Over)
+	_ = DrawShapeExt(dst, shape, at, filler, image.Point{}, nil, draw.Over)
 }
 
 // DrawShape utilizes the supplied shape's mask to draw into the destination image at an offset with
 // the filler image.
 func DrawShape(dst draw.Image, shape *Shape, at image.Point, filler image.Image) {
-	DrawShapeExt(dst, shape, at, filler, image.Point{}, nil, draw.Over)
+	_ = DrawShapeExt(dst, shape, at, filler, image.Point{}, nil, draw.Over)
 }
 
 // DrawShapeExt utilizes the supplied shape's mask to draw into the destination image at an offset with
