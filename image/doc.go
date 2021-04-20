@@ -24,6 +24,7 @@ Morphological Operations
 	LJReconstitute
 
 Remap Operations
+	ColorConvert
 	RemapGray
 	RemapRGBA
 
