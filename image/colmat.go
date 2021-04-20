@@ -2,8 +2,7 @@ package image
 
 import "image"
 
-// ExtractChannel returns an image with just the selected channel.
-// The returned image is scaled by 1/alpha, if not the alpha channel.
+// ColorConvert runs RGBA (non-premultiplied) through the supplied affine transform.
 func ColorConvert(img *image.NRGBA, xfm *Aff5) *image.NRGBA {
 	imgR := img.Bounds()
 	w, h := imgR.Dx(), imgR.Dy()
