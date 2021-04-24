@@ -14,13 +14,15 @@ import (
 
 // StrokeProc defines the width, join and cap types of the stroke.
 type StrokeProc struct {
-	Width        float64
-	hw           float64 // hw - half width
-	PointFunc    func([]float64, float64) [][][]float64
-	JoinFunc     func([]float64, []float64, []float64) [][][]float64
-	CapFunc      func([]float64, []float64, []float64) [][][]float64
-	CapStartFunc func([]float64, []float64, []float64) [][][]float64
-	CapEndFunc   func([]float64, []float64, []float64) [][][]float64
+	Width float64
+	hw    float64 // hw - half width
+	// (p, r) []part
+	PointFunc func([]float64, float64) [][][]float64
+	// (part1, p, part2) []part
+	JoinFunc     func([][]float64, []float64, [][]float64) [][][]float64
+	CapFunc      func([][]float64, []float64, [][]float64) [][][]float64
+	CapStartFunc func([][]float64, []float64, [][]float64) [][][]float64
+	CapEndFunc   func([][]float64, []float64, [][]float64) [][][]float64
 }
 
 // NewStrokeProc creates a stroke path processor with width w, the bevel join and butt cap types.
@@ -101,9 +103,9 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 	nrhs := make([][][]float64, 0, 2*n-1)
 	nrhs = append(nrhs, rhs[0])
 	for i := 1; i < n; i++ {
-		last := rhs[i-1][len(rhs[i-1])-1]
-		if !EqualsP(last, rhs[i][0]) {
-			nrhs = append(nrhs, sp.JoinFunc(last, stepoffs[i][0], rhs[i][0])...)
+		last := rhs[i-1]
+		if !EqualsP(last[len(last)-1], rhs[i][0]) {
+			nrhs = append(nrhs, sp.JoinFunc(last, stepoffs[i][0], rhs[i])...)
 		}
 		nrhs = append(nrhs, rhs[i])
 	}
@@ -128,9 +130,9 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 	nlhs := make([][][]float64, 0, 2*n-1)
 	nlhs = append(nlhs, lhs[0])
 	for i := 1; i < n; i++ {
-		last := lhs[i-1][len(lhs[i-1])-1]
-		if !EqualsP(last, lhs[i][0]) {
-			nlhs = append(nlhs, sp.JoinFunc(last, stepoffs[i][0], lhs[i][0])...)
+		last := lhs[i-1]
+		if !EqualsP(last[len(last)-1], lhs[i][0]) {
+			nlhs = append(nlhs, sp.JoinFunc(last, stepoffs[i][0], lhs[i])...)
 		}
 		nlhs = append(nlhs, lhs[i])
 	}
@@ -141,11 +143,11 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 		// Close the RHS and LHS paths and return them
 		rhsl := rhs[len(rhs)-1]
 		if !EqualsP(rhsl[len(rhsl)-1], rhs[0][0]) {
-			rhs = append(rhs, sp.JoinFunc(rhsl[len(rhsl)-1], stepoffs[0][0], rhs[0][0])...)
+			rhs = append(rhs, sp.JoinFunc(rhsl, stepoffs[0][0], rhs[0])...)
 		}
 		lhsl := lhs[len(lhs)-1]
 		if !EqualsP(lhsl[len(lhsl)-1], lhs[0][0]) {
-			lhs = append(lhs, sp.JoinFunc(lhsl[len(lhsl)-1], stepoffs[0][0], lhs[0][0])...)
+			lhs = append(lhs, sp.JoinFunc(lhsl, stepoffs[0][0], lhs[0])...)
 		}
 		rhsp, _ := PartsToPath(rhs...)
 		rhsp.Close()
@@ -163,10 +165,10 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 		both := make([][][]float64, 0, len(rhs)+len(lhs)+2)
 		both = append(both, rhs...)
 		rhsl := rhs[len(rhs)-1]
-		both = append(both, sp.CapEndFunc(rhsl[len(rhsl)-1], stepoffs[0][0], lhs[0][0])...)
+		both = append(both, sp.CapEndFunc(rhsl, stepoffs[0][0], lhs[0])...)
 		both = append(both, lhs...)
 		lhsl := lhs[len(lhs)-1]
-		both = append(both, sp.CapStartFunc(lhsl[len(lhsl)-1], stepoffs[len(stepoffs)-1][1], rhs[0][0])...)
+		both = append(both, sp.CapStartFunc(lhsl, stepoffs[len(stepoffs)-1][1], rhs[0])...)
 		bp, _ := PartsToPath(both...)
 		bp.Close()
 		res = []*Path{bp}
@@ -229,12 +231,14 @@ func reverseOffs(parts [][][]float64) [][][]float64 {
 }
 
 // JoinBevel creates a bevel join from e1 to s2.
-func JoinBevel(e1, p, s2 []float64) [][][]float64 {
+func JoinBevel(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1, s2 := p1[len(p1)-1], p2[0]
 	return [][][]float64{{e1, s2}}
 }
 
 // JoinRound creates a round join from e1 to s2, centered on p.
-func JoinRound(e1, p, s2 []float64) [][][]float64 {
+func JoinRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1, s2 := p1[len(p1)-1], p2[0]
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
 	a1 := math.Atan2(dy, dx)
 	a2 := LineAngle(p, s2)
@@ -256,7 +260,7 @@ func JoinRound(e1, p, s2 []float64) [][][]float64 {
 // for a miter join.
 type MiterJoin struct {
 	MiterLimit   float64
-	MiterAltFunc func([]float64, []float64, []float64) [][][]float64
+	MiterAltFunc func([][]float64, []float64, [][]float64) [][][]float64
 }
 
 // NewMiterJoin creates a default MiterJoin with the limit set to 10 degrees and the alternative
@@ -267,7 +271,8 @@ func NewMiterJoin() *MiterJoin {
 
 // JoinMiter creates a miter join from e1 to s2 unless the moter limit is exceeded in which
 // case the alternative function is used to perform the join.
-func (mj *MiterJoin) JoinMiter(e1, p, s2 []float64) [][][]float64 {
+func (mj *MiterJoin) JoinMiter(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1, s2 := p1[len(p1)-1], p2[0]
 	dx1, dy1 := e1[0]-p[0], e1[1]-p[1]
 	a1 := math.Atan2(dy1, dx1)
 	dx2, dy2 := s2[0]-p[0], s2[1]-p[1]
@@ -280,20 +285,20 @@ func (mj *MiterJoin) JoinMiter(e1, p, s2 []float64) [][][]float64 {
 	}
 	if da < 0 {
 		// inside angle
-		return JoinBevel(e1, p, s2)
+		return JoinBevel(p1, p, p2)
 	}
 	if da > math.Pi-mj.MiterLimit {
 		// miter limit exceeded
 		if mj.MiterAltFunc != nil {
-			return mj.MiterAltFunc(e1, p, s2)
+			return mj.MiterAltFunc(p1, p, p2)
 		}
-		return JoinBevel(e1, p, s2)
+		return JoinBevel(p1, p, p2)
 	}
 	// tangent -dy, dx
 	ts, err := IntersectionTVals(e1[0], e1[1], e1[0]-dy1, e1[1]+dx1,
 		s2[0], s2[1], s2[0]-dy2, s2[1]+dx2)
 	if err != nil {
-		return JoinBevel(e1, p, s2)
+		return JoinBevel(p1, p, p2)
 	}
 	px := Lerp(ts[0], e1[0], e1[0]-dy1)
 	py := Lerp(ts[0], e1[1], e1[1]+dx1)
@@ -305,12 +310,14 @@ func (mj *MiterJoin) JoinMiter(e1, p, s2 []float64) [][][]float64 {
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linejoin
 
 // CapButt draws a line from e1 to s1.
-func CapButt(e1, p, s1 []float64) [][][]float64 {
+func CapButt(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1, s1 := p1[len(p1)-1], p2[0]
 	return [][][]float64{{e1, s1}}
 }
 
 // CapRound draws a semicircle from e1 to s1 centered on p.
-func CapRound(e1, p, s1 []float64) [][][]float64 {
+func CapRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1 := p1[len(p1)-1]
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
 	offs := math.Atan2(dy, dx)
 	r := math.Sqrt(dx*dx + dy*dy)
@@ -318,7 +325,8 @@ func CapRound(e1, p, s1 []float64) [][][]float64 {
 }
 
 // CapSquare draws an extended square (stroke width/2) from e1 and s1.
-func CapSquare(e1, p, s1 []float64) [][][]float64 {
+func CapSquare(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1, s1 := p1[len(p1)-1], p2[0]
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
 	e2 := []float64{e1[0] - dy, e1[1] + dx}
 	s2 := []float64{s1[0] - dy, s1[1] + dx}
@@ -326,14 +334,16 @@ func CapSquare(e1, p, s1 []float64) [][][]float64 {
 }
 
 // CapHead draws an extended arrow head from e1 to extended p and then to s1.
-func CapHead(e1, p, s1 []float64) [][][]float64 {
+func CapHead(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1, s1 := p1[len(p1)-1], p2[0]
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
 	m := []float64{p[0] - dy, p[1] + dx}
 	return [][][]float64{{e1, m}, {m, s1}}
 }
 
 // CapTail draws an extended arrow tail (stroke width/2) from extended e1 to p and then to extended  s1.
-func CapTail(e1, p, s1 []float64) [][][]float64 {
+func CapTail(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1, s1 := p1[len(p1)-1], p2[0]
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
 	e2 := []float64{e1[0] - dy, e1[1] + dx}
 	s2 := []float64{s1[0] - dy, s1[1] + dx}
@@ -341,7 +351,8 @@ func CapTail(e1, p, s1 []float64) [][][]float64 {
 }
 
 // CapInvRound extends e1 and s1 and draws a semicircle that passes through p.
-func CapInvRound(e1, p, s1 []float64) [][][]float64 {
+func CapInvRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1, s1 := p1[len(p1)-1], p2[0]
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
 	e2 := []float64{e1[0] - dy, e1[1] + dx}
 	s2 := []float64{s1[0] - dy, s1[1] + dx}

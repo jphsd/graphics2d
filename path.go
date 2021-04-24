@@ -38,7 +38,7 @@ type Path struct {
 	reversed   *Path
 	tangents   [][][]float64
 	// Processed from
-	parent *Path
+	parent           *Path
 	AssumeSimplified bool
 }
 
