@@ -2,13 +2,23 @@ package util
 
 import "math"
 
-// BoundingBox returns the minimum and maximum demensional values in
-// a set of points. Bounds are inclusive.
+// BoundingBox returns the minimum and maximum dimensional values in
+// a set of points. Bounds are inclusive. The dimensionality of the
+// smallest dimension point is used for all points.
 func BoundingBox(pts ...[]float64) [][]float64 {
 	if len(pts) == 0 {
 		return nil
 	}
+
+	// Calc minimum dimensionality of point set
 	d := len(pts[0])
+	for i := 1; i < len(pts); i++ {
+		n := len(pts[i])
+		if d > n {
+			d = n
+		}
+	}
+
 	res := make([][]float64, 2)
 	res[0] = make([]float64, d)
 	res[1] = make([]float64, d)
@@ -34,9 +44,13 @@ func BoundingBox(pts ...[]float64) [][]float64 {
 	return res
 }
 
-// BBOverlap returns true if bb1 and bb2 overlap.
+// BBOverlap returns true if bb1 and bb2 overlap at the smallest dimensionality.
 func BBOverlap(bb1, bb2 [][]float64) bool {
-	for i := 0; i < len(bb1[0]); i++ {
+	min := len(bb1[0])
+	if min > len(bb2[0]) {
+		min = len(bb2[0])
+	}
+	for i := 0; i < min; i++ {
 		if bb1[0][i] > bb2[1][i] || bb2[0][i] > bb1[1][i] {
 			return false
 		}
@@ -44,9 +58,13 @@ func BBOverlap(bb1, bb2 [][]float64) bool {
 	return true
 }
 
-// BBContains returns true if p in in bb.
+// BBContains returns true if p in in bb at the smallest dimensionality.
 func BBContains(p []float64, bb [][]float64) bool {
-	for i := 0; i < len(bb[0]); i++ {
+	min := len(bb[0])
+	if min > len(p) {
+		min = len(p)
+	}
+	for i := 0; i < min; i++ {
 		if p[i] < bb[0][i] || p[i] > bb[1][i] {
 			return false
 		}

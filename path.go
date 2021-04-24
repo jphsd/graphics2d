@@ -582,3 +582,41 @@ func (p *Path) Tangents() [][][]float64 {
 	p.tangents = res
 	return res
 }
+
+// PartsIntersection returns the location of where the two parts intersect of nil. Assumes the parts
+// are the result of simplification. Uses a brute force approach for curves with d as the flattening
+// value.
+func PartsIntersection(part1, part2 [][]float64, d float64) []float64 {
+	// Test bounding boxes first
+	bb1, bb2 := BoundingBox(part1...), BoundingBox(part2...)
+	if !BBOverlap(bb1, bb2) {
+		return nil
+	}
+
+	// Flatten and calculate bounding boxes for part2
+	fparts1, fparts2 := FlattenPart(d, part1), FlattenPart(d, part2)
+	bbs2 := make([][][]float64, len(fparts2))
+	for i, part := range fparts2 {
+		bbs2[i] = BoundingBox(part...)
+	}
+
+	// Test each line in part1 against lines in part2 until we find an intersection
+	for _, part := range fparts1 {
+		bb1 = BoundingBox(part...)
+		for j, bbp2 := range bbs2 {
+			if !BBOverlap(bb1, bbp2) {
+				continue
+			}
+			// Bounding boxes of lines overlap - see if they intersect
+			s1, e1 := part[0], part[len(part)-1]
+			s2, e2 := fparts2[j][0], fparts2[j][len(fparts2[j])-1]
+			tvals, err := IntersectionTValsP(s1, e1, s2, e2)
+			if err != nil || tvals[0] < 0 || tvals[0] > 1 || tvals[1] < 0 || tvals[1] > 1 {
+				continue
+			}
+			return []float64{Lerp(tvals[0], s1[0], e1[0]), Lerp(tvals[0], s1[1], e1[1])}
+		}
+	}
+
+	return nil
+}
