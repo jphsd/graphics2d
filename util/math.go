@@ -150,38 +150,6 @@ func Centroid(pts ...[]float64) []float64 {
 	return res
 }
 
-// BoundingBox returns the minimum and maximum demensional values in
-// a set of points.
-func BoundingBox(pts ...[]float64) [][]float64 {
-	if len(pts) == 0 {
-		return nil
-	}
-	d := len(pts[0])
-	res := make([][]float64, 2)
-	res[0] = make([]float64, d)
-	res[1] = make([]float64, d)
-
-	for i := 0; i < d; i++ {
-		res[0][i], res[1][i] = -math.MaxFloat64, math.MaxFloat64
-	}
-
-	for _, pt := range pts {
-		for i, v := range pt {
-			if i > d-1 {
-				break
-			}
-			if v < res[0][i] {
-				res[0][i] = v
-			}
-			if v > res[1][i] {
-				res[1][i] = v
-			}
-		}
-	}
-
-	return res
-}
-
 // CrossProduct returns the cross product of the three points.
 func CrossProduct(p1, p2, p3 []float64) float64 {
 	return (p3[0]-p1[0])*(p2[1]-p1[1]) - (p3[1]-p1[1])*(p2[0]-p1[0])
