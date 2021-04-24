@@ -22,25 +22,33 @@ import (
  * connected to the first as a line.
  */
 
-// Path contains the housekeeping necessary for path building.
+// Path contains the housekeeping necessary for path building. AssumeSimplified allows
+// an optimization for children of the path to skip simplification if the parent is
+// already simplified. If a Path Processor does something that might generate a non-simple
+// path then this should be set to false, for example StrokeProc.
 type Path struct {
 	// step, point, ordinal
 	steps  [][][]float64
 	closed bool
 	bounds image.Rectangle
-	// Caching flattened and simplified paths
+	// Caching flattened, simplified and reversed paths, and tangents
 	flattened  *Path
 	tolerance  float64
 	simplified *Path
+	reversed   *Path
+	tangents   [][][]float64
 	// Processed from
 	parent *Path
+	AssumeSimplified bool
 }
 
 // NewPath creates a new path starting at start.
 func NewPath(start []float64) *Path {
-	np := Path{make([][][]float64, 1), false, image.Rectangle{}, nil, 1, nil, nil}
+	np := &Path{}
+	np.steps = make([][][]float64, 1)
 	np.steps[0] = [][]float64{start}
-	return &np
+	np.AssumeSimplified = true
+	return np
 }
 
 // AddStep takes an array of points and treats n-1 of them as control points and the
@@ -62,6 +70,8 @@ func (p *Path) AddStep(points ...[]float64) error {
 	p.bounds = image.Rectangle{}
 	p.flattened = nil
 	p.simplified = nil
+	p.tangents = nil
+	p.reversed = nil
 	return nil
 }
 
@@ -195,8 +205,12 @@ func (p *Path) Flatten(d float64) *Path {
 		}
 	}
 
-	p.flattened = &Path{res, p.closed, image.Rectangle{}, nil, 1, nil, p}
-	return p.flattened
+	path := &Path{}
+	path.steps = res
+	path.closed = p.closed
+	path.parent = p
+	p.flattened = path
+	return path
 }
 
 func toPoints(cp []float64, pts [][]float64) [][]float64 {
@@ -283,14 +297,20 @@ func (p *Path) Bounds() image.Rectangle {
 func (p *Path) Copy() *Path {
 	steps := make([][][]float64, len(p.steps))
 	copy(steps, p.steps)
-	return &Path{steps, p.closed, p.bounds, nil, 1, nil, p.parent}
+
+	path := &Path{}
+	path.steps = steps
+	path.closed = p.closed
+	path.bounds = p.bounds
+	path.parent = p.parent
+	return path
 }
 
 // Open performs a Deepish copy like Copy() but leaves the path open.
 func (p *Path) Open() *Path {
-	steps := make([][][]float64, len(p.steps))
-	copy(steps, p.steps)
-	return &Path{steps, false, p.bounds, nil, 1, nil, p.parent}
+	path := p.Copy()
+	path.closed = false
+	return path
 }
 
 // Parent returns the path's parent
@@ -332,7 +352,12 @@ func (p *Path) Transform(xfm *Aff3) *Path {
 	for i, step := range p.steps {
 		steps[i] = xfm.Apply(step...)
 	}
-	return &Path{steps, p.closed, image.Rectangle{}, nil, 1, nil, p}
+
+	path := &Path{}
+	path.steps = steps
+	path.closed = p.closed
+	path.parent = p
+	return path
 }
 
 // Simplify breaks up a path into steps where for any step, its control points are all on the
@@ -341,6 +366,10 @@ func (p *Path) Transform(xfm *Aff3) *Path {
 func (p *Path) Simplify() *Path {
 	if p.simplified != nil {
 		return p.simplified
+	}
+	if p.AssumeSimplified && p.parent != nil && p.parent.simplified != nil {
+		p.simplified = p
+		return p
 	}
 	res := make([][][]float64, 1)
 	res[0] = p.steps[0]
@@ -366,8 +395,12 @@ func (p *Path) Simplify() *Path {
 		}
 	}
 
-	p.simplified = &Path{res, p.closed, image.Rectangle{}, nil, 1, nil, p}
-	return p.simplified
+	path := &Path{}
+	path.steps = res
+	path.closed = p.closed
+	path.parent = p
+	p.simplified = path
+	return path
 }
 
 // Chop curve into pieces based on maxima, minima and inflections in x and y.
@@ -377,10 +410,29 @@ func simplifyExtremities(points [][]float64) [][][]float64 {
 	if nt < 3 {
 		return [][][]float64{points}
 	}
+	// Convert tvals to relative tvals
+	rtvals := make([]float64, nt)
+	lt := 0.0
+	ll := 1.0
+	for i := 0; i < nt; i++ {
+		if i == 0 {
+			// Reset
+			lt = tvals[i]
+			ll = 1 - lt
+			rtvals[i] = lt
+			continue
+		}
+		t := tvals[i]
+		d := t - lt
+		rtvals[i] = d / ll
+		lt = t
+		ll -= d
+	}
+
 	rhs := points
 	res := make([][][]float64, nt-1)
 	for i := 1; i < nt-1; i++ {
-		lr := SplitCurve(rhs, tvals[i])
+		lr := SplitCurve(rhs, rtvals[i])
 		res[i-1] = lr[0]
 		rhs = lr[1]
 	}
@@ -431,7 +483,27 @@ func cpSafe(points [][]float64) bool {
 
 // Reverse returns a new path describing the current path in reverse order (i.e start and end switched).
 func (p *Path) Reverse() *Path {
+	if p.reversed != nil {
+		return p.reversed
+	}
+
 	path, _ := PartsToPath(ReverseParts(p.Parts())...)
+	// If other aspects have already been calculated - reverse them too
+	if p.flattened != nil {
+		path.flattened, _ = PartsToPath(ReverseParts(p.flattened.Parts())...)
+		path.flattened.parent = path
+		path.tolerance = p.tolerance
+	}
+	if p.simplified != nil {
+		path.simplified, _ = PartsToPath(ReverseParts(p.simplified.Parts())...)
+		path.simplified.parent = path
+	}
+	if p.tangents != nil {
+		path.tangents = reverseTangents(p.tangents)
+	}
+	path.parent = p
+	p.reversed = path
+
 	return path
 }
 
@@ -457,6 +529,19 @@ func reversePoints(cp [][]float64) [][]float64 {
 	return res
 }
 
+// [part][start/end][normalized x/y]
+func reverseTangents(tangents [][][]float64) [][][]float64 {
+	n := len(tangents)
+	res := make([][][]float64, n)
+
+	for i, j := 0, n-1; i < n; i++ {
+		cur := tangents[j]
+		res[i] = [][]float64{{-cur[1][0], -cur[1][1]}, {-cur[0][0], -cur[0][1]}}
+		j--
+	}
+	return res
+}
+
 // Line reduces a path to a line between its endpoints. For a closed path or one where the
 // start and endpoints are coincident, a single point is returned.
 func (p *Path) Line() *Path {
@@ -476,4 +561,24 @@ func (p *Path) Line() *Path {
 	}
 	path.AddStep(last)
 	return path
+}
+
+// Tangents returns the normalized start and end tangents of every part in the path.
+// [part][start/end][normalized x/y]
+func (p *Path) Tangents() [][][]float64 {
+	if p.tangents != nil {
+		return p.tangents
+	}
+
+	parts := p.Parts()
+	n := len(parts)
+	res := make([][][]float64, n)
+	for i, part := range parts {
+		tmp0, tmp1 := DeCasteljau(part, 0), DeCasteljau(part, 1)
+		dx0, dy0 := norm(tmp0[2], tmp0[3])
+		dx1, dy1 := norm(tmp1[2], tmp1[3])
+		res[i] = [][]float64{{dx0, dy0}, {dx1, dy1}}
+	}
+	p.tangents = res
+	return res
 }
