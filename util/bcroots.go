@@ -81,28 +81,43 @@ func CalcExtremities(points [][]float64) []float64 {
 	}
 
 	bc := NewBezierCurve(points)
-	tmap := make(map[string]bool) // Use "%.4f"
-	tmap["0.0000"], tmap["1.0000"] = true, true
+	fmap := make(map[string]bool) // Use "%.4f"
+	fmap["0.0000"], fmap["1.0000"] = true, true
 
 	// Find local minima and maxima with Dt and Dt2
+	tmap := make(map[string]bool)
 	calcRoots(bc.CurveDtX, bc.CurveDt2X, tmap)
+	addMap(fmap, tmap)
+	tmap = make(map[string]bool)
 	calcRoots(bc.CurveDtY, bc.CurveDt2Y, tmap)
+	addMap(fmap, tmap)
 
 	if n > 3 {
 		// Find inflection points with Dt2 and Dt3
+		tmap = make(map[string]bool)
 		calcRoots(bc.CurveDt2X, bc.CurveDt3X, tmap)
+		addMap(fmap, tmap)
+		tmap = make(map[string]bool)
 		calcRoots(bc.CurveDt2Y, bc.CurveDt3Y, tmap)
+		addMap(fmap, tmap)
 	}
 
 	// Convert t values back to float64
-	res := make([]float64, len(tmap))
+	res := make([]float64, len(fmap))
 	i := 0
-	for k := range tmap {
+	for k := range fmap {
 		fmt.Sscanf(k, "%f", &res[i])
 		i++
 	}
 	sort.Float64s(res)
 	return res
+}
+
+// Add map2 to map1
+func addMap(map1, map2 map[string]bool) {
+	for k, v := range map2 {
+		map1[k] = v
+	}
 }
 
 func calcRoots(f, df func(float64) float64, tmap map[string]bool) {
