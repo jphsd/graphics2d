@@ -227,7 +227,7 @@ func CreateTransform(x, y, scale, rotation float64) *Aff3 {
 	return xfm
 }
 
-// Apply aplies the transform to the set of supplied points.
+// Apply applies the transform to the set of supplied points.
 func (a *Aff3) Apply(pts ...[]float64) [][]float64 {
 	npts := make([][]float64, len(pts))
 	for i, pt := range pts {
