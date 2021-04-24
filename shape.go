@@ -33,8 +33,9 @@ func (s *Shape) Mask() *image.Alpha {
 	if s.mask != nil {
 		return s.mask
 	}
-	s.mask = image.NewAlpha(s.Bounds())
-	min := s.Bounds().Min
+	rect := s.Bounds()
+	s.mask = image.NewAlpha(rect)
+	min := rect.Min
 	RenderShapeAlpha(s.mask, s, []float32{float32(-min.X), float32(-min.Y)}, draw.Over)
 	return s.mask
 }
