@@ -36,6 +36,7 @@ of other possibilities:
   SplitProc - splits each step into its own path
   StrokeProc - creates a fixed width outline of a path with options for the cap and
   join styles
+  TraceProc - creates a new path by tracing the normals of the path at a fixed distance
 
 Shapes and Paths are be rendered with the render functions. Paths are forced closed when rendered.
 Convenience methods are provided for rendering with a single color or an image. The full render function

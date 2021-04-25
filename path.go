@@ -399,7 +399,9 @@ func (p *Path) Simplify() *Path {
 	path.steps = res
 	path.closed = p.closed
 	path.parent = p
+	path.AssumeSimplified = true
 	p.simplified = path
+
 	return path
 }
 
@@ -446,6 +448,7 @@ func simplifyStep(points [][]float64) [][][]float64 {
 	if cpSafe(points) {
 		return [][][]float64{points}
 	}
+	fmt.Printf("cpSafe false\n")
 	lr := SplitCurve(points, 0.5)
 	res := append([][][]float64{}, simplifyStep(lr[0])...)
 	res = append(res, simplifyStep(lr[1])...)
@@ -453,8 +456,7 @@ func simplifyStep(points [][]float64) [][][]float64 {
 }
 
 // cpSafe returns true if all the control points are on the same side of
-// the line formed by start and the last point in step, and the t=0.5 point
-// is close to the geometric center of the polygon defined by the points.
+// the line formed by start and the last point in step.
 func cpSafe(points [][]float64) bool {
 	if len(points) < 3 {
 		// Either a point or line
@@ -470,15 +472,7 @@ func cpSafe(points [][]float64) bool {
 			return false
 		}
 	}
-
-	c := Centroid(points...)
-	v := DeCasteljau(points, 0.5)
-	bb := BoundingBox(points...)
-	dx := bb[1][0] - bb[0][0]
-	dy := bb[1][1] - bb[0][1]
-	dx, dy = dx/40, dy/40
-	// Crude check v is within 5% of c based on bb size
-	return v[0] < c[0]+dx && v[0] > c[0]-dx && v[1] < c[1]+dy && v[1] > c[1]-dy
+	return true
 }
 
 // Reverse returns a new path describing the current path in reverse order (i.e start and end switched).
@@ -490,16 +484,17 @@ func (p *Path) Reverse() *Path {
 	path, _ := PartsToPath(ReverseParts(p.Parts())...)
 	// If other aspects have already been calculated - reverse them too
 	if p.flattened != nil {
-		path.flattened, _ = PartsToPath(ReverseParts(p.flattened.Parts())...)
-		path.flattened.parent = path
+		path.flattened = p.flattened.Reverse()
 		path.tolerance = p.tolerance
 	}
-	if p.simplified != nil {
-		path.simplified, _ = PartsToPath(ReverseParts(p.simplified.Parts())...)
-		path.simplified.parent = path
+	if p.simplified != nil && p != p.simplified {
+		path.simplified = p.simplified.Reverse()
 	}
 	if p.tangents != nil {
 		path.tangents = reverseTangents(p.tangents)
+	}
+	if p.closed {
+		path.closed = true
 	}
 	path.parent = p
 	p.reversed = path
@@ -603,12 +598,12 @@ func PartsIntersection(part1, part2 [][]float64, d float64) []float64 {
 	// Test each line in part1 against lines in part2 until we find an intersection
 	for _, part := range fparts1 {
 		bb1 = BoundingBox(part...)
+		s1, e1 := part[0], part[len(part)-1]
 		for j, bbp2 := range bbs2 {
 			if !BBOverlap(bb1, bbp2) {
 				continue
 			}
 			// Bounding boxes of lines overlap - see if they intersect
-			s1, e1 := part[0], part[len(part)-1]
 			s2, e2 := fparts2[j][0], fparts2[j][len(fparts2[j])-1]
 			tvals, err := IntersectionTValsP(s1, e1, s2, e2)
 			if err != nil || tvals[0] < 0 || tvals[0] > 1 || tvals[1] < 0 || tvals[1] > 1 {
