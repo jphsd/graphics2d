@@ -24,7 +24,7 @@ func BoundingBox(pts ...[]float64) [][]float64 {
 	res[1] = make([]float64, d)
 
 	for i := 0; i < d; i++ {
-		res[0][i], res[1][i] = -math.MaxFloat64, math.MaxFloat64
+		res[0][i], res[1][i] = math.MaxFloat64, -math.MaxFloat64
 	}
 
 	for _, pt := range pts {
