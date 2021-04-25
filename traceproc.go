@@ -85,6 +85,8 @@ func (tp *TraceProc) ProcessParts(p *Path) [][][]float64 {
 		npt := PartsIntersection(last, rhs[i], tp.Flatten)
 		if npt != nil {
 			// Tweak the end of nrhs[$] and start of rhs[i]
+			// Not strictly correct - should really figure out the t value for
+			// the point and then split part at t value to preserve the part's cp.
 			last[len(last)-1] = npt
 			rhs[i][0] = npt
 		} else if !tp.checkGap(last[len(last)-1], rhs[i][0]) {
