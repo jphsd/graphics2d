@@ -34,6 +34,8 @@ func (tp *TraceProc) Process(p *Path) []*Path {
 	return []*Path{path}
 }
 
+// ProcessParts returns the processed path as a slice of parts, rather a path so other path
+// processors don't have to round trip path -> parts -> path -> parts (e.g. StrokeProc).
 func (tp *TraceProc) ProcessParts(p *Path) [][][]float64 {
 	// A point isn't traceable.
 	if len(p.Steps()) == 1 {
