@@ -615,3 +615,14 @@ func PartsIntersection(part1, part2 [][]float64, d float64) []float64 {
 
 	return nil
 }
+
+// Length returns the approximate length of a path by flattening it to the desired degree
+// and summing the line steps.
+func (p *Path) Length(flat float64) float64 {
+	parts := p.Flatten(flat).Parts()
+	sum := 0.0
+	for _, part := range parts {
+		sum += DistanceE(part[0], part[1])
+	}
+	return sum
+}

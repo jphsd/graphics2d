@@ -12,7 +12,7 @@ import (
 type SnipProc struct {
 	N       int
 	Pattern []float64
-	D       float64
+	Flatten float64
 	State   int
 	length  float64
 	patind  int
@@ -98,7 +98,7 @@ func (sp *SnipProc) Offset(offs float64) {
 
 // Process implements the PathProcessor interface.
 func (sp *SnipProc) Process(p *Path) []*Path {
-	// Flatten the path parts to D
+	// Flatten the path parts
 	parts := p.Parts()
 	np := len(parts)
 	if np == 0 {
@@ -106,7 +106,7 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 	}
 	fparts := make([][][][]float64, np) // part:subparts:points:xy
 	for i, part := range parts {
-		fparts[i] = FlattenPart(sp.D, part)
+		fparts[i] = FlattenPart(sp.Flatten, part)
 	}
 	lparts := getLengths(fparts)
 
