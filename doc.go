@@ -17,7 +17,8 @@ is closed, no more steps can be added. Unlike other implementations, a path here
 stroke (pen down). There is no move (pen up) step.
 
 The Shape type is a container for closed paths and represents something that can be filled and rendered.
-As Paths are added, if they're not already closed, they are forced closed.
+As Paths are added to a shape, if they're not already closed, they are forced closed. This can lead to
+unexpected results...
 
 The PathProcessor interface is where the magic happens. Given a path, a function implementing this
 interface returns a collection of paths derived from it. This allows for stroking, dashing and a variety
@@ -41,9 +42,9 @@ of other possibilities:
   TraceProc - creates a new path by tracing the normals of the path at a fixed distance
   TransformProc - wraps Path.Transform
 
-Shapes and Paths are rendered with the render functions. Paths are forced closed when rendered.
-Convenience methods are provided for rendering with a single color or an image. The full render function
-allows a clip mask and offset to be supplied and the draw.Op to be specified.
+Shapes and Paths are rendered with the render functions. Paths are forced closed when rendered (see shapes
+above). Convenience methods are provided for rendering with a single color or an image. The full render
+function allows a clip mask and offset to be supplied and the draw.Op to be specified.
 
 The Aff3 type provides the ability to specify affine transforms on Paths and Shapes.
 
