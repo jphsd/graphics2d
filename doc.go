@@ -23,13 +23,15 @@ The PathProcessor interface is where the magic happens. Given a path, a function
 interface returns a collection of paths derived from it. This allows for stroking, dashing and a variety
 of other possibilities:
   CapsProc - adds shapes at the start and end of a path
-  CompoundProc - allows path processors to be run in sequence
+  CompoundProc - allows multiple path processors to be run in sequence
   CurvesToLinesProc - replaces curved steps with lines between the points
   DashProc - wraps SnipProc to produce a dashed path
   FlattenProc - wraps Path.Flatten
-  LineProc - reduces a path to a single line from start to end
+  LineProc - wraps Path.Line
   MunchProc - converts a path into length sized line paths
+  OpenProc - wraps Path.Open
   PointsProc - adds shapes at the start of each step and the end of the last step
+  ReverseProc - wraps Path.Reverse
   SimplifyProc - wraps Path.Simplify
   ShapesProc - distributes shapes along a path separated by some distance
   SnipProc - cuts up a path into smaller pieces according to a pattern
@@ -37,6 +39,7 @@ of other possibilities:
   StrokeProc - creates a fixed width outline of a path with options for the cap and
   join styles
   TraceProc - creates a new path by tracing the normals of the path at a fixed distance
+  TransformProc - wraps Path.Transform
 
 Shapes and Paths are be rendered with the render functions. Paths are forced closed when rendered.
 Convenience methods are provided for rendering with a single color or an image. The full render function
