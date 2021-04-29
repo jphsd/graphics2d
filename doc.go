@@ -41,7 +41,7 @@ of other possibilities:
   TraceProc - creates a new path by tracing the normals of the path at a fixed distance
   TransformProc - wraps Path.Transform
 
-Shapes and Paths are be rendered with the render functions. Paths are forced closed when rendered.
+Shapes and Paths are rendered with the render functions. Paths are forced closed when rendered.
 Convenience methods are provided for rendering with a single color or an image. The full render function
 allows a clip mask and offset to be supplied and the draw.Op to be specified.
 
