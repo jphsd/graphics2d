@@ -73,8 +73,14 @@ func Within(d1, d2, e float64) bool {
 
 // DistanceESquared returns the squared Euclidean distance between two points.
 func DistanceESquared(p1, p2 []float64) float64 {
+	dx, dy := p2[0] - p1[0], p2[1] - p1[1]
+	return dx * dx + dy * dy
+}
+
+// DistanceESquaredN returns the squared Euclidean distance between two points.
+func DistanceESquaredN(p1, p2 []float64) float64 {
 	var sum float64
-	for i := 0; i < len(p1); i++ {
+	for i := 0; i < MinD(p1, p2); i++ {
 		diff := p2[i] - p1[i]
 		sum += diff * diff
 	}
@@ -131,7 +137,7 @@ func Centroid(pts ...[]float64) []float64 {
 	if n == 0 {
 		return nil
 	}
-	d := len(pts[0])
+	d := MinD(pts...)
 	res := make([]float64, d)
 
 	// Sum
@@ -177,4 +183,16 @@ func AngleBetweenLines(p1, p2, p3, p4 []float64) float64 {
 		da -= 2 * math.Pi
 	}
 	return da
+}
+
+// MinD calculates the minimum dimensionality of point set
+func MinD(pts... []float64) int {
+	d := len(pts[0])
+	for i := 1; i < len(pts); i++ {
+		n := len(pts[i])
+		if d > n {
+			d = n
+		}
+	}
+	return d
 }

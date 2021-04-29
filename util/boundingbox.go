@@ -10,15 +10,7 @@ func BoundingBox(pts ...[]float64) [][]float64 {
 		return nil
 	}
 
-	// Calc minimum dimensionality of point set
-	d := len(pts[0])
-	for i := 1; i < len(pts); i++ {
-		n := len(pts[i])
-		if d > n {
-			d = n
-		}
-	}
-
+	d := MinD(pts...)
 	res := make([][]float64, 2)
 	res[0] = make([]float64, d)
 	res[1] = make([]float64, d)

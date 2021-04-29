@@ -24,6 +24,8 @@ func RenderPath(dst draw.Image, path *Path, filler image.Image) {
 	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, nil, draw.Over)
 }
 
+const RenderFlatten = 0.6
+
 // RenderPathExt renders the specified path (forced closed) at an offset with the fill and clip images
 // into the destination image using op.
 func RenderPathExt(dst draw.Image, path *Path, at []float32, filler image.Image, clip *image.Alpha, op draw.Op) error {
@@ -39,7 +41,7 @@ func RenderPathExt(dst draw.Image, path *Path, at []float32, filler image.Image,
 
 	// Process path
 	ox, oy := at[0], at[1]
-	fp := path.Flatten(0.6) // tolerance 0.6
+	fp := path.Flatten(RenderFlatten) // tolerance 0.6
 	step := ToF32(fp.steps[0][0]...)
 	rasterizer.MoveTo(ox+step[0], oy+step[1])
 	for i, lp := 1, len(fp.steps); i < lp; i++ {
@@ -71,7 +73,7 @@ func RenderPathAlpha(dst *image.Alpha, path *Path, at []float32, op draw.Op) {
 
 	// Process path
 	ox, oy := at[0], at[1]
-	fp := path.Flatten(0.6) // tolerance 0.6
+	fp := path.Flatten(RenderFlatten) // tolerance 0.6
 	step := ToF32(fp.steps[0][0]...)
 	rasterizer.MoveTo(ox+step[0], oy+step[1])
 	for i, lp := 1, len(fp.steps); i < lp; i++ {
@@ -112,7 +114,7 @@ func RenderShapeExt(dst draw.Image, shape *Shape, at []float32, filler image.Ima
 	// Process paths
 	ox, oy := at[0], at[1]
 	for _, path := range shape.paths {
-		fp := path.Flatten(0.6) // tolerance 0.6
+		fp := path.Flatten(RenderFlatten) // tolerance 0.6
 		step := ToF32(fp.steps[0][0]...)
 		rasterizer.MoveTo(ox+step[0], oy+step[1])
 		for i, lp := 1, len(fp.steps); i < lp; i++ {
@@ -146,7 +148,7 @@ func RenderShapeAlpha(dst *image.Alpha, shape *Shape, at []float32, op draw.Op) 
 	// Process paths
 	ox, oy := at[0], at[1]
 	for _, path := range shape.paths {
-		fp := path.Flatten(0.6) // tolerance 0.6
+		fp := path.Flatten(RenderFlatten) // tolerance 0.6
 		step := ToF32(fp.steps[0][0]...)
 		rasterizer.MoveTo(ox+step[0], oy+step[1])
 		for i, lp := 1, len(fp.steps); i < lp; i++ {

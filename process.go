@@ -42,12 +42,12 @@ func (cp *CompoundProc) Process(p *Path) []*Path {
 // FlattenProc is a wrapper around Path.Flatten() and contains the minimum required
 // distance to the control points.
 type FlattenProc struct {
-	D float64
+	Flatten float64
 }
 
 // Process implements the PathProcessor interface.
 func (fp *FlattenProc) Process(p *Path) []*Path {
-	path := p.Flatten(fp.D)
+	path := p.Flatten(fp.Flatten)
 	return []*Path{path}
 }
 
@@ -60,11 +60,41 @@ func (lp *LineProc) Process(p *Path) []*Path {
 	return []*Path{path}
 }
 
+// OpenProc replaces a path with its open version.
+type OpenProc struct{}
+
+// Process implements the PathProcessor interface.
+func (op *OpenProc) Process(p *Path) []*Path {
+	path := p.Open()
+	return []*Path{path}
+}
+
+// ReverseProc replaces a path with its reverse.
+type ReverseProc struct{}
+
+// Process implements the PathProcessor interface.
+func (rp *ReverseProc) Process(p *Path) []*Path {
+	path := p.Reverse()
+	return []*Path{path}
+}
+
 // SimplifyProc is a wrpper around Path.Simplify().
 type SimplifyProc struct{}
 
 // Process implements the PathProcessor interface.
 func (sp *SimplifyProc) Process(p *Path) []*Path {
 	path := p.Simplify()
+	return []*Path{path}
+}
+
+// TransformProc is a wrapper around Path.Transform() and contains the Aff3
+// transform to be applied.
+type TransformProc struct {
+	Transform *Aff3
+}
+
+// Process implements the PathProcessor interface.
+func (tp *TransformProc) Process(p *Path) []*Path {
+	path := p.Transform(tp.Transform)
 	return []*Path{path}
 }
