@@ -12,7 +12,7 @@ type TraceProc struct {
 	JoinFunc func([][]float64, []float64, [][]float64) [][][]float64
 }
 
-// NewTraceProc creates a stroke path processor with width w, the bevel join and butt cap types.
+// NewTraceProc creates a trace path processor with width w, the bevel join and butt cap types.
 func NewTraceProc(w float64) *TraceProc {
 	return &TraceProc{w, 1, 0.5, JoinBevel} // 10 degrees
 }

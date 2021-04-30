@@ -13,6 +13,7 @@ type Shape struct {
 	paths  []*Path
 	bounds image.Rectangle
 	mask   *image.Alpha
+	parent *Shape
 }
 
 // Bounds calculates the union of the bounds of the paths the shape contains.
@@ -100,7 +101,7 @@ func (s *Shape) Paths() []*Path {
 func (s *Shape) Copy() *Shape {
 	np := make([]*Path, len(s.paths))
 	copy(np, s.paths)
-	return &Shape{np, s.bounds, s.mask}
+	return &Shape{np, s.bounds, s.mask, s.parent}
 }
 
 // Transform applies an affine transform to all the paths in the shape
@@ -110,12 +111,23 @@ func (s *Shape) Transform(xfm *Aff3) *Shape {
 	for i, path := range s.paths {
 		np[i] = path.Transform(xfm)
 	}
-	return &Shape{np, image.Rectangle{}, nil}
+	return &Shape{np, image.Rectangle{}, nil, s}
 }
 
-// Process applies a processor to the shape and
+// Process applies a shape processor to the shape and
+// returns a collection of new shapes.
+func (s *Shape) Process(proc ShapeProcessor) []*Shape {
+	shapes := proc.Process(s)
+	// Fix parent
+	for _, shape := range shapes {
+		shape.parent = s
+	}
+	return shapes
+}
+
+// ProcessPaths applies a path processor to the shape and
 // returns a new shape containing the processed paths.
-func (s *Shape) Process(proc PathProcessor) *Shape {
+func (s *Shape) ProcessPaths(proc PathProcessor) *Shape {
 	np := make([]*Path, 0)
 	for _, p := range s.paths {
 		npaths := p.Process(proc)
@@ -125,7 +137,7 @@ func (s *Shape) Process(proc PathProcessor) *Shape {
 		}
 	}
 
-	return &Shape{np, image.Rectangle{}, nil}
+	return &Shape{np, image.Rectangle{}, nil, s}
 }
 
 // String converts a shape into a string.
