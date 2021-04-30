@@ -24,6 +24,7 @@ func RenderPath(dst draw.Image, path *Path, filler image.Image) {
 	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, nil, draw.Over)
 }
 
+// RenderFlatten is the standard curve flattening value used when rendering.
 const RenderFlatten = 0.6
 
 // RenderPathExt renders the specified path (forced closed) at an offset with the fill and clip images

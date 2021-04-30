@@ -11,11 +11,11 @@ import (
 type PointRot int
 
 const (
-	// RotFixed, no rotation
+	// RotFixed no rotation
 	RotFixed PointRot = iota
-	// RotRelative, rotation relative to the tangent of the path step
+	// RotRelative rotation relative to the tangent of the path step
 	RotRelative
-	// RotRandom, rotation is randomized
+	// RotRandom rotation is randomized
 	RotRandom
 )
 
