@@ -2,8 +2,21 @@ package graphics2d
 
 import (
 	"math"
+	"math/rand"
 
 	. "github.com/jphsd/graphics2d/util"
+)
+
+// PointRot specifies the type of shape rotation
+type PointRot int
+
+const (
+	// RotFixed, no rotation
+	RotFixed PointRot = iota
+	// RotRelative, rotation relative to the tangent of the path step
+	RotRelative
+	// RotRandom, rotation is randomized
+	RotRandom
 )
 
 // PointsProc contains a slice of shapes, one of which will be placed using at the start of each step in the
@@ -11,11 +24,11 @@ import (
 // indicates if the shapes should be rotated relative to the path's tangent at that point.
 type PointsProc struct {
 	Points []*Shape
-	Rotate bool
+	Rotate PointRot
 }
 
 // NewPointsProc creates a new points path processor with the supplied shapes and rotation flag.
-func NewPointsProc(shapes []*Shape, rot bool) *PointsProc {
+func NewPointsProc(shapes []*Shape, rot PointRot) *PointsProc {
 	return &PointsProc{shapes, rot}
 }
 
@@ -31,14 +44,18 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 	cp := 0
 	for _, part := range parts {
 		if pp.Points[cp] != nil {
-			if pp.Rotate {
+			var xfm *Aff3
+			switch pp.Rotate {
+			case RotFixed:
+				xfm = CreateTransform(part[0][0], part[0][1], 1, 0)
+			case RotRelative:
 				t0 := DeCasteljau(part, 0)
-				xfm := CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
-				res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
-			} else {
-				xfm := CreateTransform(part[0][0], part[0][1], 1, 0)
-				res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
+				xfm = CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
+			case RotRandom:
+				t0 := DeCasteljau(part, 0)
+				xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*math.Pi*2)
 			}
+			res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
 		}
 		if cp++; cp == ns {
 			cp = 0
@@ -46,15 +63,19 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 	}
 	// Only apply end shape to open paths
 	if pp.Points[cp] != nil && !p.Closed() {
-		if pp.Rotate {
-			t1 := DeCasteljau(parts[len(parts)-1], 1)
-			xfm := CreateTransform(t1[0], t1[1], 1, math.Atan2(t1[3], t1[2]))
-			res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
-		} else {
-			part := parts[len(parts)-1]
-			xfm := CreateTransform(part[len(part)-1][0], part[len(part)-1][1], 1, 0)
-			res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
+		var xfm *Aff3
+		part := parts[len(parts)-1]
+		switch pp.Rotate {
+		case RotFixed:
+			xfm = CreateTransform(part[0][0], part[0][1], 1, 0)
+		case RotRelative:
+			t0 := DeCasteljau(part, 1)
+			xfm = CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
+		case RotRandom:
+			t0 := DeCasteljau(part, 1)
+			xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*math.Pi*2)
 		}
+		res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
 	}
 	return res
 }
@@ -70,7 +91,7 @@ type ShapesProc struct {
 }
 
 // NewShapesProc creates a new shapes path processor with the supplied shapes, spacing and rotation flag.
-func NewShapesProc(shapes []*Shape, spacing float64, rot bool) *ShapesProc {
+func NewShapesProc(shapes []*Shape, spacing float64, rot PointRot) *ShapesProc {
 	pattern := []float64{spacing, spacing}
 	spaces := NewSnipProc(2, pattern, 0)
 	n := len(shapes)
