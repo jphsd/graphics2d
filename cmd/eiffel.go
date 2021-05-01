@@ -45,7 +45,7 @@ func main() {
 	red := color.RGBA{0xff, 0, 0, 0xff}
 	RenderColoredPath(img, path1, red)
 
-	err := saveImage(img, "out")
+	err := saveImage(img, "eiffel")
 	if err != nil {
 		log.Fatal(err)
 	}

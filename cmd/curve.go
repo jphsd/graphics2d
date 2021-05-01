@@ -33,14 +33,14 @@ func main() {
 	}
 
 	/* We could have written this, this way too
-	path := PartsToPath([][]float64{p1, c1, c2, p2}})
+	path, err := PartsToPath([][]float64{p1, c1, c2, p2}})
 	*/
 
 	// Draw curve
 	DrawPath(img, path, red)
 
 	// Capture image output
-	err = saveImage(img, "out")
+	err = saveImage(img, "curve")
 	if err != nil {
 		log.Fatal(err)
 	}

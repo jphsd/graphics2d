@@ -32,7 +32,7 @@ func main() {
 	DrawPoint(img, c, color.Black)
 
 	// Capture image output
-	err := saveImage(img, "out")
+	err := saveImage(img, "circle")
 	if err != nil {
 		log.Fatal(err)
 	}

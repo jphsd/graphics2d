@@ -223,3 +223,23 @@ func RegularPolygon(pt1, pt2 []float64, n int) *Path {
 	np.Close()
 	return np
 }
+
+// ReentrantPolygon returns a closed path describing an n pointed star.
+func ReentrantPolygon(c []float64, r float64, n int, t, ang float64) *Path {
+	ang -= math.Pi / 2 // So ang = 0 has the start of the polygon pointing up
+	da := 2 * math.Pi / float64(n)
+	cosDa, sinDa := math.Cos(da), math.Sin(da)
+	ri := r * math.Cos(da/2) * t
+	dxe, dye := r*math.Cos(ang), r*math.Sin(ang)
+	dxi, dyi := ri*math.Cos(ang+da/2), ri*math.Sin(ang+da/2)
+	np := NewPath([]float64{c[0] + dxe, c[1] + dye})
+	dxe, dye = dxe*cosDa-dye*sinDa, dxe*sinDa+dye*cosDa
+	for i := 0; i < n; i++ {
+		np.AddStep([]float64{c[0] + dxi, c[1] + dyi})
+		dxi, dyi = dxi*cosDa-dyi*sinDa, dxi*sinDa+dyi*cosDa
+		np.AddStep([]float64{c[0] + dxe, c[1] + dye})
+		dxe, dye = dxe*cosDa-dye*sinDa, dxe*sinDa+dye*cosDa
+	}
+	np.Close()
+	return np
+}

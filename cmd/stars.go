@@ -19,21 +19,26 @@ func main() {
 	width, height := 400, 400
 	img := image.NewRGBA(width, height, color.White)
 
-	// Define points
-	p1 := []float64{100, 100}
-	p2 := []float64{300, 100}
-	p3 := []float64{300, 300}
-	p4 := []float64{100, 300}
+	n := 5
+	dx, dy := width/n, height/n
+	cx, cy := dx/2, dy/2
+	r := float64(dx) / 2 * 0.9
+	a := 0.0
+	shape := &Shape{}
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
+			cp := []float64{float64(cx), float64(cy)}
+			shape.AddPaths(ReentrantPolygon(cp, r, i+3, float64(j*25+1)/100.0, a))
+			cx += dx
+		}
+		cx = dx / 2
+		cy += dy
+	}
 	red := color.RGBA{0xff, 0, 0, 0xff}
-
-	// Draw lines
-	DrawLine(img, p1, p2, red)
-	DrawLine(img, p2, p3, red)
-	DrawLine(img, p3, p4, red)
-	DrawLine(img, p4, p1, red)
+	RenderColoredShape(img, shape, red)
 
 	// Capture image output
-	err := saveImage(img, "box")
+	err := saveImage(img, "stars")
 	if err != nil {
 		log.Fatal(err)
 	}
