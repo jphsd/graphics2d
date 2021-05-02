@@ -1,6 +1,7 @@
 # Yet Another 2D Graphics Package For Go
 
 Still very much under development although the image functions are about as complete as I'm going to make them.
+Note - the go:embed feature from v1.16 is required to build.
 
 The top level Path and Shape types are complete, and the majority of PathProcessors implemented, including:
 - StrokeProc - fixed width strokes with a variety of cap and join types.
