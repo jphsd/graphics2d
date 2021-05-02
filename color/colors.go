@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"strings"
 
+	// force init for go:embed
 	_ "embed"
 )
 
