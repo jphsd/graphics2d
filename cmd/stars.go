@@ -1,5 +1,7 @@
 package main
 
+// +build ignore
+
 import (
 	"image/color"
 	"image/draw"

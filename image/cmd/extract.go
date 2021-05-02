@@ -1,5 +1,7 @@
 package main
 
+// +build ignore
+
 import (
 	"flag"
 	"image"

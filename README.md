@@ -10,8 +10,7 @@ The top level Path and Shape types are complete, and the majority of PathProcess
 - CompoundProc - allows concatenation of PathProcessors
 > dashedstroke := NewCompoundProc(NewDashProc(pattern, offs), NewStrokeProc(1))
 
-Package documentation [here](https://pkg.go.dev/github.com/jphsd/graphics2d)
-
 Wiki entries [here](https://github.com/jphsd/graphics2d/wiki)
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/jphsd/graphics2d.svg)](https://pkg.go.dev/github.com/jphsd/graphics2d)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jphsd/graphics2d)](https://goreportcard.com/report/github.com/jphsd/graphics2d)
