@@ -14,3 +14,4 @@ Wiki entries [here](https://github.com/jphsd/graphics2d/wiki)
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/jphsd/graphics2d.svg)](https://pkg.go.dev/github.com/jphsd/graphics2d)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jphsd/graphics2d)](https://goreportcard.com/report/github.com/jphsd/graphics2d)
+[![Build Status](https://travis-ci.org/jphsd/graphics2d.svg?branch=master)](https://travis-ci.org/jphsd/graphics2d)
