@@ -126,8 +126,8 @@ func Monochrome(col color.Color, n int) []color.Color {
 	return res
 }
 
-// Analagous returns the color's analagous colors.
-func Analagous(col color.Color) []color.Color {
+// Analogous returns the color's analogous colors.
+func Analogous(col color.Color) []color.Color {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	d := 1 / float64(12)
 	a1.H += d
@@ -275,7 +275,7 @@ func Tone(col color.Color) color.Color {
 	return hsl
 }
 
-// Compound returns the colors analagous to the color's complement.
+// Compound returns the colors analogous to the color's complement.
 func Compound(col color.Color) []color.Color {
-	return Analagous(Complement(col))
+	return Analogous(Complement(col))
 }
