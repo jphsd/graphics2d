@@ -15,13 +15,13 @@ import (
 // into the destination image.
 func RenderColoredPath(dst draw.Image, path *Path, fill color.Color) {
 	filler := image.NewUniform(fill)
-	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, nil, draw.Over)
+	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, image.Point{}, nil, draw.Over)
 }
 
 // RenderPath renders the specified path (forced closed) at an offset with the fill image
 // into the destination image.
 func RenderPath(dst draw.Image, path *Path, filler image.Image) {
-	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, nil, draw.Over)
+	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, image.Point{}, nil, draw.Over)
 }
 
 // RenderFlatten is the standard curve flattening value used when rendering.
@@ -29,7 +29,7 @@ const RenderFlatten = 0.6
 
 // RenderPathExt renders the specified path (forced closed) at an offset with the fill and clip images
 // into the destination image using op.
-func RenderPathExt(dst draw.Image, path *Path, at []float32, filler image.Image, clip *image.Alpha, op draw.Op) error {
+func RenderPathExt(dst draw.Image, path *Path, at []float32, filler image.Image, foffs image.Point, clip *image.Alpha, op draw.Op) error {
 	rect := dst.Bounds()
 	size := rect.Size()
 
@@ -57,9 +57,9 @@ func RenderPathExt(dst draw.Image, path *Path, at []float32, filler image.Image,
 		rasterizer.Draw(alpha, rect, image.Opaque, image.Point{})
 		alpha = g2dimg.AlphaAnd(alpha, clip)
 		// alpha now has {0, 0} origin
-		draw.DrawMask(dst, rect, filler, image.Point{}, alpha, image.Point{}, op)
+		draw.DrawMask(dst, rect, filler, foffs, alpha, image.Point{}, op)
 	} else {
-		rasterizer.Draw(dst, rect, filler, image.Point{})
+		rasterizer.Draw(dst, rect, filler, foffs)
 	}
 
 	return nil
@@ -90,18 +90,18 @@ func RenderPathAlpha(dst *image.Alpha, path *Path, at []float32, op draw.Op) {
 // into the destination image.
 func RenderColoredShape(dst draw.Image, shape *Shape, fill color.Color) {
 	filler := image.NewUniform(fill)
-	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, nil, draw.Over)
+	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, image.Point{}, nil, draw.Over)
 }
 
 // RenderShape renders the supplied shape at an offset with the fill image into
 // the destination image.
 func RenderShape(dst draw.Image, shape *Shape, filler image.Image) {
-	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, nil, draw.Over)
+	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, image.Point{}, nil, draw.Over)
 }
 
 // RenderShapeExt renders the supplied shape at an offset with the fill and clip images into
 // the destination image using op.
-func RenderShapeExt(dst draw.Image, shape *Shape, at []float32, filler image.Image, clip *image.Alpha, op draw.Op) error {
+func RenderShapeExt(dst draw.Image, shape *Shape, at []float32, filler image.Image, foffs image.Point, clip *image.Alpha, op draw.Op) error {
 	rect := dst.Bounds()
 	size := rect.Size()
 
@@ -131,9 +131,9 @@ func RenderShapeExt(dst draw.Image, shape *Shape, at []float32, filler image.Ima
 		rasterizer.Draw(alpha, rect, image.Opaque, image.Point{})
 		alpha = g2dimg.AlphaAnd(alpha, clip)
 		// alpha now has origin {0, 0}
-		draw.DrawMask(dst, rect, filler, image.Point{}, alpha, image.Point{}, op)
+		draw.DrawMask(dst, rect, filler, foffs, alpha, image.Point{}, op)
 	} else {
-		rasterizer.Draw(dst, rect, filler, image.Point{})
+		rasterizer.Draw(dst, rect, filler, foffs)
 	}
 
 	return nil
@@ -167,20 +167,20 @@ func RenderShapeAlpha(dst *image.Alpha, shape *Shape, at []float32, op draw.Op) 
 
 // DrawColoredShape utilizes the supplied shape's mask to draw into the destination image at an offset
 // with the fill color.
-func DrawColoredShape(dst draw.Image, shape *Shape, at image.Point, fill color.Color) {
+func DrawColoredShape(dst draw.Image, shape *Shape, offs image.Point, fill color.Color) {
 	filler := image.NewUniform(fill)
-	_ = DrawShapeExt(dst, shape, at, filler, image.Point{}, nil, draw.Over)
+	_ = DrawShapeExt(dst, shape, offs, filler, image.Point{}, nil, draw.Over)
 }
 
 // DrawShape utilizes the supplied shape's mask to draw into the destination image at an offset with
 // the filler image.
-func DrawShape(dst draw.Image, shape *Shape, at image.Point, filler image.Image) {
-	_ = DrawShapeExt(dst, shape, at, filler, image.Point{}, nil, draw.Over)
+func DrawShape(dst draw.Image, shape *Shape, offs image.Point, filler image.Image) {
+	_ = DrawShapeExt(dst, shape, offs, filler, image.Point{}, nil, draw.Over)
 }
 
 // DrawShapeExt utilizes the supplied shape's mask to draw into the destination image at an offset with
 // the filler, also offset, and clip images using op.
-func DrawShapeExt(dst draw.Image, shape *Shape, at image.Point, filler image.Image, fat image.Point, clip *image.Alpha, op draw.Op) error {
+func DrawShapeExt(dst draw.Image, shape *Shape, offs image.Point, filler image.Image, foffs image.Point, clip *image.Alpha, op draw.Op) error {
 	rect := dst.Bounds()
 	size := rect.Size()
 
@@ -190,16 +190,16 @@ func DrawShapeExt(dst draw.Image, shape *Shape, at image.Point, filler image.Ima
 
 	mask := shape.Mask()
 	srect := mask.Bounds()
-	drect := image.Rectangle{at, image.Point{at.X + srect.Dx(), at.Y + srect.Dy()}}
+	drect := image.Rectangle{offs, image.Point{offs.X + srect.Dx(), offs.Y + srect.Dy()}}
 
 	if clip != nil {
 		// Obtain clip mask subimage and intersect it against the shape mask
 		sub := clip.SubImage(drect).(*image.Alpha)
 		mask = g2dimg.AlphaAnd(mask, sub)
 		// mask now has origin {0, 0}
-		draw.DrawMask(dst, drect, filler, fat, mask, image.Point{}, op)
+		draw.DrawMask(dst, drect, filler, foffs, mask, image.Point{}, op)
 	} else {
-		draw.DrawMask(dst, drect, filler, fat, mask, srect.Min, op)
+		draw.DrawMask(dst, drect, filler, foffs, mask, srect.Min, op)
 	}
 
 	return nil
