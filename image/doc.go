@@ -40,7 +40,7 @@ Various metrics
 	Variance
 
 Image types:
-    Patch - replicates a patch of colors aross the plane like Uniform does for a single color
-	Tile - replicates an image across the plane
+    Patch - replicates a patch of colors across the plane like Uniform does for a single color
+    Tile - replicates an image across the plane
 */
 package image
