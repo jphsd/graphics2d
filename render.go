@@ -20,8 +20,8 @@ func RenderColoredPath(dst draw.Image, path *Path, fill color.Color) {
 
 // RenderPath renders the specified path (forced closed) at an offset with the fill image
 // into the destination image.
-func RenderPath(dst draw.Image, path *Path, filler image.Image) {
-	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, image.Point{}, nil, draw.Over)
+func RenderPath(dst draw.Image, path *Path, filler image.Image, foffs image.Point) {
+	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, foffs, nil, draw.Over)
 }
 
 // RenderFlatten is the standard curve flattening value used when rendering.
@@ -95,8 +95,8 @@ func RenderColoredShape(dst draw.Image, shape *Shape, fill color.Color) {
 
 // RenderShape renders the supplied shape at an offset with the fill image into
 // the destination image.
-func RenderShape(dst draw.Image, shape *Shape, filler image.Image) {
-	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, image.Point{}, nil, draw.Over)
+func RenderShape(dst draw.Image, shape *Shape, filler image.Image, foffs image.Point) {
+	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, foffs, nil, draw.Over)
 }
 
 // RenderShapeExt renders the supplied shape at an offset with the fill and clip images into
@@ -174,8 +174,8 @@ func DrawColoredShape(dst draw.Image, shape *Shape, offs image.Point, fill color
 
 // DrawShape utilizes the supplied shape's mask to draw into the destination image at an offset with
 // the filler image.
-func DrawShape(dst draw.Image, shape *Shape, offs image.Point, filler image.Image) {
-	_ = DrawShapeExt(dst, shape, offs, filler, image.Point{}, nil, draw.Over)
+func DrawShape(dst draw.Image, shape *Shape, offs image.Point, filler image.Image, foffs image.Point) {
+	_ = DrawShapeExt(dst, shape, offs, filler, foffs, nil, draw.Over)
 }
 
 // DrawShapeExt utilizes the supplied shape's mask to draw into the destination image at an offset with
