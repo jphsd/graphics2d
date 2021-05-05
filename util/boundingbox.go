@@ -50,7 +50,7 @@ func BBOverlap(bb1, bb2 [][]float64) bool {
 	return true
 }
 
-// BBContains returns true if p in in bb at the smallest dimensionality.
+// BBContains returns true if p is in bb at the smallest dimensionality.
 func BBContains(p []float64, bb [][]float64) bool {
 	min := len(bb[0])
 	if min > len(p) {

@@ -11,6 +11,8 @@ type Patch struct {
 	Colors [][]color.RGBA
 	Width  int
 	Height int
+	OffsX  int
+	OffsY  int
 }
 
 // NewPatch creates a new iamge with the supplied patch.
@@ -27,7 +29,7 @@ func NewPatch(colors [][]color.Color) (*Patch, error) {
 			rgba[i][j], _ = color.RGBAModel.Convert(colors[i][j]).(color.RGBA)
 		}
 	}
-	return &Patch{rgba, w, h}, nil
+	return &Patch{rgba, w, h, 0, 0}, nil
 }
 
 // ColorModel implements the ColorModel function in the Image interface.
@@ -43,6 +45,8 @@ func (p *Patch) Bounds() image.Rectangle {
 // At implements the At function in the Image interface.
 func (p *Patch) At(x, y int) color.Color {
 	i := 0
+	x += p.OffsX
+	y += p.OffsY
 	if x < 0 {
 		x = -x
 		i = x % p.Width
