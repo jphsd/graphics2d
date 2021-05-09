@@ -41,7 +41,7 @@ func B8Dither() [][]float64 {
 	}
 }
 
-// OrderedDither returns a ordered dithered image.
+// OrderedDither returns an ordered dithered image.
 func OrderedDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float64, f func() [][]float64) {
 	if t < 0 {
 		t = 0
@@ -161,6 +161,7 @@ func SierraLError() ([][]float64, float64) {
 	}, 1 / 8.0
 }
 
+// ErrorDither returns an error diffused dithered image using the supplied error matrix function.
 func ErrorDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float64,
 	ef func() ([][]float64, float64), noise bool) {
 	mat, stoc := ef()
