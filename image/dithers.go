@@ -59,8 +59,8 @@ func OrderedDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t floa
 
 // ErrorDiffusion holds the error diffusion matrix and a stochastic value to use when noise is required.
 type ErrorDiffusion struct {
-	mat  [][]float64
-	stoc float64
+	Mat  [][]float64
+	Stoc float64
 }
 
 // SimplestError returns a simpler error diffusion matrix 3x3
@@ -164,7 +164,7 @@ func SierraLError() *ErrorDiffusion {
 // ErrorDither returns an error diffused dithered image using the error matrix. If noise is true, the diffusion
 // weights are randomly +1/-1/0 times the stochastic value.
 func (ed *ErrorDiffusion) ErrorDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float64, noise bool) {
-	mat := ed.mat
+	mat := ed.Mat
 	nr, nc := len(mat), len(mat[0])
 	n := r.Dx() + 2*nc // allow for diffusion at edges
 	if t < 0 {
@@ -199,7 +199,7 @@ func (ed *ErrorDiffusion) ErrorDither(dst draw.Image, r image.Rectangle, c1, c2 
 }
 
 func (ed *ErrorDiffusion) runErrorRow(rows [][]float64, t float64, noise bool) []float64 {
-	mat, stoc := ed.mat, ed.stoc
+	mat, stoc := ed.Mat, ed.Stoc
 	nr, nc := len(mat), len(mat[0])
 	e := nc / 2 // number of cells to L or R of midpoint
 	n := len(rows[0])
