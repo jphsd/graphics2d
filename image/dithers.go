@@ -57,108 +57,114 @@ func OrderedDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t floa
 
 // Error Diffusion Dithers
 
+// ErrorDiffusion holds the error diffusion matrix and a stochastic value to use when noise is required.
+type ErrorDiffusion struct {
+	mat  [][]float64
+	stoc float64
+}
+
 // SimplestError returns a simpler error diffusion matrix 3x3
-func SimplestError() ([][]float64, float64) {
-	return [][]float64{
+func SimplestError() *ErrorDiffusion {
+	return &ErrorDiffusion{[][]float64{
 		// First row is empty
 		{0, 0, 1 / 2.0},
 		{0, 1 / 2.0, 0},
-	}, 1 / 4.0
+	}, 1 / 4.0}
 }
 
 // Simple3Error returns a simple error diffusion matrix 3x3
-func Simple3Error() ([][]float64, float64) {
-	return [][]float64{
+func Simple3Error() *ErrorDiffusion {
+	return &ErrorDiffusion{[][]float64{
 		// First row is empty
 		{0, 0, 1 / 3.0},
 		{0, 1 / 3.0, 1 / 3.0},
-	}, 1 / 6.0
+	}, 1 / 6.0}
 }
 
 // FSError returns the Floyd Steinberg error diffusion matrix 3x3
-func FSError() ([][]float64, float64) {
-	return [][]float64{
+func FSError() *ErrorDiffusion {
+	return &ErrorDiffusion{[][]float64{
 		// First row is empty
 		{0, 0, 7 / 16.0},
 		{3 / 16.0, 5 / 16.0, 1 / 16.0},
-	}, 1 / 32.0
+	}, 1 / 32.0}
 }
 
 // JJNError returns the Jarvis Judice Ninke error diffusion matrix 5x5
-func JJNError() ([][]float64, float64) {
-	return [][]float64{
+func JJNError() *ErrorDiffusion {
+	return &ErrorDiffusion{[][]float64{
 		// First two rows are empty
 		{0, 0, 0, 7 / 48.0, 5 / 48.0},
 		{3 / 48.0, 5 / 48.0, 7 / 48.0, 5 / 48.0, 3 / 48.0},
 		{1 / 48.0, 3 / 48.0, 5 / 48.0, 3 / 48.0, 1 / 48.0},
-	}, 1 / 96.0
+	}, 1 / 96.0}
 }
 
 // StukiError returns the Stuki error diffusion matrix 5x5
-func StukiError() ([][]float64, float64) {
-	return [][]float64{
+func StukiError() *ErrorDiffusion {
+	return &ErrorDiffusion{[][]float64{
 		// First two rows are empty
 		{0, 0, 0, 8 / 42.0, 4 / 42.0},
 		{2 / 42.0, 4 / 42.0, 8 / 42.0, 4 / 42.0, 2 / 42.0},
 		{1 / 42.0, 2 / 42.0, 4 / 42.0, 2 / 42.0, 1 / 42.0},
-	}, 1 / 84.0
+	}, 1 / 84.0}
 }
 
 // BurkesError returns the Burkes error diffusion matrix 5x3
 // (Stuki without the last row)
-func BurkesError() ([][]float64, float64) {
-	return [][]float64{
+func BurkesError() *ErrorDiffusion {
+	return &ErrorDiffusion{[][]float64{
 		// First row is empty
 		{0, 0, 0, 8 / 32.0, 4 / 32.0},
 		{2 / 32.0, 4 / 32.0, 8 / 32.0, 4 / 32.0, 2 / 32.0},
-	}, 1 / 64.0
+	}, 1 / 64.0}
 }
 
 // AtkinsonError returns the Atkinson error diffusion matrix 5x5
-func AtkinsonError() ([][]float64, float64) {
+func AtkinsonError() *ErrorDiffusion {
 	// 8 and not 6!
-	return [][]float64{
+	return &ErrorDiffusion{[][]float64{
 		// First two rows are empty
 		{0, 0, 0, 1 / 8.0, 1 / 8.0},
 		{0, 1 / 8.0, 1 / 8.0, 1 / 8.0, 0},
 		{0, 0, 1 / 8.0, 0, 0},
-	}, 1 / 16.0
+	}, 1 / 16.0}
 }
 
 // MAYBE Modified Atkinson over 6?
 
 // SierraError returns the Sierra error diffusion matrix 5x5
-func SierraError() ([][]float64, float64) {
-	return [][]float64{
+func SierraError() *ErrorDiffusion {
+	return &ErrorDiffusion{[][]float64{
 		// First two rows are empty
 		{0, 0, 0, 5 / 32.0, 3 / 32.0},
 		{2 / 32.0, 4 / 32.0, 5 / 32.0, 4 / 32.0, 2 / 32.0},
 		{0, 2 / 32.0, 3 / 32.0, 2 / 32.0, 0},
-	}, 1 / 64.0
+	}, 1 / 64.0}
 }
 
 // Sierra2Error returns the Sierra two row error diffusion matrix 5x3
-func Sierra2Error() ([][]float64, float64) {
-	return [][]float64{
+func Sierra2Error() *ErrorDiffusion {
+	return &ErrorDiffusion{[][]float64{
 		// First row is empty
 		{0, 0, 0, 4 / 16.0, 3 / 16.0},
 		{1 / 16.0, 2 / 16.0, 3 / 16.0, 2 / 16.0, 1 / 16.0},
-	}, 1 / 32.0
+	}, 1 / 32.0}
 }
 
 // SierraLError returns the Sierra lite error diffusion matrix 3x3
-func SierraLError() ([][]float64, float64) {
-	return [][]float64{
+func SierraLError() *ErrorDiffusion {
+	return &ErrorDiffusion{[][]float64{
 		// First row is empty
 		{0, 0, 2 / 4.0},
 		{1 / 4.0, 1 / 4.0, 0},
-	}, 1 / 8.0
+	}, 1 / 8.0}
 }
 
-// ErrorDither returns an error diffused dithered image using the supplied error matrix function.
-func ErrorDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float64,
-	ef func() ([][]float64, float64), noise bool) {
-	mat, stoc := ef()
+// ErrorDither returns an error diffused dithered image using the error matrix. If noise is true, the diffusion
+// weights are randomly +1/-1/0 times the stochastic value.
+func (ed *ErrorDiffusion) ErrorDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float64, noise bool) {
+	mat := ed.mat
 	nr, nc := len(mat), len(mat[0])
 	n := r.Dx() + 2*nc // allow for diffusion at edges
 	if t < 0 {
@@ -174,12 +180,12 @@ func ErrorDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float6
 
 	// Warm it up
 	for i := 0; i < nr; i++ {
-		_ = runErrorRow(rows, mat, t, stoc, noise)
+		_ = ed.runErrorRow(rows, t, noise)
 	}
 
 	// Generate image
 	for y := r.Min.Y; y < r.Max.Y; y++ {
-		row := runErrorRow(rows, mat, t, stoc, noise)
+		row := ed.runErrorRow(rows, t, noise)
 		i := nc
 		for x := r.Min.X; x < r.Max.X; x++ {
 			if row[i] < 0.5 {
@@ -192,7 +198,8 @@ func ErrorDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float6
 	}
 }
 
-func runErrorRow(rows, mat [][]float64, t, stoc float64, noise bool) []float64 {
+func (ed *ErrorDiffusion) runErrorRow(rows [][]float64, t float64, noise bool) []float64 {
+	mat, stoc := ed.mat, ed.stoc
 	nr, nc := len(mat), len(mat[0])
 	e := nc / 2 // number of cells to L or R of midpoint
 	n := len(rows[0])
