@@ -8,28 +8,23 @@ import (
 )
 
 // Ordered Dithers
-
-// B2Dither returns the Bayer ordered dither matrix 2x2
-func B2Dither() [][]float64 {
-	return [][]float64{
+var (
+	// B2Dither is the Bayer ordered dither matrix 2x2
+	B2Dither = [][]float64{
 		{1 / 4.0, 3 / 4.0},
 		{4 / 4.0, 2 / 4.0},
 	}
-}
 
-// B4Dither returns the Bayer ordered dither matrix 4x4
-func B4Dither() [][]float64 {
-	return [][]float64{
+	// B4Dither is the Bayer ordered dither matrix 4x4
+	B4Dither = [][]float64{
 		{1 / 16.0, 9 / 16.0, 3 / 16.0, 11 / 16.0},
 		{13 / 16.0, 5 / 16.0, 15 / 16.0, 7 / 16.0},
 		{4 / 16.0, 12 / 16.0, 2 / 16.0, 10 / 16.0},
 		{16 / 16.0, 8 / 16.0, 14 / 16.0, 6 / 16.0},
 	}
-}
 
-// B8Dither returns the Bayer ordered dither matrix 8x8
-func B8Dither() [][]float64 {
-	return [][]float64{
+	// B8Dither is the Bayer ordered dither matrix 8x8
+	B8Dither = [][]float64{
 		{0.015625, 0.515625, 0.140625, 0.640625, 0.046875, 0.546875, 0.171875, 0.671875},
 		{0.765625, 0.265625, 0.890625, 0.390625, 0.796875, 0.296875, 0.921875, 0.421875},
 		{0.203125, 0.703125, 0.078125, 0.578125, 0.234375, 0.734375, 0.109375, 0.609375},
@@ -39,16 +34,15 @@ func B8Dither() [][]float64 {
 		{0.250000, 0.750000, 0.125000, 0.625000, 0.218750, 0.718750, 0.093750, 0.593750},
 		{1.000000, 0.500000, 0.875000, 0.375000, 0.968750, 0.468750, 0.843750, 0.343750},
 	}
-}
+)
 
 // OrderedDither returns an ordered dithered image.
-func OrderedDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float64, f func() [][]float64) {
+func OrderedDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float64, mat [][]float64) {
 	if t < 0 {
 		t = 0
 	} else if t > 1 {
 		t = 1
 	}
-	mat := f()
 	nr, nc := len(mat), len(mat[0])
 	for y := r.Min.Y; y < r.Max.Y; y++ {
 		for x := r.Min.X; x < r.Max.X; x++ {
