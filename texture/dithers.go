@@ -1,4 +1,4 @@
-package image
+package texture
 
 import (
 	"image"
