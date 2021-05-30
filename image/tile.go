@@ -36,27 +36,15 @@ func (t *Tile) Bounds() image.Rectangle {
 
 // At implements the At function in the Image interface.
 func (t *Tile) At(x, y int) color.Color {
-	i := 0
 	x += t.OffsX
 	y += t.OffsY
+	x %= t.Width
 	if x < 0 {
-		x = -x
-		i = x % t.Width
-		if i != 0 {
-			i = t.Width - i
-		}
-	} else {
-		i = x % t.Width
+		x = t.Width - x
 	}
-	j := 0
+	y %= t.Height
 	if y < 0 {
-		y = -y
-		j = y % t.Height
-		if j != 0 {
-			j = t.Height - j
-		}
-	} else {
-		j = y % t.Height
+		y = t.Height - y
 	}
-	return t.Tile.At(i, j)
+	return t.Tile.At(x, y)
 }

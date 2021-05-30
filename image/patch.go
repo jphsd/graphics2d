@@ -44,27 +44,15 @@ func (p *Patch) Bounds() image.Rectangle {
 
 // At implements the At function in the Image interface.
 func (p *Patch) At(x, y int) color.Color {
-	i := 0
 	x += p.OffsX
 	y += p.OffsY
+	x %= p.Width
 	if x < 0 {
-		x = -x
-		i = x % p.Width
-		if i != 0 {
-			i = p.Width - i
-		}
-	} else {
-		i = x % p.Width
+		x = p.Width - x
 	}
-	j := 0
+	y %= p.Height
 	if y < 0 {
-		y = -y
-		j = y % p.Height
-		if j != 0 {
-			j = p.Height - j
-		}
-	} else {
-		j = y % p.Height
+		y = p.Height - y
 	}
-	return p.Colors[j][i]
+	return p.Colors[y][x]
 }

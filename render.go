@@ -11,14 +11,14 @@ import (
 	"golang.org/x/image/vector"
 )
 
-// RenderColoredPath renders the specified path (forced closed) at an offset with the fill color
+// RenderColoredPath renders the specified path (forced closed) with the fill color
 // into the destination image.
 func RenderColoredPath(dst draw.Image, path *Path, fill color.Color) {
 	filler := image.NewUniform(fill)
 	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, image.Point{}, nil, draw.Over)
 }
 
-// RenderPath renders the specified path (forced closed) at an offset with the fill image
+// RenderPath renders the specified path (forced closed) with the fill image
 // into the destination image.
 func RenderPath(dst draw.Image, path *Path, filler image.Image, foffs image.Point) {
 	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, foffs, nil, draw.Over)
@@ -86,14 +86,14 @@ func RenderPathAlpha(dst *image.Alpha, path *Path, at []float32, op draw.Op) {
 	rasterizer.Draw(dst, rect, image.Opaque, image.Point{})
 }
 
-// RenderColoredShape renders the supplied shape at an offset with the fill color
+// RenderColoredShape renders the supplied shape with the fill color
 // into the destination image.
 func RenderColoredShape(dst draw.Image, shape *Shape, fill color.Color) {
 	filler := image.NewUniform(fill)
 	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, image.Point{}, nil, draw.Over)
 }
 
-// RenderShape renders the supplied shape at an offset with the fill image into
+// RenderShape renders the supplied shape with the fill image into
 // the destination image.
 func RenderShape(dst draw.Image, shape *Shape, filler image.Image, foffs image.Point) {
 	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, foffs, nil, draw.Over)
