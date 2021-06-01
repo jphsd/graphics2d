@@ -1,0 +1,50 @@
+package surface
+
+import (
+	"image/color"
+)
+
+// Light provides the At function to determine the color (RGB in [0,1]), unit direction, distance and power of a
+// light at a location.
+// If the direction is nil then the light is treated as an ambient one and any distance and power values ignored.
+// If the distance is -ve then this is treated as a directional light at infinity.
+// Otherwise the light is treated as a point light source with the power falling as the inverse square of the
+// distance from the light.
+type Light interface {
+	At(x, y int) (*FRGB, []float64, float64, float64)
+}
+
+// Ambient describes an ambient light source.
+type Ambient struct {
+	Color *FRGB
+}
+
+// DefaultAmbient is a low gray light.
+var DefaultAmbient = &Ambient{NewFRGB(color.RGBA{10, 10, 10, 255})}
+
+// NewAmbient returns a new ambient light source.
+func NewAmbient(col color.Color) *Ambient {
+	return &Ambient{NewFRGB(col)}
+}
+
+// At implements the At function of the Light interface.
+func (a *Ambient) At(x, y int) (*FRGB, []float64, float64, float64) {
+	return a.Color, nil, -1, 0
+}
+
+// Directional describes a directional light source. The direction is from the surface to the light, normalized.
+type Directional struct {
+	Color     *FRGB
+	Direction []float64
+}
+
+// NewDirectional returns a new directional light source.
+func NewDirectional(col color.Color, dir []float64) *Directional {
+	dir = norm(dir)
+	return &Directional{NewFRGB(col), dir}
+}
+
+// At implements the At function of the Light interface.
+func (d *Directional) At(x, y int) (*FRGB, []float64, float64, float64) {
+	return d.Color, d.Direction, -1, 0
+}
