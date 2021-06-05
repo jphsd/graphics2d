@@ -75,6 +75,7 @@ func (a *Aff5) Transform(tup []uint8) []uint8 {
 }
 
 // Matrix values are taken from https://www.w3.org/TR/SVG11/filters.html#feColorMatrixTypeAttribute
+// and https://www.w3.org/TR/filter-effects-1/
 
 // Saturate returns a transform that will modify the saturation of an image by s (0, 1)
 func Saturate(s float64) *Aff5 {
@@ -86,15 +87,15 @@ func Saturate(s float64) *Aff5 {
 	oms := 1 - s
 
 	res := NewAff5()
-	res[5*0+0] = 0.213 + 0.787*s
-	res[5*0+1] = 0.715 * oms
-	res[5*0+2] = 0.072 * oms
-	res[5*1+0] = 0.213 * oms
-	res[5*1+1] = 0.715 + 0.285*s
-	res[5*1+2] = 0.072 * oms
-	res[5*2+0] = 0.213 * oms
-	res[5*2+1] = 0.715 * oms
-	res[5*2+2] = 0.072 + 0.928*s
+	res[5*0+0] = 0.2126 + 0.7874*s
+	res[5*0+1] = 0.7152 * oms
+	res[5*0+2] = 0.0722 * oms
+	res[5*1+0] = 0.2126 * oms
+	res[5*1+1] = 0.7152 + 0.2848*s
+	res[5*1+2] = 0.0722 * oms
+	res[5*2+0] = 0.2126 * oms
+	res[5*2+1] = 0.7152 * oms
+	res[5*2+2] = 0.0722 + 0.9278*s
 	return res
 }
 
@@ -109,17 +110,17 @@ func HueRotate(th float64) *Aff5 {
 
 	cth, sth := math.Cos(th), math.Sin(th)
 	res := NewAff5()
-	res[5*0+0] = 0.213 + 0.787*cth - 0.213*sth
-	res[5*0+1] = 0.715 - 0.715*cth - 0.715*sth
-	res[5*0+2] = 0.072 - 0.072*cth + 0.928*sth
+	res[5*0+0] = 0.2126 + 0.7874*cth - 0.2126*sth
+	res[5*0+1] = 0.7152 - 0.7152*cth - 0.7152*sth
+	res[5*0+2] = 0.0722 - 0.0722*cth + 0.9278*sth
 
-	res[5*1+0] = 0.213 - 0.213*cth + 0.143*sth
-	res[5*1+1] = 0.715 + 0.285*cth + 0.140*sth
-	res[5*1+2] = 0.072 - 0.072*cth - 0.283*sth
+	res[5*1+0] = 0.2126 - 0.2126*cth + 0.143*sth // JH
+	res[5*1+1] = 0.7152 + 0.2848*cth + 0.140*sth // JH
+	res[5*1+2] = 0.0722 - 0.0722*cth - 0.283*sth // JH
 
-	res[5*2+0] = 0.213 - 0.213*cth - 0.787*sth
-	res[5*2+1] = 0.715 - 0.715*cth + 0.715*sth
-	res[5*2+2] = 0.072 + 0.928*cth + 0.072*sth
+	res[5*2+0] = 0.2126 - 0.2126*cth - 0.7874*sth
+	res[5*2+1] = 0.7152 - 0.7152*cth + 0.7152*sth
+	res[5*2+2] = 0.0722 + 0.9278*cth + 0.0722*sth
 
 	return res
 }
@@ -128,9 +129,47 @@ func HueRotate(th float64) *Aff5 {
 func LuminanceToAlpha() *Aff5 {
 	var res Aff5
 
-	res[5*3+0] = 0.2125
-	res[5*3+1] = 0.7154
-	res[5*3+2] = 0.0721
+	res[5*3+0] = 0.2126
+	res[5*3+1] = 0.7152
+	res[5*3+2] = 0.0722
 
 	return &res
+}
+
+// Sepia returns a transform that will create a sepia tinted image.
+func Sepia(t float64) *Aff5 {
+	omt := 1 - t
+	res := NewAff5()
+	res[5*0+0] = 0.393 + 0.607*omt
+	res[5*0+1] = 0.769 * t
+	res[5*0+2] = 0.189 * t
+
+	res[5*1+0] = 0.349 * t
+	res[5*1+1] = 0.686 + 0.314*omt
+	res[5*1+2] = 0.168 * t
+
+	res[5*2+0] = 0.272 * t
+	res[5*2+1] = 0.534 * t
+	res[5*2+2] = 0.131 + 0.869*omt
+
+	return res
+}
+
+// Grayscale returns a transform that will create a gray tinted image.
+func Grayscale(t float64) *Aff5 {
+	omt := 1 - t
+	res := NewAff5()
+	res[5*0+0] = 0.2126 + 0.7874*omt
+	res[5*0+1] = 0.7152 * t
+	res[5*0+2] = 0.0722 * t
+
+	res[5*1+0] = 0.2126 * t
+	res[5*1+1] = 0.7152 + 0.2848*omt
+	res[5*1+2] = 0.0722 * t
+
+	res[5*2+0] = 0.2126 * t
+	res[5*2+1] = 0.7152 * t
+	res[5*2+2] = 0.0722 + 0.9278*omt
+
+	return res
 }
