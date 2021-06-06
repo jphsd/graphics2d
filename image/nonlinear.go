@@ -7,9 +7,9 @@ import (
 	"math"
 )
 
-// CircNonLinImage renders the supplied non-linear function into a circle to generate a Gray16 image
+// CircNonLinear renders the supplied non-linear function into a circle to generate a Gray16 image
 // of the specified dimensions.
-func CircNonLinImage(w, h, inset int, f util.NonLinear, inv bool) *image.Gray16 {
+func CircNonLinear(w, h, inset int, f util.NonLinear, inv bool) *image.Gray16 {
 	res := &image.Gray16{}
 	if inv {
 		res = NewGray16(w, h, color.White)
