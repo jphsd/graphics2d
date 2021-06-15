@@ -15,6 +15,11 @@ A new color type and model for HSL along with functions:
   Tone - adds 10% of gray to a color
   Compound - returns the analogous colors of the color's complement
 
+A new color type and model that represents colors as float64 along with functions:
+  Add
+  Prod
+  Scale
+
 An embedded list of popular color names (see @color_parrot) and their colors.
 */
 package color

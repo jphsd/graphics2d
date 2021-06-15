@@ -1,6 +1,7 @@
 package surface
 
 import (
+	gc "github.com/jphsd/graphics2d/color"
 	"image/color"
 )
 
@@ -11,40 +12,40 @@ import (
 // Otherwise the light is treated as a point light source with the power falling as the inverse square of the
 // distance from the light.
 type Light interface {
-	At(x, y int) (*FRGB, []float64, float64, float64)
+	At(x, y int) (*gc.FRGBA, []float64, float64, float64)
 }
 
 // Ambient describes an ambient light source.
 type Ambient struct {
-	Color *FRGB
+	Color *gc.FRGBA
 }
 
 // DefaultAmbient is a low gray light.
-var DefaultAmbient = &Ambient{NewFRGB(color.RGBA{10, 10, 10, 255})}
+var DefaultAmbient = &Ambient{gc.NewFRGBA(color.RGBA{10, 10, 10, 255})}
 
 // NewAmbient returns a new ambient light source.
 func NewAmbient(col color.Color) *Ambient {
-	return &Ambient{NewFRGB(col)}
+	return &Ambient{gc.NewFRGBA(col)}
 }
 
 // At implements the At function of the Light interface.
-func (a *Ambient) At(x, y int) (*FRGB, []float64, float64, float64) {
+func (a *Ambient) At(x, y int) (*gc.FRGBA, []float64, float64, float64) {
 	return a.Color, nil, -1, 0
 }
 
 // Directional describes a directional light source. The direction is from the surface to the light, normalized.
 type Directional struct {
-	Color     *FRGB
+	Color     *gc.FRGBA
 	Direction []float64
 }
 
 // NewDirectional returns a new directional light source.
 func NewDirectional(col color.Color, dir []float64) *Directional {
 	dir = norm(dir)
-	return &Directional{NewFRGB(col), dir}
+	return &Directional{gc.NewFRGBA(col), dir}
 }
 
 // At implements the At function of the Light interface.
-func (d *Directional) At(x, y int) (*FRGB, []float64, float64, float64) {
+func (d *Directional) At(x, y int) (*gc.FRGBA, []float64, float64, float64) {
 	return d.Color, d.Direction, -1, 0
 }

@@ -6,6 +6,5 @@ Package surface contains functions that populate images with lit textured surfac
     Directional
   Material
   NormalMap
-    ImageNM
 */
 package surface

@@ -1,6 +1,7 @@
 package surface
 
 import (
+	"github.com/jphsd/graphics2d/color"
 	"image"
 	"image/draw"
 	"math"
@@ -36,7 +37,7 @@ func RenderSurface(dst draw.Image, rect image.Rectangle, surf *Surface, sp image
 		for x := rect.Min.X; x < rect.Max.X; x++ {
 			ox := x + sp.X
 			emm, amb, diff, spec, shine := material.At(ox, oy) // Emissive
-			lemm := &FRGB{}
+			lemm := &color.FRGBA{}
 			if emm != nil {
 				lemm = emm
 			}
@@ -46,7 +47,7 @@ func RenderSurface(dst draw.Image, rect image.Rectangle, surf *Surface, sp image
 			if diff == nil {
 				continue
 			}
-			cdiff, cspec := &FRGB{}, &FRGB{}
+			cdiff, cspec := &color.FRGBA{}, &color.FRGBA{}
 			for _, light := range surf.Lights {
 				lcol, dir, dist, pow := light.At(ox, oy)
 				if lcol.IsBlack() {
