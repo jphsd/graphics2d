@@ -294,15 +294,15 @@ func (nl *NLP5) InvTransform(v float64) float64 {
 
 // NLCompound v = nl[0](nl[1](nl[2](...nl[n-1](t))))
 type NLCompound struct {
-	nl []NonLinear
+	fs []NonLinear
 }
 
-func NewNLCompound(nl []NonLinear) *NLCompound {
-	return &NLCompound{nl}
+func NewNLCompound(fs []NonLinear) *NLCompound {
+	return &NLCompound{fs}
 }
 
 func (nl *NLCompound) Transform(t float64) float64 {
-	for _, f := range nl.nl {
+	for _, f := range nl.fs {
 		t = f.Transform(t)
 	}
 
@@ -310,10 +310,27 @@ func (nl *NLCompound) Transform(t float64) float64 {
 }
 
 func (nl *NLCompound) InvTransform(v float64) float64 {
-	for i := len(nl.nl) - 1; i > -1; i-- {
-		v = nl.nl[i].InvTransform(v)
+	for i := len(nl.fs) - 1; i > -1; i-- {
+		v = nl.fs[i].InvTransform(v)
 	}
 	return v
+}
+
+// NLOmt v = 1-f(1-t)
+type NLOmt struct {
+	f NonLinear
+}
+
+func NewNLOmt(f NonLinear) *NLOmt {
+	return &NLOmt{f}
+}
+
+func (nl *NLOmt) Transform(t float64) float64 {
+	return 1 - nl.f.Transform(1-t)
+}
+
+func (nl *NLOmt) InvTransform(v float64) float64 {
+	return 1 - nl.f.InvTransform(1-v)
 }
 
 // Numerical method to find inverse

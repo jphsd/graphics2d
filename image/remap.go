@@ -3,6 +3,7 @@ package image
 import (
 	"fmt"
 	"image"
+	"image/color"
 )
 
 // RemapGray remaps a color map with a look up table. The lookup table must be 256 long.
@@ -36,7 +37,27 @@ func RemapGray(img *image.Gray, lut []uint8) *image.Gray {
 	return res
 }
 
-// RemapRGB rempas all the color maps with R, G, B look up tables. The lookup tables must all be 256 long.
+// RemapGray2RGBA remaps a grayscale image to a RGBA one using a look up table. The lookup table must be 256 long.
+func RemapGray2RGBA(img image.Image, lut []color.Color) *image.RGBA {
+	if len(lut) != 256 {
+		panic(fmt.Errorf("lut must be 256 long"))
+	}
+
+	imgR := img.Bounds()
+	w, h := imgR.Dx(), imgR.Dy()
+	res := image.NewRGBA(image.Rect(0, 0, w, h))
+
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			gc := color.GrayModel.Convert(img.At(x+imgR.Min.X, y+imgR.Min.Y)).(color.Gray)
+			res.Set(x, y, lut[gc.Y])
+		}
+	}
+
+	return res
+}
+
+// RemapRGB remaps all the color maps with R, G, B look up tables. The lookup tables must all be 256 long.
 // The maps are applied after alpha pre-multiplication.
 func RemapRGB(img *image.RGBA, lutR, lutG, lutB []uint8) *image.RGBA {
 	if len(lutR) != 256 || len(lutG) != 256 || len(lutB) != 256 {

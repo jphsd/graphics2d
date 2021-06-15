@@ -41,6 +41,9 @@ func init() {
 		//		{&NLP3{}, "P3"},
 		//		{&NLP5{}, "P5"},
 		{&NLCompound{[]NonLinear{&NLCube{}, &NLSin{}}}, "Compound"},
+		{&NLOmt{&NLCube{}}, "OneMinusT Cube"},
+		{&NLOmt{&NLSin{}}, "OneMinusT Sin"},
+		{&NLOmt{&NLCircle2{}}, "OneMinusT Circle2"},
 	}
 }
 
