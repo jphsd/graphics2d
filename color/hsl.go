@@ -9,7 +9,7 @@ import (
 
 // HSL describes a color in HSL space. All values are in range [0,1].
 type HSL struct {
-	H, S, L float64
+	H, S, L, A float64
 }
 
 // HSL conversions (see https://www.w3.org/TR/css-color-3/#hsl-color)
@@ -23,10 +23,11 @@ func (c *HSL) RGBA() (uint32, uint32, uint32, uint32) {
 		m2 = c.L * (1 + c.S)
 	}
 	m1 := c.L*2 - m2
-	r := uint32(hueConv(m1, m2, c.H+1/3.0) * 0xffff)
-	g := uint32(hueConv(m1, m2, c.H) * 0xffff)
-	b := uint32(hueConv(m1, m2, c.H-1/3.0) * 0xffff)
-	return r, g, b, 0xffff
+	r := uint32(hueConv(m1, m2, c.H+1/3.0) * c.A * 0xffff)
+	g := uint32(hueConv(m1, m2, c.H) * c.A * 0xffff)
+	b := uint32(hueConv(m1, m2, c.H-1/3.0) * c.A * 0xffff)
+	a := uint32(c.A * 0xffff)
+	return r, g, b, a
 }
 
 func hueConv(m1, m2, h float64) float64 {
@@ -58,9 +59,16 @@ func hslModel(col color.Color) color.Color {
 
 // NewHSL returns the color as an HSL triplet.
 func NewHSL(col color.Color) *HSL {
-	ir, ig, ib, _ := col.RGBA()
+	ir, ig, ib, ia := col.RGBA()
+	if ia == 0 {
+		return &HSL{0, 0, 0, 0}
+	}
+
 	// Convert to [0,1]
-	r, g, b := float64(ir)/0xffff, float64(ig)/0xffff, float64(ib)/0xffff
+	r, g, b, a := float64(ir)/0xffff, float64(ig)/0xffff, float64(ib)/0xffff, float64(ia)/0xffff
+	r /= a
+	g /= a
+	b /= a
 
 	min := math.Min(math.Min(r, g), b)
 	max := math.Max(math.Max(r, g), b)
@@ -94,7 +102,7 @@ func NewHSL(col color.Color) *HSL {
 		}
 	}
 
-	return &HSL{h, s, l}
+	return &HSL{h, s, l, a}
 }
 
 // Complement returns the color's complement.
@@ -156,7 +164,7 @@ func Triad(col color.Color) []color.Color {
 	return []color.Color{a1, a2}
 }
 
-// Tetrad returns the color's other three triadics.
+// Tetrad returns the color's other three tetradics.
 func Tetrad(col color.Color) []color.Color {
 	a1, a2, a3 := NewHSL(col), NewHSL(col), NewHSL(col)
 	d := 0.25
