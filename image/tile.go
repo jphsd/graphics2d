@@ -13,6 +13,8 @@ type Tile struct {
 	Height int
 	OffsX  int
 	OffsY  int
+	StagX  int
+	StagY  int
 }
 
 // NewTile creates a new image with the supplied image tile.
@@ -21,7 +23,7 @@ func NewTile(img image.Image) *Tile {
 	w, h := rect.Dx(), rect.Dy()
 	tile := image.NewRGBA(image.Rectangle{image.Point{}, rect.Size()})
 	draw.Draw(tile, tile.Bounds(), img, rect.Min, draw.Src)
-	return &Tile{tile, w, h, 0, 0}
+	return &Tile{tile, w, h, 0, 0, 0, 0}
 }
 
 // ColorModel implements the ColorModel function in the Image interface.
@@ -36,12 +38,25 @@ func (t *Tile) Bounds() image.Rectangle {
 
 // At implements the At function in the Image interface.
 func (t *Tile) At(x, y int) color.Color {
+	if t.StagX != 0 {
+		x += t.OffsX + t.StagX
+		x %= t.Width
+		if x < 0 {
+			x = t.Width - x
+		}
+		y += t.OffsY
+		y %= t.Height
+		if y < 0 {
+			y = t.Height - y
+		}
+		return t.Tile.At(x, y)
+	}
 	x += t.OffsX
-	y += t.OffsY
 	x %= t.Width
 	if x < 0 {
 		x = t.Width - x
 	}
+	y += t.OffsY + t.StagY
 	y %= t.Height
 	if y < 0 {
 		y = t.Height - y
