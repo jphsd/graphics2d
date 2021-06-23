@@ -2,7 +2,8 @@ package image
 
 import (
 	"fmt"
-	. "github.com/jphsd/graphics2d/util"
+	g2dcol "github.com/jphsd/graphics2d/color"
+	"github.com/jphsd/graphics2d/util"
 	"image/color"
 	"math"
 )
@@ -38,7 +39,7 @@ func PremulLut(lut []uint8) [][]uint8 {
 
 // NLExpansionLut generates a lut [start,end), normalized and mapped through f.
 // For example NLExpansionLut(256, 0, 256, &NLSin{}) will generate a Sin ramp.
-func NLExpansionLut(n, start, end int, f NonLinear) []uint8 {
+func NLExpansionLut(n, start, end int, f util.NonLinear) []uint8 {
 	if start > end {
 		start, end = end, start
 	}
@@ -67,8 +68,8 @@ func NLExpansionLut(n, start, end int, f NonLinear) []uint8 {
 	return res
 }
 
-// NLColorLut generates a color lut using the tvals ((0,1) ascending, strict) and colors given.
-func NLColorLut(n int, f NonLinear, start, end color.Color, tvals []float64, colors []color.Color) []color.Color {
+// NLColorLut generates a color lut using the tvals ((0,1) ascending, strict) and colors given in either HSL or RGB space.
+func NLColorLut(n int, f util.NonLinear, start, end color.Color, hsl bool, tvals []float64, colors []color.Color) []color.Color {
 	if n < 3 {
 		return []color.Color{start, end}
 	}
@@ -95,7 +96,11 @@ func NLColorLut(n int, f NonLinear, start, end color.Color, tvals []float64, col
 	for i := 0; i < n; i++ {
 		ft := f.Transform(t)
 		ftp := (ft - fs) / fd
-		res[i] = ColorLerp(ftp, cs, ce)
+		if hsl {
+			res[i] = ColorHSLLerp(ftp, cs, ce)
+		} else {
+			res[i] = ColorRGBALerp(ftp, cs, ce)
+		}
 		t += dt
 		for t > te {
 			ts, fs, cs = te, fe, ce
@@ -116,8 +121,8 @@ func NLColorLut(n int, f NonLinear, start, end color.Color, tvals []float64, col
 	return res
 }
 
-// ColorLerp calulates the color value at t [0,1] given a start and end color.
-func ColorLerp(t float64, start, end color.Color) color.Color {
+// ColorRGBALerp calulates the color value at t [0,1] given a start and end color in RGB space.
+func ColorRGBALerp(t float64, start, end color.Color) color.Color {
 	rs, gs, bs, as := start.RGBA() // uint32 [0,0xffff]
 	re, ge, be, ae := end.RGBA()
 	rt := uint32(math.Floor((1-t)*float64(rs) + t*float64(re) + 0.5))
@@ -131,28 +136,12 @@ func ColorLerp(t float64, start, end color.Color) color.Color {
 	return &color.RGBA{uint8(rt), uint8(gt), uint8(bt), uint8(at)}
 }
 
-/*
-// ColorLerpSE calulates the color value at t [ts,te] given the colors at ts and te.
-// Where ts < te and both are in [0,1].
-func ColorLerpSE(t, ts, te float64, start, end color.Color) color.Color {
-	rs, gs, bs, as := start.RGBA() // uint32 [0,0xffff]
-	re, ge, be, ae := end.RGBA()
-
-	// Convert s and e to 0 and 1 values
-	dt := te - ts
-	frs, fgs, fbs, fas := float64(rs), float64(gs), float64(bs), float64(as)
-	fre, fge, fbe, fae := float64(re), float64(ge), float64(be), float64(ae)
-	dr, dg, db, da := (fre-frs)/dt, (fge-fgs)/dt, (fbe-fbs)/dt, (fae-fas)/dt
-
-	omte := 1 - te
-	rt := uint32(math.Floor((1-t)*(frs-dr*ts) + t*(fre+dr*omte) + 0.5))
-	gt := uint32(math.Floor((1-t)*(fgs-dg*ts) + t*(fge+dg*omte) + 0.5))
-	bt := uint32(math.Floor((1-t)*(fbs-db*ts) + t*(fbe+db*omte) + 0.5))
-	at := uint32(math.Floor((1-t)*(fas-da*ts) + t*(fae+da*omte) + 0.5))
-	rt >>= 8 // uint32 [0,0xff]
-	gt >>= 8
-	bt >>= 8
-	at >>= 8
-	return &color.RGBA{uint8(rt), uint8(gt), uint8(bt), uint8(at)}
+// ColorHSLLerp calulates the color value at t [0,1] given a start and end color in HSL space.
+func ColorHSLLerp(t float64, start, end color.Color) color.Color {
+	cs, ce := g2dcol.NewHSL(start), g2dcol.NewHSL(end)
+	ht := (1-t)*cs.H + t*ce.H
+	st := (1-t)*cs.S + t*ce.S
+	lt := (1-t)*cs.L + t*ce.L
+	at := (1-t)*cs.A + t*ce.A
+	return &g2dcol.HSL{ht, st, lt, at}
 }
-*/
