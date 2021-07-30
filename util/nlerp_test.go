@@ -38,18 +38,20 @@ func init() {
 		{NewNLLogistic(1, 0.8), "Logistic 7"},
 		{NewNLLogistic(12, 0.8), "Logistic 8"},
 		{NewNLLogistic(100, 0.8), "Logistic 9"},
-		//		{&NLP3{}, "P3"},
-		//		{&NLP5{}, "P5"},
+		// {&NLP3{}, "P3"},
+		// {&NLP5{}, "P5"},
 		{&NLCompound{[]NonLinear{&NLCube{}, &NLSin{}}}, "Compound"},
 		{&NLOmt{&NLCube{}}, "OneMinusT Cube"},
 		{&NLOmt{&NLSin{}}, "OneMinusT Sin"},
 		{&NLOmt{&NLCircle2{}}, "OneMinusT Circle2"},
+		{NewNLRand(0.1, 0.01, true), "Rand Sharp"},
+		{NewNLRand(0.1, 0.01, false), "Rand Flat"},
 	}
 }
 
 const (
 	// level of accuracy on bsInv()
-	epsilon = 0.00001
+	epsilon = 0.0005
 )
 
 func Equalf64(a, b float64) bool {

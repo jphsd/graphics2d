@@ -1,6 +1,9 @@
 package util
 
-import "math"
+import (
+	"math"
+	"math/rand"
+)
 
 /*
  * Non-linear interpolations between 0 and 1. Clamping is enforced lest the result not
@@ -333,6 +336,52 @@ func (nl *NLOmt) InvTransform(v float64) float64 {
 	return 1 - nl.f.InvTransform(1-v)
 }
 
+// NewRandNL calculates a collection of ascending values [0,1] with an average increment of mean
+// and standard deviation of std.
+func NewNLRand(mean, std float64, sharp bool) *NLRand {
+	sum := 0.0
+	steps := []float64{0, 0} // 0 prefix
+	for sum < 1 {
+		v := rand.NormFloat64()*std + mean
+		if v < 0 {
+			v = 0
+		}
+		sum += v
+		if sum > 1 {
+			sum = 1
+		}
+		steps = append(steps, sum)
+	}
+	if sharp {
+		steps[0] = -steps[2]
+		steps = append(steps, 2-steps[len(steps)-2])
+	} else {
+		steps = append(steps, 1.0) // 1 postfix
+	}
+	return &NLRand{steps, 1.0 / float64(len(steps)-3)}
+}
+
+// NLRand uses random incremental steps from a normal distribution, smoothed with a cubic.
+type NLRand struct {
+	Steps []float64
+	Dt    float64
+}
+
+func (nl *NLRand) Transform(t float64) float64 {
+	// Find steps t is between and use cubic interpolation
+	// to calc v
+	fn := math.Floor(t / nl.Dt)
+	fr := t - fn*nl.Dt
+	frt := fr / nl.Dt
+	n := int(fn)
+	p := nl.Steps[n : n+4]
+	return Cubic(frt, p)
+}
+
+func (nl *NLRand) InvTransform(v float64) float64 {
+	return bsInv(v, nl)
+}
+
 // Numerical method to find inverse
 func bsInv(v float64, f NonLinear) float64 {
 	n := 16
@@ -348,4 +397,16 @@ func bsInv(v float64, f NonLinear) float64 {
 		s /= 2
 	}
 	return t
+}
+
+// Cubic calculates the value of f(t) for t in range [0,1] given the values of t at -1, 0, 1, 2 in p[]
+// fitted to a cubic polynomial: f(t) = at^3 + bt^2 + ct + d. Clamped because it over/undershoots.
+func Cubic(t float64, p []float64) float64 {
+	v := p[1] + 0.5*t*(p[2]-p[0]+t*(2.0*p[0]-5.0*p[1]+4.0*p[2]-p[3]+t*(3.0*(p[1]-p[2])+p[3]-p[0])))
+	if v < 0 {
+		v = 0
+	} else if v > 1 {
+		v = 1
+	}
+	return v
 }
