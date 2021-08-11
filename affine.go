@@ -201,6 +201,34 @@ func (a *Aff3) Copy() *Aff3 {
 	return &res
 }
 
+// Reflect performs a reflection along the axis defined by the two non-coincident points.
+func (a *Aff3) Reflect(x1, y1, x2, y2 float64) {
+	dx, dy := x2-x1, y2-y1
+	if Equals(dy, 0) {
+		// Horizontal - no rotation required
+		a.Translate(0, y1)
+		a.Scale(1, -1)
+		a.Translate(0, -y1)
+		return
+	}
+	if Equals(dx, 0) {
+		// Vertical - no rotation required
+		a.Translate(x1, 0)
+		a.Scale(-1, 1)
+		a.Translate(-x1, 0)
+		return
+	}
+	th := math.Atan2(dy, dx)
+	if th < 0 {
+		th += math.Pi * 2
+	}
+	a.Translate(x1, y1)
+	a.Rotate(th)
+	a.Scale(1, -1)
+	a.Rotate(-th)
+	a.Translate(-x1, -y1)
+}
+
 // LineTransform produces a transform that maps the line {p1, p2} to {p1', p2'}.
 // Assumes neither of the lines are degenerate.
 func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {

@@ -113,6 +113,13 @@ func DistanceToLineSquared(lp1, lp2, p []float64) float64 {
 	return dx*dx + dy*dy
 }
 
+// SideOfLine calculates which side of a line a point is one by calculating the dot product of the
+// vector from the line start to the point with the line's normal. If +ve then one side, -ve the other,
+// 0 - on the line.
+func SideOfLine(lp1, lp2, p []float64) float64 {
+	return (p[0]-lp1[0])*(lp2[1]-lp1[1]) - (p[1]-lp1[1])*(lp2[0]-lp1[0])
+}
+
 // ToF64 casts a slice of float32 to float64.
 func ToF64(pts ...float32) []float64 {
 	res := make([]float64, len(pts))
