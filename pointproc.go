@@ -80,7 +80,7 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 	return res
 }
 
-// ShapesProc contains a slice of shapes, which will be placed sequentially using along the path,
+// ShapesProc contains a slice of shapes, which will be placed sequentially along the path,
 // starting at the beginning and spaced there after by the spacing value, and at the path end,
 // if not closed. If any shape is nil, then it is skipped. The rotation flag indicates if the
 // shapes should be rotated relative to the path's tangent at that point.
@@ -106,7 +106,7 @@ func NewShapesProc(shapes []*Shape, spacing float64, rot PointRot) *ShapesProc {
 
 // Process implements the PathProcessor interface.
 func (sp *ShapesProc) Process(p *Path) []*Path {
-	// Break up the path into pieces smaller than the spacingg so the tangents are
+	// Break up the path into pieces smaller than the spacing so the tangents are
 	// correct - Spaces has been grown with nil shapes to accommodate the extra steps.
 	paths := p.Process(sp.Munch)
 	path, _ := ConcatenatePaths(paths...)

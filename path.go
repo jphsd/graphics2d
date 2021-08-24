@@ -570,8 +570,8 @@ func (p *Path) Tangents() [][][]float64 {
 	res := make([][][]float64, n)
 	for i, part := range parts {
 		tmp0, tmp1 := DeCasteljau(part, 0), DeCasteljau(part, 1)
-		dx0, dy0 := norm(tmp0[2], tmp0[3])
-		dx1, dy1 := norm(tmp1[2], tmp1[3])
+		dx0, dy0 := unit(tmp0[2], tmp0[3])
+		dx1, dy1 := unit(tmp1[2], tmp1[3])
 		res[i] = [][]float64{{dx0, dy0}, {dx1, dy1}}
 	}
 	p.tangents = res

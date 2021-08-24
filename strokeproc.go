@@ -103,8 +103,8 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 	return []*Path{bp}
 }
 
-// norm converts a normal to a unit normal
-func norm(dx, dy float64) (float64, float64) {
+// unit converts a normal to a unit normal
+func unit(dx, dy float64) (float64, float64) {
 	d := math.Sqrt(dx*dx + dy*dy)
 	if Equals(0, d) {
 		return 0, 0
