@@ -11,12 +11,13 @@ type PathProcessor interface {
 
 // CompoundProc applies a collection of PathProcessors to a path.
 type CompoundProc struct {
-	Procs []PathProcessor
+	Procs       []PathProcessor
+	Concatenate bool
 }
 
 // NewCompoundProc creates a new CompundProcessor with the supplied path processors.
 func NewCompoundProc(procs ...PathProcessor) *CompoundProc {
-	return &CompoundProc{procs}
+	return &CompoundProc{procs, false}
 }
 
 // Process implements the PathProcessor interface.
@@ -31,7 +32,12 @@ func (cp *CompoundProc) Process(p *Path) []*Path {
 		for _, path := range paths {
 			npaths = append(npaths, proc.Process(path)...)
 		}
-		paths = npaths
+		if cp.Concatenate {
+			path, _ := ConcatenatePaths(npaths...)
+			paths = []*Path{path}
+		} else {
+			paths = npaths
+		}
 	}
 
 	return paths

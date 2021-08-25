@@ -85,8 +85,7 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 // if not closed. If any shape is nil, then it is skipped. The rotation flag indicates if the
 // shapes should be rotated relative to the path's tangent at that point.
 type ShapesProc struct {
-	Munch  *MunchProc
-	Spaces *SnipProc
+	Comp   *CompoundProc
 	Shapes *PointsProc
 }
 
@@ -101,16 +100,14 @@ func NewShapesProc(shapes []*Shape, spacing float64, rot PointRot) *ShapesProc {
 	for i := 0; i < n; i++ {
 		nshapes[i*d] = shapes[i]
 	}
-	return &ShapesProc{NewMunchProc(1), spaces, NewPointsProc(nshapes, rot)}
+	comp := NewCompoundProc(NewMunchProc(1), spaces)
+	comp.Concatenate = true
+	return &ShapesProc{comp, NewPointsProc(nshapes, rot)}
 }
 
 // Process implements the PathProcessor interface.
 func (sp *ShapesProc) Process(p *Path) []*Path {
-	// Break up the path into pieces smaller than the spacing so the tangents are
-	// correct - Spaces has been grown with nil shapes to accommodate the extra steps.
-	paths := p.Process(sp.Munch)
-	path, _ := ConcatenatePaths(paths...)
-	paths = path.Process(sp.Spaces)
-	path, _ = ConcatenatePaths(paths...)
+	path := p.Process(sp.Comp)[0]
+
 	return path.Process(sp.Shapes)
 }

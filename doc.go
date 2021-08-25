@@ -28,6 +28,7 @@ of other possibilities:
   CurvesToLinesProc - replaces curved steps with lines between the points
   DashProc - wraps SnipProc to produce a dashed path
   FlattenProc - wraps Path.Flatten
+  JitterProc - randomly move segment endpoints by some percentage of the segment's length
   LineProc - wraps Path.Line
   MunchProc - converts a path into length sized line paths
   OpenProc - wraps Path.Open
