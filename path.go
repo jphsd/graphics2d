@@ -448,7 +448,6 @@ func simplifyStep(points [][]float64) [][][]float64 {
 	if cpSafe(points) {
 		return [][][]float64{points}
 	}
-	fmt.Printf("cpSafe false\n")
 	lr := SplitCurve(points, 0.5)
 	res := append([][][]float64{}, simplifyStep(lr[0])...)
 	res = append(res, simplifyStep(lr[1])...)
