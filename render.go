@@ -165,22 +165,22 @@ func RenderShapeAlpha(dst *image.Alpha, shape *Shape, at []float32, op draw.Op) 
 // The following functions use a pre-rendered mask of the shape to draw to the destination image.
 // Note that the offsets are Points and not []float32 as previous.
 
-// DrawColoredShape utilizes the supplied shape's mask to draw into the destination image at an offset
+// DrawColoredMask utilizes the supplied shape's mask to draw into the destination image at an offset
 // with the fill color.
-func DrawColoredShape(dst draw.Image, shape *Shape, offs image.Point, fill color.Color) {
+func DrawColoredMask(dst draw.Image, shape *Shape, offs image.Point, fill color.Color) {
 	filler := image.NewUniform(fill)
-	_ = DrawShapeExt(dst, shape, offs, filler, image.Point{}, nil, draw.Over)
+	_ = DrawMaskExt(dst, shape, offs, filler, image.Point{}, nil, draw.Over)
 }
 
-// DrawShape utilizes the supplied shape's mask to draw into the destination image at an offset with
+// DrawMask utilizes the supplied shape's mask to draw into the destination image at an offset with
 // the filler image.
-func DrawShape(dst draw.Image, shape *Shape, offs image.Point, filler image.Image, foffs image.Point) {
-	_ = DrawShapeExt(dst, shape, offs, filler, foffs, nil, draw.Over)
+func DrawMask(dst draw.Image, shape *Shape, offs image.Point, filler image.Image, foffs image.Point) {
+	_ = DrawMaskExt(dst, shape, offs, filler, foffs, nil, draw.Over)
 }
 
-// DrawShapeExt utilizes the supplied shape's mask to draw into the destination image at an offset with
+// DrawMaskExt utilizes the supplied shape's mask to draw into the destination image at an offset with
 // the filler, also offset, and clip images using op.
-func DrawShapeExt(dst draw.Image, shape *Shape, offs image.Point, filler image.Image, foffs image.Point, clip *image.Alpha, op draw.Op) error {
+func DrawMaskExt(dst draw.Image, shape *Shape, offs image.Point, filler image.Image, foffs image.Point, clip *image.Alpha, op draw.Op) error {
 	rect := dst.Bounds()
 	size := rect.Size()
 

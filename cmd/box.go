@@ -26,13 +26,13 @@ func main() {
 	p2 := []float64{300, 100}
 	p3 := []float64{300, 300}
 	p4 := []float64{100, 300}
-	red := color.RGBA{0xff, 0, 0, 0xff}
+	red := NewPen(1, color.RGBA{0xff, 0, 0, 0xff})
 
 	// Draw lines
-	DrawLine(img, p1, p2, red)
-	DrawLine(img, p2, p3, red)
-	DrawLine(img, p3, p4, red)
-	DrawLine(img, p4, p1, red)
+	DrawLineP(img, p1, p2, red)
+	DrawLineP(img, p2, p3, red)
+	DrawLineP(img, p3, p4, red)
+	DrawLineP(img, p4, p1, red)
 
 	// Capture image output
 	err := saveImage(img, "box")
