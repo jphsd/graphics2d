@@ -2,7 +2,7 @@ name: Create repo diagram
 on:
   push:
     branches:
-      - main
+      - master
 jobs:
   get_data:
     runs-on: ubuntu-latest
