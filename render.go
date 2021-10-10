@@ -11,81 +11,6 @@ import (
 	"golang.org/x/image/vector"
 )
 
-// RenderColoredPath renders the specified path (forced closed) with the fill color
-// into the destination image.
-func RenderColoredPath(dst draw.Image, path *Path, fill color.Color) {
-	filler := image.NewUniform(fill)
-	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, image.Point{}, nil, draw.Over)
-}
-
-// RenderPath renders the specified path (forced closed) with the fill image
-// into the destination image.
-func RenderPath(dst draw.Image, path *Path, filler image.Image, foffs image.Point) {
-	_ = RenderPathExt(dst, path, []float32{0, 0}, filler, foffs, nil, draw.Over)
-}
-
-// RenderFlatten is the standard curve flattening value used when rendering.
-const RenderFlatten = 0.6
-
-// RenderPathExt renders the specified path (forced closed) at an offset with the fill and clip images
-// into the destination image using op.
-func RenderPathExt(dst draw.Image, path *Path, at []float32, filler image.Image, foffs image.Point, clip *image.Alpha, op draw.Op) error {
-	rect := dst.Bounds()
-	size := rect.Size()
-
-	if clip != nil && !size.Eq(clip.Bounds().Size()) {
-		return fmt.Errorf("clip image must have same size as destination image")
-	}
-
-	rasterizer := vector.NewRasterizer(size.X, size.Y)
-	rasterizer.DrawOp = op
-
-	// Process path
-	ox, oy := at[0], at[1]
-	fp := path.Flatten(RenderFlatten) // tolerance 0.6
-	step := ToF32(fp.steps[0][0]...)
-	rasterizer.MoveTo(ox+step[0], oy+step[1])
-	for i, lp := 1, len(fp.steps); i < lp; i++ {
-		step = ToF32(fp.steps[i][0]...)
-		rasterizer.LineTo(ox+step[0], oy+step[1])
-	}
-	rasterizer.ClosePath()
-
-	if clip != nil {
-		// Obtain rasterizer mask and intersect it against the clip mask
-		alpha := image.NewAlpha(rect)
-		rasterizer.Draw(alpha, rect, image.Opaque, image.Point{})
-		alpha = g2dimg.AlphaAnd(alpha, clip)
-		// alpha now has {0, 0} origin
-		draw.DrawMask(dst, rect, filler, foffs, alpha, image.Point{}, op)
-	} else {
-		rasterizer.Draw(dst, rect, filler, foffs)
-	}
-
-	return nil
-}
-
-// RenderPathAlpha adds the path (forced closed) to the mask at the supplied offset with op.
-func RenderPathAlpha(dst *image.Alpha, path *Path, at []float32, op draw.Op) {
-	rect := dst.Bounds()
-	size := rect.Size()
-	rasterizer := vector.NewRasterizer(size.X, size.Y)
-	rasterizer.DrawOp = op
-
-	// Process path
-	ox, oy := at[0], at[1]
-	fp := path.Flatten(RenderFlatten) // tolerance 0.6
-	step := ToF32(fp.steps[0][0]...)
-	rasterizer.MoveTo(ox+step[0], oy+step[1])
-	for i, lp := 1, len(fp.steps); i < lp; i++ {
-		step = ToF32(fp.steps[i][0]...)
-		rasterizer.LineTo(ox+step[0], oy+step[1])
-	}
-	rasterizer.ClosePath()
-
-	rasterizer.Draw(dst, rect, image.Opaque, image.Point{})
-}
-
 // RenderColoredShape renders the supplied shape with the fill color
 // into the destination image.
 func RenderColoredShape(dst draw.Image, shape *Shape, fill color.Color) {
@@ -98,6 +23,9 @@ func RenderColoredShape(dst draw.Image, shape *Shape, fill color.Color) {
 func RenderShape(dst draw.Image, shape *Shape, filler image.Image, foffs image.Point) {
 	_ = RenderShapeExt(dst, shape, []float32{0, 0}, filler, foffs, nil, draw.Over)
 }
+
+// RenderFlatten is the standard curve flattening value used when rendering.
+const RenderFlatten = 0.6
 
 // RenderShapeExt renders the supplied shape at an offset with the fill and clip images into
 // the destination image using op.

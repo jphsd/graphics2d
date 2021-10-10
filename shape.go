@@ -8,7 +8,7 @@ import (
 )
 
 // Shape is a fillable collection of paths. For a path to be fillable,
-// it must be closed, so paths added to the shape are forced closed.
+// it must be closed, so paths added to the shape are forced closed on rendering.
 type Shape struct {
 	paths  []*Path
 	bounds image.Rectangle
@@ -73,7 +73,6 @@ func NewShape(paths ...*Path) *Shape {
 func (s *Shape) AddPaths(paths ...*Path) {
 	for _, p := range paths {
 		lp := p.Copy()
-		lp.Close()
 		if s.paths == nil {
 			s.paths = make([]*Path, 1)
 			s.paths[0] = lp
@@ -132,7 +131,6 @@ func (s *Shape) ProcessPaths(proc PathProcessor) *Shape {
 	for _, p := range s.paths {
 		npaths := p.Process(proc)
 		for _, pp := range npaths {
-			pp.Close()
 			np = append(np, pp)
 		}
 	}

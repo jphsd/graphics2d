@@ -20,7 +20,7 @@ func Halftone(dst draw.Image, r image.Rectangle, c color.Color, perc, sep, rot f
 	}
 	rad := perc2radius(perc)
 	// Circle path template centered on 0, 0
-	circ := g2d.Circle([]float64{0, 0}, rad*sep)
+	circ := g2d.NewShape(g2d.Circle([]float64{0, 0}, rad*sep))
 
 	// Calculate grid of centers
 	l := r.Max.X
@@ -82,7 +82,7 @@ func Halftone(dst draw.Image, r image.Rectangle, c color.Color, perc, sep, rot f
 	// Render template at each point into alpha image
 	img := g2di.NewAlpha(r.Max.X, r.Max.Y, color.Transparent)
 	for _, pt := range points {
-		g2d.RenderPathAlpha(img, circ, g2du.ToF32(pt...), draw.Over)
+		g2d.RenderShapeAlpha(img, circ, g2du.ToF32(pt...), draw.Over)
 	}
 	// Use alpha image to write color to destination rectangle
 	filler := image.NewUniform(c)
