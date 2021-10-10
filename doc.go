@@ -16,9 +16,22 @@ number of control points determines the polynomial order of the step: 0 - line; 
 is closed, no more steps can be added. Unlike other implementations, a path here represents a single
 stroke (pen down). There is no move (pen up) step.
 
-The Shape type is a container for closed paths and represents something that can be filled and rendered.
-As Paths are added to a shape, if they're not already closed, they are forced closed. This can lead to
-unexpected results...
+The Shape type is a container for paths and represents something that can be filled and rendered.
+When paths are rendered, they must be fillable (i.e. closed), so they are forced closed. This can lead to
+unexpected results... If a shape is rendered with a pen (see DrawShape) and the pen has a stroke
+associated with it, then open paths are not an issue since strokes return closed paths.
+
+A pen is a combination of a color (or image), a stroke and a transformation from shape space to image
+space. If you're defining operations in the same space as the image, then the transformation is
+simply the identity transformation. If, however, say your operations are in a space [0, 1]^2, then
+you'd specify a transformation that maps [0, 1] => [0, width-1] etc. (i.e. scale by image width and
+height). Note that this transforamtion is applied *after* the stroke, so for a 1 pixel wide stroke
+the stroke width would be 1 / width. You don't have to use pens, you can use the RenderShape, PathProcessor,
+image filler and transformation functions directly. Pens just provide a convenient abstraction.
+
+Note that if the image is written to every graphics operation (as it is with the Draw*() functions), this
+will kill performance as the entire image is written every time. It's better to collect all the operations
+associated with a color in a shape and then render that shape once.
 
 The PathProcessor interface is where the magic happens. Given a path, a function implementing this
 interface returns a collection of paths derived from it. This allows for stroking, dashing and a variety
@@ -43,9 +56,9 @@ of other possibilities:
   TraceProc - creates a new path by tracing the normals of the path at a fixed distance
   TransformProc - wraps Path.Transform
 
-Shapes and Paths are rendered with the render functions. Paths are forced closed when rendered (see shapes
-above). Convenience methods are provided for rendering with a single color or an image. The full render
-function allows a clip mask and offset to be supplied and the draw.Op to be specified.
+Shapes are rendered with the render functions. Paths are forced closed when rendered (see shapes
+above). Convenience methods are provided for rendering with a single color or an image (see also pens,
+above). The full render function allows a clip mask and offset to be supplied, and the draw.Op to be specified.
 
 The Aff3 type provides the ability to specify affine transforms on Paths and Shapes.
 
