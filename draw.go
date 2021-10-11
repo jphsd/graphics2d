@@ -39,7 +39,7 @@ func DrawArc(dst draw.Image, start, center []float64, radians float64, pen *Pen)
 func DrawPath(dst draw.Image, path *Path, pen *Pen) {
 	shape := NewShape(path)
 	if pen.Stroke != nil {
-		shape.ProcessPaths(pen.Stroke)
+		shape = shape.ProcessPaths(pen.Stroke)
 	}
 	if pen.Xfm != nil {
 		shape = shape.Transform(pen.Xfm)
@@ -50,7 +50,7 @@ func DrawPath(dst draw.Image, path *Path, pen *Pen) {
 // DrawShape renders a shape with the pen into the destination image.
 func DrawShape(dst draw.Image, shape *Shape, pen *Pen) {
 	if pen.Stroke != nil {
-		shape.ProcessPaths(pen.Stroke)
+		shape = shape.ProcessPaths(pen.Stroke)
 	}
 	if pen.Xfm != nil {
 		shape = shape.Transform(pen.Xfm)
