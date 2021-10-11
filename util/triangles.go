@@ -12,7 +12,7 @@ func TriArea(p1, p2, p3 []float64) float64 {
 	return det / 2
 }
 
-// Collinear returns true if three points are on a lines (i.e. if the area of the resultant triangle is 0)
+// Collinear returns true if three points are on a line (i.e. if the area of the resultant triangle is 0)
 func Collinear(p1, p2, p3 []float64) bool {
 	a := TriArea(p1, p2, p3)
 	return Equals(0, a)

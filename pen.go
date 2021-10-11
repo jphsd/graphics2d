@@ -29,7 +29,7 @@ var (
 	Orange  = NewPen(g2dc.Orange, 1)
 )
 
-// NewPen returns a newpen that will render a shape with the given pen
+// NewPen returns a pen that will render a shape with the given pen
 // width and color into an image.
 func NewPen(color color.Color, width float64) *Pen {
 	return &Pen{image.NewUniform(color), NewStrokeProc(width), nil}
