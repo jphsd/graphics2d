@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	. "github.com/jphsd/graphics2d/util"
+	"github.com/jphsd/graphics2d/util"
 )
 
 // PointRot specifies the type of shape rotation
@@ -49,10 +49,10 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 			case RotFixed:
 				xfm = CreateTransform(part[0][0], part[0][1], 1, 0)
 			case RotRelative:
-				t0 := DeCasteljau(part, 0)
+				t0 := util.DeCasteljau(part, 0)
 				xfm = CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
 			case RotRandom:
-				t0 := DeCasteljau(part, 0)
+				t0 := util.DeCasteljau(part, 0)
 				xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*math.Pi*2)
 			}
 			res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
@@ -69,10 +69,10 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 		case RotFixed:
 			xfm = CreateTransform(part[0][0], part[0][1], 1, 0)
 		case RotRelative:
-			t0 := DeCasteljau(part, 1)
+			t0 := util.DeCasteljau(part, 1)
 			xfm = CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
 		case RotRandom:
-			t0 := DeCasteljau(part, 1)
+			t0 := util.DeCasteljau(part, 1)
 			xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*math.Pi*2)
 		}
 		res = append(res, pp.Points[cp].Transform(xfm).Paths()...)

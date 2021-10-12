@@ -7,7 +7,7 @@ import (
 	"image/draw"
 
 	g2dimg "github.com/jphsd/graphics2d/image"
-	. "github.com/jphsd/graphics2d/util"
+	"github.com/jphsd/graphics2d/util"
 	"golang.org/x/image/vector"
 )
 
@@ -44,10 +44,10 @@ func RenderShapeExt(dst draw.Image, shape *Shape, at []float32, filler image.Ima
 	ox, oy := at[0], at[1]
 	for _, path := range shape.paths {
 		fp := path.Flatten(RenderFlatten) // tolerance 0.6
-		step := ToF32(fp.steps[0][0]...)
+		step := util.ToF32(fp.steps[0][0]...)
 		rasterizer.MoveTo(ox+step[0], oy+step[1])
 		for i, lp := 1, len(fp.steps); i < lp; i++ {
-			step = ToF32(fp.steps[i][0]...)
+			step = util.ToF32(fp.steps[i][0]...)
 			rasterizer.LineTo(ox+step[0], oy+step[1])
 		}
 		rasterizer.ClosePath()
@@ -78,10 +78,10 @@ func RenderShapeAlpha(dst *image.Alpha, shape *Shape, at []float32, op draw.Op) 
 	ox, oy := at[0], at[1]
 	for _, path := range shape.paths {
 		fp := path.Flatten(RenderFlatten) // tolerance 0.6
-		step := ToF32(fp.steps[0][0]...)
+		step := util.ToF32(fp.steps[0][0]...)
 		rasterizer.MoveTo(ox+step[0], oy+step[1])
 		for i, lp := 1, len(fp.steps); i < lp; i++ {
-			step = ToF32(fp.steps[i][0]...)
+			step = util.ToF32(fp.steps[i][0]...)
 			rasterizer.LineTo(ox+step[0], oy+step[1])
 		}
 		rasterizer.ClosePath()

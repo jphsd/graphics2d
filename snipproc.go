@@ -3,7 +3,7 @@ package graphics2d
 import (
 	"math"
 
-	. "github.com/jphsd/graphics2d/util"
+	"github.com/jphsd/graphics2d/util"
 )
 
 // SnipProc contains the snip pattern and offset. The snip pattern represents lengths of state0, state1,
@@ -79,7 +79,7 @@ func (sp *SnipProc) Offset(offs float64) {
 		break
 	}
 
-	if Equals(delta, 0) {
+	if util.Equals(delta, 0) {
 		state++
 		if state == sp.N {
 			state = 0
@@ -176,7 +176,7 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 			rem = parts[pind]
 		}
 		// rem is the correct part
-		if Equals(t, 0) {
+		if util.Equals(t, 0) {
 			// t == 0
 			if len(pparts) == 0 {
 				continue
@@ -186,7 +186,7 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 			// rem already set
 		} else {
 			// state change is in this part, split it at t
-			pieces := SplitCurve(rem, t)
+			pieces := util.SplitCurve(rem, t)
 			pparts = append(pparts, pieces[0])
 			lp, _ := PartsToPath(pparts...)
 			res = append(res, lp)

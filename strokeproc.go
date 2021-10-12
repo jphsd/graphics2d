@@ -3,7 +3,7 @@ package graphics2d
 import (
 	"math"
 
-	. "github.com/jphsd/graphics2d/util"
+	"github.com/jphsd/graphics2d/util"
 )
 
 // Constant width path stroker which uses TraceProc to calculate the two sides for it.
@@ -106,7 +106,7 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 // unit converts a normal to a unit normal
 func unit(dx, dy float64) (float64, float64) {
 	d := math.Sqrt(dx*dx + dy*dy)
-	if Equals(0, d) {
+	if util.Equals(0, d) {
 		return 0, 0
 	}
 	return dx / d, dy / d

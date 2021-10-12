@@ -3,7 +3,7 @@ package graphics2d
 import (
 	"math"
 
-	. "github.com/jphsd/graphics2d/util"
+	"github.com/jphsd/graphics2d/util"
 )
 
 // CapsProc contains a pair of shapes, one which will be placed using the start at the path and the other
@@ -25,13 +25,13 @@ func (cp *CapsProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	if cp.Rotate {
 		if cp.Caps[0] != nil {
-			t0 := DeCasteljau(parts[0], 0)
+			t0 := util.DeCasteljau(parts[0], 0)
 			xfm := CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
 			res = append(res, cp.Caps[0].Transform(xfm).Paths()...)
 		}
 		// Only apply end cap to open paths
 		if cp.Caps[1] != nil && !p.Closed() {
-			t1 := DeCasteljau(parts[len(parts)-1], 1)
+			t1 := util.DeCasteljau(parts[len(parts)-1], 1)
 			xfm := CreateTransform(t1[0], t1[1], 1, math.Atan2(t1[3], t1[2]))
 			res = append(res, cp.Caps[1].Transform(xfm).Paths()...)
 		}

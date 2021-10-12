@@ -3,7 +3,7 @@ package graphics2d
 import (
 	"math"
 
-	. "github.com/jphsd/graphics2d/util"
+	"github.com/jphsd/graphics2d/util"
 )
 
 // PointSquare renders points as squares aligned in x/y.
@@ -48,7 +48,7 @@ func JoinRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
 	e1, s2 := p1[len(p1)-1], p2[0]
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
 	a1 := math.Atan2(dy, dx)
-	a2 := LineAngle(p, s2)
+	a2 := util.LineAngle(p, s2)
 	da := a2 - a1
 	if da < -math.Pi {
 		da += 2 * math.Pi
@@ -102,13 +102,13 @@ func (mj *MiterJoin) JoinMiter(p1 [][]float64, p []float64, p2 [][]float64) [][]
 		return JoinBevel(p1, p, p2)
 	}
 	// tangent -dy, dx
-	ts, err := IntersectionTVals(e1[0], e1[1], e1[0]-dy1, e1[1]+dx1,
+	ts, err := util.IntersectionTVals(e1[0], e1[1], e1[0]-dy1, e1[1]+dx1,
 		s2[0], s2[1], s2[0]-dy2, s2[1]+dx2)
 	if err != nil {
 		return JoinBevel(p1, p, p2)
 	}
-	px := Lerp(ts[0], e1[0], e1[0]-dy1)
-	py := Lerp(ts[0], e1[1], e1[1]+dx1)
+	px := util.Lerp(ts[0], e1[0], e1[0]-dy1)
+	py := util.Lerp(ts[0], e1[1], e1[1]+dx1)
 	j := []float64{px, py}
 	return [][][]float64{{e1, j}, {j, s2}}
 }

@@ -5,7 +5,7 @@ import (
 	"image"
 	"math"
 
-	. "github.com/jphsd/graphics2d/util"
+	"github.com/jphsd/graphics2d/util"
 )
 
 /*
@@ -63,7 +63,7 @@ func (p *Path) AddStep(points ...[]float64) error {
 	}
 	lastStep := p.steps[len(p.steps)-1]
 	last := lastStep[len(lastStep)-1]
-	if EqualsP(last, points[n-1]) {
+	if util.EqualsP(last, points[n-1]) {
 		return fmt.Errorf("zero length step")
 	}
 	p.steps = append(p.steps, points)
@@ -102,7 +102,7 @@ func (p *Path) Concatenate(paths ...*Path) error {
 	last := lstep[len(lstep)-1]
 	for _, path := range paths {
 		steps := path.Steps()
-		if EqualsP(last, steps[0][0]) {
+		if util.EqualsP(last, steps[0][0]) {
 			// End of p is coincident with sep[0][0] of path
 			p.AddSteps(steps[1:]...)
 		} else {
@@ -149,7 +149,7 @@ func (p *Path) Parts() [][][]float64 {
 		fpts[i-1] = pts
 		cp = pts[len(pts)-1]
 	}
-	if p.closed && !EqualsP(cp, p.steps[0][0]) {
+	if p.closed && !util.EqualsP(cp, p.steps[0][0]) {
 		fpts = append(fpts, [][]float64{cp, p.steps[0][0]})
 	}
 	return fpts
@@ -177,7 +177,7 @@ func PartsToPath(parts ...[][]float64) (*Path, error) {
 	}
 
 	for i, part := range parts {
-		if EqualsP(part[0], part[len(part)-1]) {
+		if util.EqualsP(part[0], part[len(part)-1]) {
 			return nil, fmt.Errorf("part %d start and end are coincident", i)
 		}
 		res.AddStep(part[1:]...)
@@ -224,7 +224,7 @@ func flattenPart(d2 float64, pts [][]float64) [][][]float64 {
 	if cpWithinD2(d2, pts) {
 		return [][][]float64{{pts[0], pts[len(pts)-1]}}
 	}
-	lr := SplitCurve(pts, 0.5)
+	lr := util.SplitCurve(pts, 0.5)
 	res := append([][][]float64{}, flattenPart(d2, lr[0])...)
 	res = append(res, flattenPart(d2, lr[1])...)
 	return res
@@ -239,7 +239,7 @@ func cpWithinD2(d2 float64, pts [][]float64) bool {
 	}
 	start, cpts, end := pts[0], pts[1:l-1], pts[l-1]
 	for _, cp := range cpts {
-		pd2 := DistanceToLineSquared(start, end, cp)
+		pd2 := util.DistanceToLineSquared(start, end, cp)
 		if pd2 > d2 {
 			return false
 		}
@@ -407,7 +407,7 @@ func (p *Path) Simplify() *Path {
 
 // Chop curve into pieces based on maxima, minima and inflections in x and y.
 func simplifyExtremities(points [][]float64) [][][]float64 {
-	tvals := CalcExtremities(points)
+	tvals := util.CalcExtremities(points)
 	nt := len(tvals)
 	if nt < 3 {
 		return [][][]float64{points}
@@ -434,7 +434,7 @@ func simplifyExtremities(points [][]float64) [][][]float64 {
 	rhs := points
 	res := make([][][]float64, nt-1)
 	for i := 1; i < nt-1; i++ {
-		lr := SplitCurve(rhs, rtvals[i])
+		lr := util.SplitCurve(rhs, rtvals[i])
 		res[i-1] = lr[0]
 		rhs = lr[1]
 	}
@@ -448,7 +448,7 @@ func simplifyStep(points [][]float64) [][][]float64 {
 	if cpSafe(points) {
 		return [][][]float64{points}
 	}
-	lr := SplitCurve(points, 0.5)
+	lr := util.SplitCurve(points, 0.5)
 	res := append([][][]float64{}, simplifyStep(lr[0])...)
 	res = append(res, simplifyStep(lr[1])...)
 	return res
@@ -465,9 +465,9 @@ func cpSafe(points [][]float64) bool {
 	n := len(points)
 	start := points[0]
 	end := points[n-1]
-	side := CrossProduct(start, end, points[1]) < 0
+	side := util.CrossProduct(start, end, points[1]) < 0
 	for i := 2; i < n-1; i++ {
-		if (CrossProduct(start, end, points[i]) < 0) != side {
+		if (util.CrossProduct(start, end, points[i]) < 0) != side {
 			return false
 		}
 	}
@@ -550,7 +550,7 @@ func (p *Path) Line() *Path {
 	last := lastStep[len(lastStep)-1]
 
 	path := NewPath(first)
-	if EqualsP(first, last) {
+	if util.EqualsP(first, last) {
 		return path
 	}
 	path.AddStep(last)
@@ -568,7 +568,7 @@ func (p *Path) Tangents() [][][]float64 {
 	n := len(parts)
 	res := make([][][]float64, n)
 	for i, part := range parts {
-		tmp0, tmp1 := DeCasteljau(part, 0), DeCasteljau(part, 1)
+		tmp0, tmp1 := util.DeCasteljau(part, 0), util.DeCasteljau(part, 1)
 		dx0, dy0 := unit(tmp0[2], tmp0[3])
 		dx1, dy1 := unit(tmp1[2], tmp1[3])
 		res[i] = [][]float64{{dx0, dy0}, {dx1, dy1}}
@@ -582,8 +582,8 @@ func (p *Path) Tangents() [][][]float64 {
 // value.
 func PartsIntersection(part1, part2 [][]float64, d float64) []float64 {
 	// Test bounding boxes first
-	bb1, bb2 := BoundingBox(part1...), BoundingBox(part2...)
-	if !BBOverlap(bb1, bb2) {
+	bb1, bb2 := util.BoundingBox(part1...), util.BoundingBox(part2...)
+	if !util.BBOverlap(bb1, bb2) {
 		return nil
 	}
 
@@ -591,24 +591,24 @@ func PartsIntersection(part1, part2 [][]float64, d float64) []float64 {
 	fparts1, fparts2 := FlattenPart(d, part1), FlattenPart(d, part2)
 	bbs2 := make([][][]float64, len(fparts2))
 	for i, part := range fparts2 {
-		bbs2[i] = BoundingBox(part...)
+		bbs2[i] = util.BoundingBox(part...)
 	}
 
 	// Test each line in part1 against lines in part2 until we find an intersection
 	for _, part := range fparts1 {
-		bb1 = BoundingBox(part...)
+		bb1 = util.BoundingBox(part...)
 		s1, e1 := part[0], part[len(part)-1]
 		for j, bbp2 := range bbs2 {
-			if !BBOverlap(bb1, bbp2) {
+			if !util.BBOverlap(bb1, bbp2) {
 				continue
 			}
 			// Bounding boxes of lines overlap - see if they intersect
 			s2, e2 := fparts2[j][0], fparts2[j][len(fparts2[j])-1]
-			tvals, err := IntersectionTValsP(s1, e1, s2, e2)
+			tvals, err := util.IntersectionTValsP(s1, e1, s2, e2)
 			if err != nil || tvals[0] < 0 || tvals[0] > 1 || tvals[1] < 0 || tvals[1] > 1 {
 				continue
 			}
-			return []float64{Lerp(tvals[0], s1[0], e1[0]), Lerp(tvals[0], s1[1], e1[1])}
+			return []float64{util.Lerp(tvals[0], s1[0], e1[0]), util.Lerp(tvals[0], s1[1], e1[1])}
 		}
 	}
 
@@ -621,7 +621,7 @@ func (p *Path) Length(flat float64) float64 {
 	parts := p.Flatten(flat).Parts()
 	sum := 0.0
 	for _, part := range parts {
-		sum += DistanceE(part[0], part[1])
+		sum += util.DistanceE(part[0], part[1])
 	}
 	return sum
 }

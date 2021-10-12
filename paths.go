@@ -3,7 +3,7 @@ package graphics2d
 import (
 	"math"
 
-	. "github.com/jphsd/graphics2d/util"
+	"github.com/jphsd/graphics2d/util"
 )
 
 // A collection of part and path creation functions.
@@ -27,7 +27,7 @@ func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 		a /= 2
 		n *= 2
 	}
-	cp := CalcPointsForArc(a)
+	cp := util.CalcPointsForArc(a)
 	if rev {
 		cp = [][]float64{cp[3], cp[2], cp[1], cp[0]}
 	}

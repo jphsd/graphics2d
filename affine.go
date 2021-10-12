@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	. "github.com/jphsd/graphics2d/util"
+	"github.com/jphsd/graphics2d/util"
 )
 
 // Aff3 is a 3x3 affine transformation matrix in row major order, where the
@@ -155,7 +155,7 @@ func (a *Aff3) InverseOf() (*Aff3, error) {
 // Invert inverts the transform.
 func (a *Aff3) Invert() error {
 	det := a.Determinant()
-	if Equals(math.Abs(det), 0) {
+	if util.Equals(math.Abs(det), 0) {
 		return fmt.Errorf("Determinant is zero => non-invertible")
 	}
 
@@ -174,22 +174,22 @@ func (a *Aff3) String() string {
 
 // Identity returns true if the transform is the identity.
 func (a *Aff3) Identity() bool {
-	if !Equals(a[3*0+0], 1) {
+	if !util.Equals(a[3*0+0], 1) {
 		return false
 	}
-	if !Equals(a[3*0+1], 0) {
+	if !util.Equals(a[3*0+1], 0) {
 		return false
 	}
-	if !Equals(a[3*0+2], 0) {
+	if !util.Equals(a[3*0+2], 0) {
 		return false
 	}
-	if !Equals(a[3*1+0], 0) {
+	if !util.Equals(a[3*1+0], 0) {
 		return false
 	}
-	if !Equals(a[3*1+1], 1) {
+	if !util.Equals(a[3*1+1], 1) {
 		return false
 	}
-	if !Equals(a[3*1+2], 0) {
+	if !util.Equals(a[3*1+2], 0) {
 		return false
 	}
 	return true
@@ -204,14 +204,14 @@ func (a *Aff3) Copy() *Aff3 {
 // Reflect performs a reflection along the axis defined by the two non-coincident points.
 func (a *Aff3) Reflect(x1, y1, x2, y2 float64) {
 	dx, dy := x2-x1, y2-y1
-	if Equals(dy, 0) {
+	if util.Equals(dy, 0) {
 		// Horizontal - no rotation required
 		a.Translate(0, y1)
 		a.Scale(1, -1)
 		a.Translate(0, -y1)
 		return
 	}
-	if Equals(dx, 0) {
+	if util.Equals(dx, 0) {
 		// Vertical - no rotation required
 		a.Translate(x1, 0)
 		a.Scale(-1, 1)
