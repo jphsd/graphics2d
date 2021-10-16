@@ -1,18 +1,11 @@
+//go:build ignore
 // +build ignore
 
 package main
 
 import (
-	"image/color"
-	"image/draw"
-
-	// For image output only
-	"fmt"
-	"image/png"
-	"log"
-	"os"
-
 	. "github.com/jphsd/graphics2d"
+	"github.com/jphsd/graphics2d/color"
 	"github.com/jphsd/graphics2d/image"
 )
 
@@ -36,32 +29,13 @@ func main() {
 	path1 := path.Transform(CreateTransform(20, 20, 1, 0))
 
 	// Render the shape in blue
-	blue := color.RGBA{0, 0, 0xff, 0xff}
-	RenderColoredShape(img, shape1, blue)
+	DrawShape(img, shape1, Blue)
 
 	// and again offset in green
-	green := color.RGBA{0, 0xff, 0, 0xff}
-	RenderColoredShape(img, shape, green)
+	DrawShape(img, shape, Green)
 
 	// and again offset in red
-	red := color.RGBA{0xff, 0, 0, 0xff}
-	RenderColoredPath(img, path1, red)
+	DrawPath(img, path1, Red)
 
-	err := saveImage(img, "eiffel")
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func saveImage(img draw.Image, name string) error {
-	fDst, err := os.Create(fmt.Sprintf("%s.png", name))
-	if err != nil {
-		return err
-	}
-	defer fDst.Close()
-	err = png.Encode(fDst, img)
-	if err != nil {
-		return err
-	}
-	return nil
+	image.SaveImage(img, "eiffel")
 }

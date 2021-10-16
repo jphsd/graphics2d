@@ -8,7 +8,7 @@ import (
 // Simple drawing functions with pens
 
 // DrawPoint renders a point with the pen into the destination image.
-func DrawPoint(dst draw.Image, at []float64, width float64, pen *Pen) {
+func DrawPoint(dst draw.Image, at []float64, pen *Pen) {
 	shape := NewShape(Point(at).Process(pen.Stroke)...)
 	if pen.Xfm != nil {
 		shape = shape.Transform(pen.Xfm)
