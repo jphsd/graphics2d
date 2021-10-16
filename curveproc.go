@@ -13,7 +13,7 @@ const (
 )
 
 // CurveProc replaces the steps on a path with cubics. The locations of the control points
-// are controlled by the Style setting and whether or not the path is close.
+// are controlled by the Style setting and whether or not the path is closed.
 type CurveProc struct {
 	Scale float64
 	Style CurveStyle
@@ -46,7 +46,7 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 		mp[ns-1] = util.Centroid(points[ns-1], points[0])
 
 		// Create path
-		if p.Closed() {
+		if p.closed {
 			res = append(res, NewPath(mp[0]))
 		} else {
 			res = append(res, NewPath(points[0]))
@@ -57,7 +57,7 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 			c2 := Lerp(cp.Scale, mp[i], points[i])
 			res[0].AddStep(c1, c2, mp[i])
 		}
-		if p.Closed() {
+		if p.closed {
 			c1 := Lerp(cp.Scale, mp[ns-2], points[ns-1])
 			c2 := Lerp(cp.Scale, mp[ns-1], points[ns-1])
 			res[0].AddStep(c1, c2, mp[ns-1])
@@ -77,10 +77,9 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 	// Calc opposite tangents
 	ops := make([][]float64, ns)
 	for i := 1; i < ns-1; i++ {
-		// Scaled down by 50%
 		ops[i] = []float64{(points[i+1][0] - points[i-1][0]) / 2, (points[i+1][1] - points[i-1][1]) / 2}
 	}
-	if p.Closed() {
+	if p.closed {
 		ops[0] = []float64{points[1][0] - points[ns-1][0], points[1][1] - points[ns-1][1]}
 		ops[ns-1] = []float64{points[0][0] - points[ns-2][0], points[0][1] - points[ns-2][1]}
 	} else {
@@ -90,14 +89,24 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 
 	// Create path
 	res = append(res, NewPath(points[0]))
-	for i := 0; i < ns-1; i++ {
-		c1, c2 := cp.calcControlOpp(points[i], ops[i], points[i+1], ops[i+1])
-		res[0].AddStep(c1, c2, points[i+1])
-	}
-	if p.Closed() {
+	if p.closed {
+		for i := 0; i < ns-1; i++ {
+			c1, c2 := cp.calcControlOpp(points[i], ops[i], points[i+1], ops[i+1])
+			res[0].AddStep(c1, c2, points[i+1])
+		}
 		c1, c2 := cp.calcControlOpp(points[ns-1], ops[ns-1], points[0], ops[0])
 		res[0].AddStep(c1, c2, points[0])
 		res[0].Close()
+	} else {
+		// Insert quads for start and end
+		c1, c2 := cp.calcControlOpp(points[0], ops[0], points[1], ops[1])
+		res[0].AddStep(c2, points[1])
+		for i := 1; i < ns-2; i++ {
+			c1, c2 = cp.calcControlOpp(points[i], ops[i], points[i+1], ops[i+1])
+			res[0].AddStep(c1, c2, points[i+1])
+		}
+		c1, c2 = cp.calcControlOpp(points[ns-2], ops[ns-2], points[ns-1], ops[ns-1])
+		res[0].AddStep(c1, points[ns-1])
 	}
 
 	return res

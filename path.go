@@ -22,10 +22,7 @@ import (
  * connected to the first as a line.
  */
 
-// Path contains the housekeeping necessary for path building. AssumeSimplified allows
-// an optimization for children of the path to skip simplification if the parent is
-// already simplified. If a Path Processor does something that might generate a non-simple
-// path then this should be set to false, for example StrokeProc.
+// Path contains the housekeeping necessary for path building.
 type Path struct {
 	// step, point, ordinal
 	steps  [][][]float64
@@ -38,8 +35,7 @@ type Path struct {
 	reversed   *Path
 	tangents   [][][]float64
 	// Processed from
-	parent           *Path
-	AssumeSimplified bool
+	parent *Path
 }
 
 // NewPath creates a new path starting at start.
@@ -47,7 +43,6 @@ func NewPath(start []float64) *Path {
 	np := &Path{}
 	np.steps = make([][][]float64, 1)
 	np.steps[0] = [][]float64{start}
-	np.AssumeSimplified = true
 	return np
 }
 
@@ -178,7 +173,8 @@ func PartsToPath(parts ...[][]float64) (*Path, error) {
 
 	for i, part := range parts {
 		if util.EqualsP(part[0], part[len(part)-1]) {
-			return nil, fmt.Errorf("part %d start and end are coincident", i)
+			fmt.Printf("Attempt to add zero length part %d ignored\n", i)
+			continue
 		}
 		res.AddStep(part[1:]...)
 	}
@@ -367,10 +363,6 @@ func (p *Path) Simplify() *Path {
 	if p.simplified != nil {
 		return p.simplified
 	}
-	if p.AssumeSimplified && p.parent != nil && p.parent.simplified != nil {
-		p.simplified = p
-		return p
-	}
 	res := make([][][]float64, 1)
 	res[0] = p.steps[0]
 	cp := res[0][0]
@@ -399,7 +391,6 @@ func (p *Path) Simplify() *Path {
 	path.steps = res
 	path.closed = p.closed
 	path.parent = p
-	path.AssumeSimplified = true
 	p.simplified = path
 
 	return path
@@ -481,12 +472,13 @@ func (p *Path) Reverse() *Path {
 	}
 
 	path, _ := PartsToPath(ReverseParts(p.Parts())...)
+
 	// If other aspects have already been calculated - reverse them too
 	if p.flattened != nil {
 		path.flattened = p.flattened.Reverse()
 		path.tolerance = p.tolerance
 	}
-	if p.simplified != nil && p != p.simplified {
+	if p.simplified != nil {
 		path.simplified = p.simplified.Reverse()
 	}
 	if p.tangents != nil {
@@ -495,7 +487,7 @@ func (p *Path) Reverse() *Path {
 	if p.closed {
 		path.closed = true
 	}
-	path.parent = p
+	path.parent = p.parent
 	p.reversed = path
 
 	return path
