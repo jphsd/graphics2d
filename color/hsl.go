@@ -3,6 +3,7 @@ package color
 import (
 	"image/color"
 	"math"
+	"math/rand"
 
 	"github.com/jphsd/graphics2d/util"
 )
@@ -286,4 +287,9 @@ func Tone(col color.Color) color.Color {
 // Compound returns the colors analogous to the color's complement.
 func Compound(col color.Color) []color.Color {
 	return Analogous(Complement(col))
+}
+
+// RandomHue returns an HSL color with a randon hue, fully saturated and 50% lightness.
+func RandomHue() color.Color {
+	return &HSL{rand.Float64(), 1, 0.5, 1}
 }
