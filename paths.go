@@ -93,6 +93,7 @@ func PolyCurve(pts ...[][]float64) *Path {
 // ArcStyle defines the type of arc - open, chord (closed) and pie (closed).
 type ArcStyle int
 
+// Constans for arc styles.
 const (
 	ArcOpen ArcStyle = iota
 	ArcChord

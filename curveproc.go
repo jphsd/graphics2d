@@ -2,11 +2,13 @@ package graphics2d
 
 import "github.com/jphsd/graphics2d/util"
 
-type CurveStyle int
 
 // CurveStyle determines how the curve behaves relative to the path points. With Bezier, the
 // path will intersect the mid-point of each path step. With Catmul, the path will intersect
 // point.
+type CurveStyle int
+
+// Constants for curve styles.
 const (
 	Bezier CurveStyle = iota
 	CatmullRom

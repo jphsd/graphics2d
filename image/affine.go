@@ -3,7 +3,7 @@ package image
 import (
 	"math"
 
-	. "github.com/jphsd/graphics2d/util"
+	"github.com/jphsd/graphics2d/util"
 )
 
 // Aff5 is a 5x5 affine transformation matrix in row major order, where the
@@ -26,9 +26,9 @@ func NewAff5() *Aff5 {
 func (a *Aff5) Identity() bool {
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 5; j++ {
-			if i == j && !Equals(a[5*i+j], 1) {
+			if i == j && !util.Equals(a[5*i+j], 1) {
 				return false
-			} else if !Equals(a[5*i+j], 0) {
+			} else if !util.Equals(a[5*i+j], 0) {
 				return false
 			}
 		}
