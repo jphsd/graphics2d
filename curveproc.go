@@ -2,7 +2,6 @@ package graphics2d
 
 import "github.com/jphsd/graphics2d/util"
 
-
 // CurveStyle determines how the curve behaves relative to the path points. With Bezier, the
 // path will intersect the mid-point of each path step. With Catmul, the path will intersect
 // point.
