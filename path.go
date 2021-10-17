@@ -56,12 +56,23 @@ func (p *Path) AddStep(points ...[]float64) error {
 	if p.closed {
 		return fmt.Errorf("path is closed, adding a step is forbidden")
 	}
+
 	lastStep := p.steps[len(p.steps)-1]
 	last := lastStep[len(lastStep)-1]
-	if util.EqualsP(last, points[n-1]) {
-		return fmt.Errorf("zero length step")
+	npoints := make([][]float64, 0, n)
+	for _, pt := range points {
+		if util.EqualsP(last, pt) {
+			// Ignore coincident points
+			continue
+		}
+		npoints = append(npoints, pt)
+		last = pt
 	}
-	p.steps = append(p.steps, points)
+	if len(npoints) == 0 {
+		return nil
+	}
+
+	p.steps = append(p.steps, npoints)
 	p.bounds = image.Rectangle{}
 	p.flattened = nil
 	p.simplified = nil
@@ -171,11 +182,7 @@ func PartsToPath(parts ...[][]float64) (*Path, error) {
 		return res, nil
 	}
 
-	for i, part := range parts {
-		if util.EqualsP(part[0], part[len(part)-1]) {
-			fmt.Printf("Attempt to add zero length part %d ignored\n", i)
-			continue
-		}
+	for _, part := range parts {
 		res.AddStep(part[1:]...)
 	}
 	return res, nil

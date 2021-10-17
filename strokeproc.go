@@ -29,22 +29,21 @@ func NewStrokeProc(w float64) *StrokeProc {
 	if w < 0 {
 		w = -w
 	}
-	return NewStrokeProcExt(w/2, -w/2, JoinBevel, JoinBevel, 1, 0.5) // 10 degrees
+	return NewStrokeProcExt(w/2, -w/2, JoinBevel, JoinBevel, 0.5) // 10 degrees
 }
 
 // NewStrokeProcExt creates a stroke path processor where the trace join types and widths are specified
 // separately for each side of the stroke. This allows the stroke to be offset to the left or right
 // of the path being processed.
 func NewStrokeProcExt(rw, lw float64,
-	rjf, ljf func([][]float64, []float64, [][]float64) [][][]float64,
-	mg, d float64) *StrokeProc {
+	rjf, ljf func([][]float64, []float64, [][]float64) [][][]float64, d float64) *StrokeProc {
 	if rw < 0 {
 		rw = -rw
 	}
 	if lw > 0 {
 		lw = -lw
 	}
-	return &StrokeProc{&TraceProc{rw, mg, d, rjf}, &TraceProc{lw, mg, d, ljf}, PointCircle, CapButt, nil, nil}
+	return &StrokeProc{&TraceProc{rw, d, rjf}, &TraceProc{lw, d, ljf}, PointCircle, CapButt, nil, nil}
 }
 
 // Process implements the PathProcessor interface and will return either one or two paths

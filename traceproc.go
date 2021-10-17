@@ -7,14 +7,13 @@ package graphics2d
 // steps must be greater than MinGap for the join function to be called.
 type TraceProc struct {
 	Width    float64
-	MinGap   float64
 	Flatten  float64
 	JoinFunc func([][]float64, []float64, [][]float64) [][][]float64
 }
 
 // NewTraceProc creates a trace path processor with width w, the bevel join and butt cap types.
 func NewTraceProc(w float64) *TraceProc {
-	return &TraceProc{w, 1, 0.5, JoinBevel} // 10 degrees
+	return &TraceProc{w, 0.5, JoinBevel} // 10 degrees
 }
 
 // Process implements the PathProcessor interface.
@@ -89,11 +88,8 @@ func (tp *TraceProc) ProcessParts(p *Path) [][][]float64 {
 			// the point and then split part at t value to preserve the part's cp.
 			last[len(last)-1] = npt
 			rhs[i][0] = npt
-		} else if !tp.checkGap(last[len(last)-1], rhs[i][0]) {
-			nrhs = append(nrhs, tp.JoinFunc(last, parts[i][0], rhs[i])...)
 		} else {
-			// No join, so nudge end to start of rhs[i]
-			last[len(last)-1] = rhs[i][0]
+			nrhs = append(nrhs, tp.JoinFunc(last, parts[i][0], rhs[i])...)
 		}
 		nrhs = append(nrhs, rhs[i])
 	}
@@ -105,19 +101,10 @@ func (tp *TraceProc) ProcessParts(p *Path) [][][]float64 {
 		if npt != nil {
 			last[len(last)-1] = npt
 			nrhs[0][0] = npt
-		} else if !tp.checkGap(last[len(last)-1], nrhs[0][0]) {
-			nrhs = append(nrhs, tp.JoinFunc(last, parts[0][0], nrhs[0])...)
 		} else {
-			last[len(last)-1] = nrhs[0][0]
+			nrhs = append(nrhs, tp.JoinFunc(last, parts[0][0], nrhs[0])...)
 		}
 	}
 
 	return nrhs
-}
-
-func (tp *TraceProc) checkGap(p1, p2 []float64) bool {
-	d2 := tp.MinGap * tp.MinGap
-	dx := p2[0] - p1[0]
-	dy := p2[1] - p1[1]
-	return d2 > dx*dx+dy*dy
 }
