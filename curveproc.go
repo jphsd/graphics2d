@@ -34,6 +34,10 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 		points[i] = step[len(step)-1]
 	}
 
+	if p.closed && util.EqualsP(points[0], points[ns-1]) {
+		ns--
+	}
+
 	res := []*Path{}
 
 	// Bezier

@@ -3,17 +3,9 @@
 package main
 
 import (
-	"image/color"
-	"image/draw"
 	"math"
-
-	// For image output only
-	"fmt"
-	"image/png"
-	"log"
-	"os"
-
 	. "github.com/jphsd/graphics2d"
+	"github.com/jphsd/graphics2d/color"
 	"github.com/jphsd/graphics2d/image"
 )
 
@@ -42,25 +34,8 @@ func main() {
 		cx = 0
 		cy += dy
 	}
-	red := color.RGBA{0xff, 0, 0, 0xff}
-	RenderColoredShape(img, shape, red)
+	RenderColoredShape(img, shape, color.Red)
 
 	// Capture image output
-	err := saveImage(img, "polys")
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func saveImage(img draw.Image, name string) error {
-	fDst, err := os.Create(fmt.Sprintf("%s.png", name))
-	if err != nil {
-		return err
-	}
-	defer fDst.Close()
-	err = png.Encode(fDst, img)
-	if err != nil {
-		return err
-	}
-	return nil
+	image.SaveImage(img, "polys")
 }
