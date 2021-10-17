@@ -18,15 +18,15 @@ type Pen struct {
 
 // Predefined pens.
 var (
-	Black   = NewPen(g2dc.Black, 1)
-	White   = NewPen(g2dc.White, 1)
-	Red     = NewPen(g2dc.Red, 1)
-	Green   = NewPen(g2dc.Green, 1)
-	Blue    = NewPen(g2dc.Blue, 1)
-	Yellow  = NewPen(g2dc.Yellow, 1)
-	Magenta = NewPen(g2dc.Magenta, 1)
-	Cyan    = NewPen(g2dc.Cyan, 1)
-	Orange  = NewPen(g2dc.Orange, 1)
+	Black   = NewPen(g2dc.Black, 2)
+	White   = NewPen(g2dc.White, 2)
+	Red     = NewPen(g2dc.Red, 2)
+	Green   = NewPen(g2dc.Green, 2)
+	Blue    = NewPen(g2dc.Blue, 2)
+	Yellow  = NewPen(g2dc.Yellow, 2)
+	Magenta = NewPen(g2dc.Magenta, 2)
+	Cyan    = NewPen(g2dc.Cyan, 2)
+	Orange  = NewPen(g2dc.Orange, 2)
 )
 
 // NewPen returns a pen that will render a shape with the given pen

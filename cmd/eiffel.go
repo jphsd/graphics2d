@@ -1,5 +1,4 @@
 //go:build ignore
-// +build ignore
 
 package main
 
@@ -28,13 +27,13 @@ func main() {
 	shape1 := shape.Transform(CreateTransform(-20, -20, 1, 0))
 	path1 := path.Transform(CreateTransform(20, 20, 1, 0))
 
-	// Render the shape in blue
+	// Draw the shape with the Blue pen
 	DrawShape(img, shape1, Blue)
 
-	// and again offset in green
+	// and again offset with the Green pen
 	DrawShape(img, shape, Green)
 
-	// and again offset in red
+	// Draw the path offset with the Red pen
 	DrawPath(img, path1, Red)
 
 	image.SaveImage(img, "eiffel")
