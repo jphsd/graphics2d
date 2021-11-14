@@ -24,9 +24,9 @@ func CalcPointsForArc(theta float64) [][]float64 {
 // Conversion methods for cubic Bezier to CatmullRom and v.v.
 // From https://pomax.github.io/bezierinfo/#catmullconv
 
-// Bezier3ToCatmul converts a cubic bezier to a catmul curve.
+// Bezier3ToCatmull converts a cubic bezier to a catmul curve.
 // p1, c1, c2, p2 => t1, p1, p2, t2
-func Bezier3ToCatmul(p1, p2, p3, p4 []float64) []float64 {
+func Bezier3ToCatmull(p1, p2, p3, p4 []float64) []float64 {
 	dx12 := 6 * (p1[0] - p2[0])
 	dy12 := 6 * (p1[1] - p2[1])
 	dx43 := 6 * (p4[0] - p3[0])
@@ -34,9 +34,9 @@ func Bezier3ToCatmul(p1, p2, p3, p4 []float64) []float64 {
 	return []float64{p4[0] + dx12, p4[1] + dy12, p1[0], p1[1], p4[0], p4[1], p1[0] + dx43, p1[1] + dy43}
 }
 
-// CatmulToBezier3 converts a catmul curve to a cubic bezier.
+// CatmullToBezier3 converts a catmul curve to a cubic bezier.
 // t1, p1, p2, t2 => p1, c1, c2, p2
-func CatmulToBezier3(tau float64, p1, p2, p3, p4 []float64) []float64 {
+func CatmullToBezier3(tau float64, p1, p2, p3, p4 []float64) []float64 {
 	tau *= 6
 	dx31 := (p3[0] - p1[0]) / tau
 	dy31 := (p3[1] - p1[1]) / tau

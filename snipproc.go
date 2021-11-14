@@ -181,14 +181,14 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 			if len(pparts) == 0 {
 				continue
 			}
-			lp, _ := PartsToPath(pparts...)
+			lp := PartsToPath(pparts...)
 			res = append(res, lp)
 			// rem already set
 		} else {
 			// state change is in this part, split it at t
 			pieces := util.SplitCurve(rem, t)
 			pparts = append(pparts, pieces[0])
-			lp, _ := PartsToPath(pparts...)
+			lp := PartsToPath(pparts...)
 			res = append(res, lp)
 			rem = pieces[1]
 		}
@@ -202,7 +202,7 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 		pparts = append(pparts, parts[pind])
 		pind++
 	}
-	lp, _ := PartsToPath(pparts...)
+	lp := PartsToPath(pparts...)
 	return append(res, lp)
 }
 

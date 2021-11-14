@@ -53,7 +53,7 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 	steps := p.Steps()
 	if len(steps) == 1 {
 		w := sp.RTraceProc.Width - sp.LTraceProc.Width
-		np, _ := PartsToPath(sp.PointFunc(steps[0][0], w)...)
+		np := PartsToPath(sp.PointFunc(steps[0][0], w)...)
 		np.Close()
 		return []*Path{np}
 	}
@@ -64,9 +64,9 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 
 	if p.closed {
 		// ProcessParts has already performed the last join
-		rhsp, _ := PartsToPath(rhs...)
+		rhsp := PartsToPath(rhs...)
 		rhsp.Close()
-		lhsp, _ := PartsToPath(lhs...)
+		lhsp := PartsToPath(lhs...)
 		lhsp.Close()
 		return []*Path{rhsp, lhsp}
 	}
@@ -97,7 +97,7 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 	y = (lhsl[len(lhsl)-1][1] + rhs[0][0][1]) / 2
 	pt = []float64{x, y}
 	both = append(both, sp.CapStartFunc(lhsl, pt, rhs[0])...)
-	bp, _ := PartsToPath(both...)
+	bp := PartsToPath(both...)
 	bp.Close()
 	return []*Path{bp}
 }

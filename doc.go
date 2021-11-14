@@ -47,6 +47,7 @@ of other possibilities:
   OpenProc - wraps Path.Open
   PointsProc - adds shapes at the start of each step and the end of the last step
   ReverseProc - wraps Path.Reverse
+  RoundedProc - rounds the corners of adjacent line segments in a path
   SimplifyProc - wraps Path.Simplify
   ShapesProc - distributes shapes along a path separated by some distance
   SnipProc - cuts up a path into smaller pieces according to a pattern

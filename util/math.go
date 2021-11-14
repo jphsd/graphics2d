@@ -173,6 +173,22 @@ func DotProduct(p1, p2, p3, p4 []float64) float64 {
 	return (p2[0]-p1[0])*(p4[0]-p3[0]) + (p2[1]-p1[1])*(p4[1]-p3[1])
 }
 
+// Vec returns the vector joining two points.
+func Vec(p1, p2 []float64) []float64 {
+	return []float64{p2[0] - p1[0], p2[1] - p1[1]}
+}
+
+// VecMag returns the magnitude of the vector.
+func VecMag(v []float64) float64 {
+	return math.Sqrt(v[0]*v[0] + v[1]*v[1])
+}
+
+// VecNormalize scales a vector to unit length.
+func VecNormalize(v []float64) []float64 {
+	d := VecMag(v)
+	return []float64{v[0] / d, v[1] / d}
+}
+
 // LineAngle returns the angle of a line.
 func LineAngle(p1, p2 []float64) float64 {
 	return math.Atan2(p2[1]-p1[1], p2[0]-p1[0])

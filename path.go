@@ -163,6 +163,7 @@ func (p *Path) Parts() [][][]float64 {
 
 // Close marks the path as closed.
 func (p *Path) Close() {
+	p.AddStep(p.steps[0][0])
 	p.closed = true
 }
 
@@ -172,20 +173,20 @@ func (p *Path) Closed() bool {
 }
 
 // PartsToPath constructs a new path by concatenating the parts.
-func PartsToPath(parts ...[][]float64) (*Path, error) {
+func PartsToPath(parts ...[][]float64) *Path {
 	if len(parts) == 0 {
-		return nil, nil
+		return nil
 	}
 
 	res := NewPath(parts[0][0])
 	if len(parts[0]) == 1 {
-		return res, nil
+		return res
 	}
 
 	for _, part := range parts {
 		res.AddStep(part[1:]...)
 	}
-	return res, nil
+	return res
 }
 
 // Flatten works by recursively subdividing the path until the control points are within d of
@@ -478,7 +479,7 @@ func (p *Path) Reverse() *Path {
 		return p.reversed
 	}
 
-	path, _ := PartsToPath(ReverseParts(p.Parts())...)
+	path := PartsToPath(ReverseParts(p.Parts())...)
 
 	// If other aspects have already been calculated - reverse them too
 	if p.flattened != nil {
@@ -576,7 +577,7 @@ func (p *Path) Tangents() [][][]float64 {
 	return res
 }
 
-// PartsIntersection returns the location of where the two parts intersect of nil. Assumes the parts
+// PartsIntersection returns the location of where the two parts intersect or nil. Assumes the parts
 // are the result of simplification. Uses a brute force approach for curves with d as the flattening
 // value.
 func PartsIntersection(part1, part2 [][]float64, d float64) []float64 {
@@ -623,4 +624,108 @@ func (p *Path) Length(flat float64) float64 {
 		sum += util.DistanceE(part[0], part[1])
 	}
 	return sum
+}
+
+// ProjectPoint returns the point on the path closest to pt.
+func (p *Path) ProjectPoint(pt []float64) []float64 {
+	sp := p.Simplify()
+	parts := sp.Parts()
+	n := len(parts)
+
+	// Iterate through the parts of the simplified path to
+	// find the closest parts.
+	d := make([]float64, n+1)
+	cp := 0
+	cd := dist2(pt, parts[0][0])
+	d[0] = cd
+	for i := 1; i < n; i++ {
+		d2 := dist2(pt, parts[i][0])
+		d[i] = d2
+		if d2 < cd {
+			cp, cd = i, d2
+		}
+	}
+	// Check end point
+	d2 := dist2(pt, parts[n-1][len(parts[n-1])])
+	d[n] = d2
+	if d2 < cd {
+		cp, cd = n, d2
+	}
+
+	if cp == 0 {
+		pr, dr := bs(pt, 0, d[0], 1, d[1], parts[0])
+		if !p.closed {
+			// point lies in first part
+			return pr
+		}
+		// else test parts[n-1]
+		pl, dl := bs(pt, 0, d[n-1], 1, d[n], parts[n-1])
+		if dl < dr {
+			return pl
+		}
+		return pr
+	}
+
+	if cp == n {
+		pl, dl := bs(pt, 0, d[n-1], 1, d[n], parts[n-1])
+		if !p.closed {
+			// point lies in last part
+			return pl
+		}
+		// else test parts[0]
+		pr, dr := bs(pt, 0, d[0], 1, d[1], parts[0])
+		if dl < dr {
+			return pl
+		}
+		return pr
+	}
+
+	// point lies in either cp-1 to ci or, ci to cp+1
+	pl, dl := bs(pt, 0, d[cp-1], 1, d[cp], parts[cp-1])
+	pr, dr := bs(pt, 0, d[cp], 1, d[cp+1], parts[cp])
+
+	if dl < dr {
+		return pl
+	}
+
+	return pr
+}
+
+func dist2(a, b []float64) float64 {
+	dx, dy := b[0]-a[0], b[1]-a[1]
+	return dx*dx + dy*dy
+}
+
+// Returns closest point on part to pt and dist2
+func bs(pt []float64, ts, ds, te, de float64, part [][]float64) ([]float64, float64) {
+	td := te - ts
+	if td < 0.00001 {
+		return util.DeCasteljau(part, ts), ds
+	}
+	t := []float64{ts, ts + td/4, ts + td/2, ts + 3*td/4, te}
+	dl := dist2(pt, util.DeCasteljau(part, t[1]))
+	dm := dist2(pt, util.DeCasteljau(part, t[2]))
+	dr := dist2(pt, util.DeCasteljau(part, t[3]))
+	d := []float64{ds, dl, dm, dr, de}
+	ci, cd := 0, d[0]
+	for i := 1; i < 5; i++ {
+		if d[i] < cd {
+			ci = i
+		}
+	}
+	if ci == 0 {
+		// Search t[0] to t[1]
+		return bs(pt, t[0], d[0], t[1], d[1], part)
+	}
+	if ci == 4 {
+		// Search t[3] to t[4]
+		return bs(pt, t[3], d[3], t[4], d[4], part)
+	}
+	// Search t[ci-1] to t[ci] and t[ci] to t[ci+1]
+	pl, d1 := bs(pt, t[ci-1], d[ci-1], t[ci], d[ci], part)
+	pr, d2 := bs(pt, t[ci], d[ci], t[ci+1], d[ci+1], part)
+	if d1 < d2 {
+		return pl, d1
+	}
+	return pr, d2
 }

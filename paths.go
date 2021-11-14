@@ -30,8 +30,6 @@ func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 	cp := util.CalcPointsForArc(a)
 	if rev {
 		cp = [][]float64{cp[3], cp[2], cp[1], cp[0]}
-	}
-	if rev {
 		a = -a
 	}
 
@@ -103,7 +101,7 @@ const (
 // Arc returns a path with an arc centered on c with radius r from offs in the direction and length of ang.
 func Arc(c []float64, r, offs, ang float64, s ArcStyle) *Path {
 	parts := MakeArcParts(c[0], c[1], r, offs, ang)
-	np, _ := PartsToPath(parts...)
+	np := PartsToPath(parts...)
 	switch s {
 	case ArcChord:
 		np.Close()
@@ -145,14 +143,14 @@ func PolyArcFromPoint(pt []float64, cs [][]float64, angs []float64) *Path {
 		parts = append(parts, tmp...)
 	}
 
-	res, _ := PartsToPath(parts...)
+	res := PartsToPath(parts...)
 	return res
 }
 
 // Circle returns a closed path describing a circle centered on c with radius r.
 func Circle(c []float64, r float64) *Path {
 	ax, ay := c[0], c[1]
-	np, _ := PartsToPath(MakeArcParts(ax, ay, r, 0, 2*math.Pi)...)
+	np := PartsToPath(MakeArcParts(ax, ay, r, 0, 2*math.Pi)...)
 	np.Close()
 	return np
 }
@@ -160,7 +158,7 @@ func Circle(c []float64, r float64) *Path {
 // Ellipse returns a closed path describing an ellipse with rx and ry rotated by xang from the x axis.
 func Ellipse(c []float64, rx, ry, xang float64) *Path {
 	ax, ay := c[0], c[1]
-	np, _ := PartsToPath(MakeArcParts(ax, ay, rx, 0, 2*math.Pi)...)
+	np := PartsToPath(MakeArcParts(ax, ay, rx, 0, 2*math.Pi)...)
 	np.Close()
 	xfm := NewAff3()
 	// Reverse order
@@ -174,7 +172,7 @@ func Ellipse(c []float64, rx, ry, xang float64) *Path {
 // EllipticalArc returns a path describing an ellipse arc with rx and ry rotated by xang from the x axis.
 func EllipticalArc(c []float64, rx, ry, offs, ang, xang float64, s ArcStyle) *Path {
 	ax, ay := c[0], c[1]
-	np, _ := PartsToPath(MakeArcParts(ax, ay, rx, offs-xang, ang)...)
+	np := PartsToPath(MakeArcParts(ax, ay, rx, offs-xang, ang)...)
 
 	switch s {
 	case ArcChord:

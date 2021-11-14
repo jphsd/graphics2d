@@ -18,7 +18,7 @@ func NewTraceProc(w float64) *TraceProc {
 
 // Process implements the PathProcessor interface.
 func (tp *TraceProc) Process(p *Path) []*Path {
-	path, _ := PartsToPath(tp.ProcessParts(p)...)
+	path := PartsToPath(tp.ProcessParts(p)...)
 	if path == nil {
 		return []*Path{}
 	}

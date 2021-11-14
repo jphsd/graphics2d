@@ -23,7 +23,7 @@ func (clp *CurvesToLinesProc) Process(p *Path) []*Path {
 			}
 		}
 	}
-	path, _ := PartsToPath(nparts...)
+	path := PartsToPath(nparts...)
 	return []*Path{path}
 }
 
@@ -36,7 +36,7 @@ func (sp *SplitProc) Process(p *Path) []*Path {
 	n := len(parts)
 	res := make([]*Path, n)
 	for i := 0; i < n; i++ {
-		res[i], _ = PartsToPath(parts[i])
+		res[i] = PartsToPath(parts[i])
 	}
 	return res
 }
