@@ -110,7 +110,7 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 			c1, c2 := cp.calcControlOpp(points[i], ops[i], points[i+1], ops[i+1])
 			res[0].AddStep(c1, c2, points[i+1])
 		}
-		c1, _ = cp.calcControlOpp(points[ns-2], ops[ns-2], points[ns-1], ops[ns-1])
+		c1, _ := cp.calcControlOpp(points[ns-2], ops[ns-2], points[ns-1], ops[ns-1])
 		res[0].AddStep(c1, points[ns-1])
 	}
 
