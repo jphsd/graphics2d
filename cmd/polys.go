@@ -3,10 +3,10 @@
 package main
 
 import (
-	"math"
 	. "github.com/jphsd/graphics2d"
 	"github.com/jphsd/graphics2d/color"
 	"github.com/jphsd/graphics2d/image"
+	"math"
 )
 
 func main() {

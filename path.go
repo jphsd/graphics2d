@@ -649,7 +649,7 @@ func (p *Path) ProjectPoint(pt []float64) []float64 {
 	d2 := dist2(pt, parts[n-1][len(parts[n-1])])
 	d[n] = d2
 	if d2 < cd {
-		cp, cd = n, d2
+		cp = n
 	}
 
 	if cp == 0 {
