@@ -2,6 +2,7 @@ package image
 
 import (
 	"image"
+	"image/draw"
 	"sort"
 )
 
@@ -79,33 +80,40 @@ func MedOp(values [][]uint8, support [][]bool) uint8 {
 
 // Morphological runs op over the image img using support and supplying def when a location
 // falls outside of the image boundary. The support dimensions must be odd (not checked for).
-func Morphological(img *image.Gray, op func([][]uint8, [][]bool) uint8, support [][]bool, def uint8) *image.Gray {
-	imgR := img.Bounds()
-	w, h := imgR.Dx(), imgR.Dy()
-	res := image.NewGray(image.Rect(0, 0, w, h))
+func Morphological(img image.Image, op func([][]uint8, [][]bool) uint8, support [][]bool, def uint8) *image.Gray {
+	r := img.Bounds()
+	res := image.NewGray(r)
+
+	// Convert to grayscale if necessary
+	gray, ok := img.(*image.Gray)
+	if !ok {
+		gray := image.NewGray(r)
+		draw.Draw(gray, r, img, r.Min, draw.Src)
+	}
+
 	sw, sh := len(support[0]), len(support)
-	i := 0
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			values := morphHelper(x, y, sw, sh, w, h, img, def)
-			res.Pix[i] = op(values, support)
-			i++
+	for y := r.Min.Y; y < r.Max.Y; y++ {
+		roffs := gray.PixOffset(r.Min.X, y)
+		for x := r.Min.X; x < r.Max.X; x++ {
+			values := morphHelper(x, y, sw, sh, gray, def)
+			res.Pix[roffs] = op(values, support)
+			roffs++
 		}
 	}
 	return res
 }
 
-func morphHelper(x, y, sw, sh, iw, ih int, img *image.Gray, def uint8) [][]uint8 {
-	imgR := img.Bounds()
+func morphHelper(x, y, sw, sh int, img *image.Gray, def uint8) [][]uint8 {
+	r := img.Bounds()
 	// if entire value set is within the image, create new slice references
 	// else copy def and valid values
 	res := make([][]uint8, sh)
 	w1, h1 := sw/2, sh/2
 	x1, y1, x2, y2 := x-w1, y-h1, x+w1, y+h1
-	if x1 > -1 && y1 > -1 && x2 < iw && y2 < ih {
+	if x1 >= r.Min.X && y1 >= r.Min.Y && x2 < r.Max.X && y2 < r.Max.Y {
 		// We can construct new slices using the image
 		for i := 0; i < sh; i++ {
-			so := img.PixOffset(x1+imgR.Min.X, y1+i+imgR.Min.Y)
+			so := img.PixOffset(x1, y1+i)
 			res[i] = img.Pix[so : so+sw]
 		}
 		return res
@@ -116,22 +124,24 @@ func morphHelper(x, y, sw, sh, iw, ih int, img *image.Gray, def uint8) [][]uint8
 		da[i] = def
 	}
 	for i := 0; i < sh; i++ {
-		if y1+i < 0 || y1+i >= ih {
+		if y1+i < r.Min.Y || y1+i >= r.Max.Y {
+			// y out of bounds
 			res[i] = da
 			continue
 		}
-		if x1 > -1 && x2 < iw {
-			so := img.PixOffset(x1+imgR.Min.X, y1+i+imgR.Min.Y)
+		if x1 >= r.Min.X && x2 < r.Max.X {
+			// x1, x2 and y in bounds
+			so := img.PixOffset(x1, y1+i)
 			res[i] = img.Pix[so : so+sw]
 			continue
 		}
 		res[i] = make([]uint8, sw)
-		so := img.PixOffset(0+imgR.Min.X, y1+i+imgR.Min.Y)
 		for j := x1; j < x1+sw; j++ {
-			if j < 0 || j >= iw {
+			if j < r.Min.X || j >= r.Max.X {
 				res[i][j-x1] = def
 			} else {
-				res[i][j-x1] = img.Pix[so+j]
+				so := img.PixOffset(j, y1+i)
+				res[i][j-x1] = img.Pix[so]
 			}
 		}
 	}
@@ -139,43 +149,46 @@ func morphHelper(x, y, sw, sh, iw, ih int, img *image.Gray, def uint8) [][]uint8
 }
 
 // Dilate replaces each pixel with the max of the pixels in its support.
-func Dilate(img *image.Gray, support [][]bool) *image.Gray {
+func Dilate(img image.Image, support [][]bool) *image.Gray {
 	return Morphological(img, MaxOp, support, 0)
 }
 
 // Erode replaces each pixel with the min of the pixels in its support.
-func Erode(img *image.Gray, support [][]bool) *image.Gray {
+func Erode(img image.Image, support [][]bool) *image.Gray {
 	return Morphological(img, MinOp, support, 0xff)
 }
 
 // Open applies a dilation to a prior erosion.
-func Open(img *image.Gray, support [][]bool) *image.Gray {
+func Open(img image.Image, support [][]bool) *image.Gray {
 	return Dilate(Erode(img, support), support)
 }
 
 // Close applies an erosion to a prior dilation.
-func Close(img *image.Gray, support [][]bool) *image.Gray {
+func Close(img image.Image, support [][]bool) *image.Gray {
 	return Erode(Dilate(img, support), support)
 }
 
 // TopHat is the subtraction of an open from the original.
-func TopHat(img *image.Gray, support [][]bool) *image.Gray {
-	return Sub(img, Open(img, support), image.Point{})
+func TopHat(img image.Image, support [][]bool) *image.Gray {
+	r := img.Bounds()
+	return Sub(img, Open(img, support), r.Min)
 }
 
 // BotHat is the subtraction of the original from a close.
-func BotHat(img *image.Gray, support [][]bool) *image.Gray {
-	return Sub(Close(img, support), img, image.Point{})
+func BotHat(img image.Image, support [][]bool) *image.Gray {
+	r := img.Bounds()
+	return Sub(Close(img, support), img, r.Min)
 }
 
 // HitOrMiss keeps support1 and not support2 in the image. It requires that the
 // intersection of the two supports be empty.
-func HitOrMiss(img *image.Gray, support1, support2 [][]bool) *image.Gray {
-	return And(Erode(img, support1), Erode(Not(img), support2), image.Point{})
+func HitOrMiss(img image.Image, support1, support2 [][]bool) *image.Gray {
+	r := img.Bounds()
+	return And(Erode(img, support1), Erode(Not(img), support2), r.Min)
 }
 
 // Thin thins the image by repeatedly subtracting HitOrMiss with the selected support pairs.
-func Thin(img *image.Gray) *image.Gray {
+func Thin(img image.Image) *image.Gray {
 	// Apply all eight pairs
 	res := ThinStep(img, C11, D11)
 	res = ThinStep(res, C21, D21)
@@ -188,20 +201,22 @@ func Thin(img *image.Gray) *image.Gray {
 }
 
 // ThinStep thins the image by subtracting HitOrMiss with a support pair.
-func ThinStep(img *image.Gray, support1, support2 [][]bool) *image.Gray {
-	return Sub(img, HitOrMiss(img, support1, support2), image.Point{})
+func ThinStep(img image.Image, support1, support2 [][]bool) *image.Gray {
+	r := img.Bounds()
+	return Sub(img, HitOrMiss(img, support1, support2), r.Min)
 }
 
 // Skeleton repeatedly thins the image until it's no longer changing.
 // This operation can take a while to converge.
-func Skeleton(img *image.Gray) *image.Gray {
-	prev := &image.Gray{}
+func Skeleton(img image.Image) *image.Gray {
+	r := img.Bounds()
+	prev := image.Image(&image.Gray{})
 	res := img
-	for !Equal(res, prev, image.Point{}) {
+	for !Equal(res, prev, r.Min) {
 		prev = res
 		res = Thin(res)
 	}
-	return res
+	return res.(*image.Gray)
 }
 
 /*

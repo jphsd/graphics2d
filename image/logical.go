@@ -243,4 +243,3 @@ func sub(a, b uint8) uint8 {
 func xor(a, b uint8) uint8 {
 	return min(max(a, b), sub(0xff, min(a, b)))
 }
-
