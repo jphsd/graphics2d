@@ -17,8 +17,8 @@ func NewAff5() *Aff5 {
 	var res Aff5
 	res[5*0+0] = 1
 	res[5*1+1] = 1
-	res[5*2+1] = 1
-	res[5*3+1] = 1
+	res[5*2+2] = 1
+	res[5*3+3] = 1
 	return &res
 }
 
