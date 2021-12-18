@@ -3,7 +3,6 @@ package graphics2d
 import (
 	"fmt"
 	"image"
-	"image/draw"
 	"math"
 )
 
@@ -18,7 +17,7 @@ type Shape struct {
 
 // Bounds calculates the union of the bounds of the paths the shape contains.
 func (s *Shape) Bounds() image.Rectangle {
-	if s.bounds.Empty() && s.paths != nil {
+	if s.bounds.Empty() && s.paths != nil && len(s.paths) > 0 {
 		rect := s.paths[0].Bounds()
 		for i := 1; i < len(s.paths); i++ {
 			rect = rect.Union(s.paths[i].Bounds())
@@ -29,15 +28,12 @@ func (s *Shape) Bounds() image.Rectangle {
 }
 
 // Mask returns an Alpha image, the size of the shape bounds, containing the result
-// of rendering the shape.
+// of rendering the shape, located at {0, 0}.
 func (s *Shape) Mask() *image.Alpha {
 	if s.mask != nil {
 		return s.mask
 	}
-	rect := s.Bounds()
-	s.mask = image.NewAlpha(rect)
-	min := rect.Min
-	RenderShapeAlpha(s.mask, s, []float32{float32(-min.X), float32(-min.Y)}, draw.Over)
+	s.mask = RenderShapeAlpha(s)
 	return s.mask
 }
 

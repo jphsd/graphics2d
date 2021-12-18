@@ -160,18 +160,18 @@ func Close(img *image.Gray, support [][]bool) *image.Gray {
 
 // TopHat is the subtraction of an open from the original.
 func TopHat(img *image.Gray, support [][]bool) *image.Gray {
-	return Sub(img, Open(img, support))
+	return Sub(img, Open(img, support), image.Point{})
 }
 
 // BotHat is the subtraction of the original from a close.
 func BotHat(img *image.Gray, support [][]bool) *image.Gray {
-	return Sub(Close(img, support), img)
+	return Sub(Close(img, support), img, image.Point{})
 }
 
 // HitOrMiss keeps support1 and not support2 in the image. It requires that the
 // intersection of the two supports be empty.
 func HitOrMiss(img *image.Gray, support1, support2 [][]bool) *image.Gray {
-	return And(Erode(img, support1), Erode(Not(img), support2))
+	return And(Erode(img, support1), Erode(Not(img), support2), image.Point{})
 }
 
 // Thin thins the image by repeatedly subtracting HitOrMiss with the selected support pairs.
@@ -189,7 +189,7 @@ func Thin(img *image.Gray) *image.Gray {
 
 // ThinStep thins the image by subtracting HitOrMiss with a support pair.
 func ThinStep(img *image.Gray, support1, support2 [][]bool) *image.Gray {
-	return Sub(img, HitOrMiss(img, support1, support2))
+	return Sub(img, HitOrMiss(img, support1, support2), image.Point{})
 }
 
 // Skeleton repeatedly thins the image until it's no longer changing.
@@ -197,9 +197,9 @@ func ThinStep(img *image.Gray, support1, support2 [][]bool) *image.Gray {
 func Skeleton(img *image.Gray) *image.Gray {
 	prev := &image.Gray{}
 	res := img
-	for !Equal(prev, img) {
+	for !Equal(res, prev, image.Point{}) {
 		prev = res
-		res = Thin(prev)
+		res = Thin(res)
 	}
 	return res
 }

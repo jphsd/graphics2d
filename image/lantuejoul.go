@@ -26,7 +26,7 @@ func LJSkeleton(img *image.Gray, b [][]bool, n int) []*image.Gray {
 
 		tmp := Erode(img, suppt)
 		res[i] = TopHat(tmp, b)
-		res[n] = Or(res[n], res[i])
+		res[n] = Or(res[n], res[i], image.Point{})
 	}
 	return res
 }
@@ -46,7 +46,7 @@ func LJReconstitute(skels []*image.Gray, b [][]bool) *image.Gray {
 		simg = Dilate(simg, b)
 		suppt := GrayToSupport(simg)
 
-		res = Or(res, Dilate(skels[i], suppt))
+		res = Or(res, Dilate(skels[i], suppt), image.Point{})
 	}
 	return res
 }

@@ -9,34 +9,38 @@ import (
 
 // DrawPoint renders a point with the pen into the destination image.
 func DrawPoint(dst draw.Image, at []float64, pen *Pen) {
+	r := dst.Bounds()
 	shape := NewShape(Point(at).Process(pen.Stroke)...)
 	if pen.Xfm != nil {
 		shape = shape.Transform(pen.Xfm)
 	}
-	RenderShapeExt(dst, shape, []float32{0, 0}, pen.Filler, image.Point{}, nil, draw.Over)
+	RenderShapeExt(dst, shape, pen.Filler, r.Min, nil, image.Point{}, draw.Over)
 }
 
 // DrawLine renders a line with the pen into the destination image.
 func DrawLine(dst draw.Image, start, end []float64, pen *Pen) {
+	r := dst.Bounds()
 	shape := NewShape(Line(start, end).Process(pen.Stroke)...)
 	if pen.Xfm != nil {
 		shape = shape.Transform(pen.Xfm)
 	}
-	RenderShapeExt(dst, shape, []float32{0, 0}, pen.Filler, image.Point{}, nil, draw.Over)
+	RenderShapeExt(dst, shape, pen.Filler, r.Min, nil, image.Point{}, draw.Over)
 }
 
 // DrawArc renders an arc with the pen into the destination image.
 // radians +ve CCW, -ve CW
 func DrawArc(dst draw.Image, start, center []float64, radians float64, pen *Pen) {
+	r := dst.Bounds()
 	shape := NewShape(ArcFromPoint(start, center, radians, ArcOpen).Process(pen.Stroke)...)
 	if pen.Xfm != nil {
 		shape = shape.Transform(pen.Xfm)
 	}
-	RenderShapeExt(dst, shape, []float32{0, 0}, pen.Filler, image.Point{}, nil, draw.Over)
+	RenderShapeExt(dst, shape, pen.Filler, r.Min, nil, image.Point{}, draw.Over)
 }
 
 // DrawPath renders a path with the pen into the destination image.
 func DrawPath(dst draw.Image, path *Path, pen *Pen) {
+	r := dst.Bounds()
 	shape := NewShape(path)
 	if pen.Stroke != nil {
 		shape = shape.ProcessPaths(pen.Stroke)
@@ -44,16 +48,17 @@ func DrawPath(dst draw.Image, path *Path, pen *Pen) {
 	if pen.Xfm != nil {
 		shape = shape.Transform(pen.Xfm)
 	}
-	RenderShapeExt(dst, shape, []float32{0, 0}, pen.Filler, image.Point{}, nil, draw.Over)
+	RenderShapeExt(dst, shape, pen.Filler, r.Min, nil, image.Point{}, draw.Over)
 }
 
 // DrawShape renders a shape with the pen into the destination image.
 func DrawShape(dst draw.Image, shape *Shape, pen *Pen) {
+	r := dst.Bounds()
 	if pen.Stroke != nil {
 		shape = shape.ProcessPaths(pen.Stroke)
 	}
 	if pen.Xfm != nil {
 		shape = shape.Transform(pen.Xfm)
 	}
-	RenderShapeExt(dst, shape, []float32{0, 0}, pen.Filler, image.Point{}, nil, draw.Over)
+	RenderShapeExt(dst, shape, pen.Filler, r.Min, nil, image.Point{}, draw.Over)
 }
