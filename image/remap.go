@@ -37,7 +37,7 @@ func RemapGray(img *image.Gray, lut []uint8) *image.Gray {
 	return res
 }
 
-// RemapGray2RGBA remaps a grayscale image to a RGBA one using a look up table. The lookup table must be 256 long.
+// RemapGray2RGBA remaps a grayscale image to an RGBA one using a look up table. The lookup table must be 256 long.
 func RemapGray2RGBA(img image.Image, lut []color.Color) *image.RGBA {
 	if len(lut) != 256 {
 		panic(fmt.Errorf("lut must be 256 long"))

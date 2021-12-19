@@ -15,7 +15,7 @@ type Patch struct {
 	OffsY  int
 }
 
-// NewPatch creates a new iamge with the supplied patch.
+// NewPatch creates a new image with the supplied patch.
 func NewPatch(colors [][]color.Color) (*Patch, error) {
 	h := len(colors)
 	w := len(colors[0])

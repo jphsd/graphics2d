@@ -2,7 +2,7 @@ package image
 
 import "image"
 
-// ColorConvert runs RGBA (non-premultiplied) through the supplied affine transform.
+// ColorConvert runs NRGBA through the supplied affine transform.
 func ColorConvert(img *image.NRGBA, xfm *Aff5) *image.NRGBA {
 	imgR := img.Bounds()
 	w, h := imgR.Dx(), imgR.Dy()

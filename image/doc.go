@@ -7,7 +7,7 @@ Logical Operations
 	Xor
 	Not
 	Sub
-	Equals
+	Equal
 	Copy
 
 Morphological Operations
