@@ -271,8 +271,8 @@ func (p *Path) Bounds() image.Rectangle {
 				if rect.Empty() {
 					rect.Min.X = fx
 					rect.Min.Y = fy
-					rect.Max.X = cx
-					rect.Max.Y = cy
+					rect.Max.X = cx + 1
+					rect.Max.Y = cy + 1
 				} else {
 					if rect.Min.X > fx {
 						rect.Min.X = fx
@@ -280,18 +280,15 @@ func (p *Path) Bounds() image.Rectangle {
 					if rect.Min.Y > fy {
 						rect.Min.Y = fy
 					}
-					if rect.Max.X < cx {
-						rect.Max.X = cx
+					if rect.Max.X <= cx {
+						rect.Max.X = cx + 1
 					}
-					if rect.Max.Y < cy {
-						rect.Max.Y = cy
+					if rect.Max.Y <= cy {
+						rect.Max.Y = cy + 1
 					}
 				}
 			}
 		}
-		// Bump Max by 1 as image.Rectangle is exclusive on the high end
-		rect.Max.X += 1
-		rect.Max.Y += 1
 		p.bounds = rect
 	}
 	return p.bounds
