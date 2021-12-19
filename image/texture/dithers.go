@@ -1,7 +1,6 @@
 package texture
 
 import (
-	"image"
 	"image/color"
 	"image/draw"
 	"math/rand"
@@ -37,12 +36,15 @@ var (
 )
 
 // OrderedDither returns an ordered dithered image.
-func OrderedDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float64, mat [][]float64) {
+func OrderedDither(dst draw.Image, c1, c2 color.Color, t float64, mat [][]float64) {
+	r := dst.Bounds()
+
 	if t < 0 {
 		t = 0
 	} else if t > 1 {
 		t = 1
 	}
+
 	nr, nc := len(mat), len(mat[0])
 	for y := r.Min.Y; y < r.Max.Y; y++ {
 		for x := r.Min.X; x < r.Max.X; x++ {
@@ -163,7 +165,9 @@ func SierraLError() *ErrorDiffusion {
 
 // ErrorDither returns an error diffused dithered image using the error matrix. If noise is true, the diffusion
 // weights are randomly +1/-1/0 times the stochastic value.
-func (ed *ErrorDiffusion) ErrorDither(dst draw.Image, r image.Rectangle, c1, c2 color.Color, t float64, noise bool) {
+func (ed *ErrorDiffusion) ErrorDither(dst draw.Image, c1, c2 color.Color, t float64, noise bool) {
+	r := dst.Bounds()
+
 	mat := ed.Mat
 	nr, nc := len(mat), len(mat[0])
 	n := r.Dx() + 2*nc // allow for diffusion at edges

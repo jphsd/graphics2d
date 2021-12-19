@@ -2,17 +2,16 @@ package texture
 
 import (
 	g2d "github.com/jphsd/graphics2d"
-	g2di "github.com/jphsd/graphics2d/image"
-	g2du "github.com/jphsd/graphics2d/util"
-	"image"
 	"image/color"
 	"image/draw"
 	"math"
 )
 
-// Halftone renders colored halftone dots into the rectangle within destination image. Line separation, rotation
+// Halftone renders colored halftone dots into the destination image. Line separation, rotation
 // and percentage fill with a point offset (from {0, 0}) control the dot locations.
-func Halftone(dst draw.Image, r image.Rectangle, c color.Color, perc, sep, rot float64, offs []float64) {
+func Halftone(dst draw.Image, c color.Color, perc, sep, rot float64, offs []float64) {
+	r := dst.Bounds()
+
 	if perc <= 0 {
 		return
 	} else if perc > 1 {
@@ -20,7 +19,7 @@ func Halftone(dst draw.Image, r image.Rectangle, c color.Color, perc, sep, rot f
 	}
 	rad := perc2radius(perc)
 	// Circle path template centered on 0, 0
-	circ := g2d.NewShape(g2d.Circle([]float64{0, 0}, rad*sep))
+	circp := g2d.Circle([]float64{0, 0}, rad*sep)
 
 	// Calculate grid of centers
 	l := r.Max.X
@@ -60,33 +59,22 @@ func Halftone(dst draw.Image, r image.Rectangle, c color.Color, perc, sep, rot f
 	for rot > math.Pi {
 		rot -= math.Pi
 	}
+
 	xfm := g2d.NewAff3()
 	xfm.Translate(offs[0], offs[1])
 	xfm.Rotate(rot)
-
-	// Filter points against expanded r
-	npts := make([][]float64, 0, len(points))
-	bb := [][]float64{
-		{float64(r.Min.X) - sep, float64(r.Min.Y) - sep},
-		{float64(r.Max.X) + sep, float64(r.Max.Y) + sep},
-	}
 	points = xfm.Apply(points...)
-	for _, pt := range points {
-		if pt[0] < bb[0][0] || pt[0] > bb[1][0] || pt[1] < bb[0][1] || pt[1] > bb[1][1] {
-			continue
-		}
-		npts = append(npts, pt)
-	}
-	points = npts
 
-	// Render template at each point into alpha image
-	img := g2di.NewAlpha(r.Max.X, r.Max.Y, color.Transparent)
+	// Construct shape with dots in it at each point location
+	shape := &g2d.Shape{}
 	for _, pt := range points {
-		g2d.RenderShapeAlpha(img, circ, g2du.ToF32(pt...), draw.Over)
+		xfm := g2d.NewAff3()
+		xfm.Translate(pt[0], pt[1])
+		shape.AddPaths(circp.Transform(xfm))
 	}
-	// Use alpha image to write color to destination rectangle
-	filler := image.NewUniform(c)
-	draw.DrawMask(dst, r, filler, image.Point{}, img, r.Min, draw.Over)
+
+	// Write to image
+	g2d.RenderColoredShape(dst, shape, c)
 }
 
 // Precalculated radius to percentage for once dots start to overlap
