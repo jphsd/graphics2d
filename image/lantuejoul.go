@@ -15,7 +15,7 @@ func LJSkeleton(img image.Image, b [][]bool, n int) []*image.Gray {
 	// Convert to grayscale if necessary
 	gray, ok := img.(*image.Gray)
 	if !ok {
-		gray := image.NewGray(r)
+		gray = image.NewGray(r)
 		draw.Draw(gray, r, img, r.Min, draw.Src)
 	}
 

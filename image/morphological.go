@@ -87,7 +87,7 @@ func Morphological(img image.Image, op func([][]uint8, [][]bool) uint8, support 
 	// Convert to grayscale if necessary
 	gray, ok := img.(*image.Gray)
 	if !ok {
-		gray := image.NewGray(r)
+		gray = image.NewGray(r)
 		draw.Draw(gray, r, img, r.Min, draw.Src)
 	}
 

@@ -76,7 +76,7 @@ func process(img1, img2 image.Image, res *image.Gray, offs image.Point, f func(u
 	// Convert to grayscale if necessary
 	gray1, ok := img1.(*image.Gray)
 	if !ok {
-		gray1 := image.NewGray(r)
+		gray1 = image.NewGray(r)
 		draw.Draw(gray1, r, img1, r.Min, draw.Src)
 	}
 
@@ -107,7 +107,7 @@ func Not(img image.Image) *image.Gray {
 	// Convert to grayscale if necessary
 	gray, ok := img.(*image.Gray)
 	if !ok {
-		gray := image.NewGray(r)
+		gray = image.NewGray(r)
 		draw.Draw(gray, r, img, r.Min, draw.Src)
 	}
 
@@ -131,7 +131,7 @@ func Equal(img1, img2 image.Image, offs image.Point) bool {
 	// Convert to grayscale if necessary
 	gray1, ok := img1.(*image.Gray)
 	if !ok {
-		gray1 := image.NewGray(r)
+		gray1 = image.NewGray(r)
 		draw.Draw(gray1, r, img1, r.Min, draw.Src)
 	}
 

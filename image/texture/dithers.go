@@ -1,6 +1,7 @@
 package texture
 
 import (
+	"image"
 	"image/color"
 	"image/draw"
 	"math/rand"
@@ -55,6 +56,38 @@ func OrderedDither(dst draw.Image, c1, c2 color.Color, t float64, mat [][]float6
 			}
 		}
 	}
+}
+
+// ToOrderedDither takes the grayscale version of img and renders it as a black and white dithered image
+// using the specified dither mask.
+func ToOrderedDither(img image.Image, mat [][]float64) *image.Gray {
+	r := img.Bounds()
+	res := image.NewGray(r)
+
+	gray, ok := img.(*image.Gray)
+	if !ok {
+		gray = image.NewGray(r)
+		draw.Draw(gray, r, img, r.Min, draw.Src)
+	}
+
+	nr, nc := len(mat), len(mat[0])
+	scale := 1 / float64(0xff)
+	for y := r.Min.Y; y < r.Max.Y; y++ {
+		goffs := gray.PixOffset(r.Min.X, y)
+		roffs := res.PixOffset(r.Min.X, y)
+		for x := r.Min.X; x < r.Max.X; x++ {
+			val := float64(gray.Pix[goffs]) * scale
+			if val < mat[y%nr][x%nc] {
+				res.Pix[roffs] = 0x00 // Black
+			} else {
+				res.Pix[roffs] = 0xff // White
+			}
+			goffs++
+			roffs++
+		}
+	}
+
+	return res
 }
 
 // Error Diffusion Dithers
@@ -254,4 +287,104 @@ func closest(v float64) float64 {
 		return 0
 	}
 	return 1
+}
+
+// ToErrorDither takes the grayscale version of img and renders it as a black and white dithered image
+// using the specified error dither.
+func (ed *ErrorDiffusion) ToErrorDither(img image.Image) *image.Gray {
+	r := img.Bounds()
+	res := image.NewGray(r)
+
+	gray, ok := img.(*image.Gray)
+	if !ok {
+		gray = image.NewGray(r)
+		draw.Draw(gray, r, img, r.Min, draw.Src)
+	}
+
+	mat := ed.Mat
+	nr, nc := len(mat), len(mat[0])
+
+	rows := make([][]float64, nr)
+	for i := 0; i < nr; i++ {
+		rows[i] = loadImgRow(gray, r.Min.Y+i, nc)
+	}
+
+	// Convert image
+	for y := r.Min.Y; y < r.Max.Y; y++ {
+		row := ed.runImgErrorRow(rows, gray, y, nc)
+		i := nc
+		roffs := res.PixOffset(r.Min.X, y)
+		for x := r.Min.X; x < r.Max.X; x++ {
+			if row[i] < 0.5 {
+				res.Pix[roffs] = 0x0
+			} else {
+				res.Pix[roffs] = 0xff
+			}
+			roffs++
+			i++
+		}
+	}
+
+	return res
+}
+
+func (ed *ErrorDiffusion) runImgErrorRow(rows [][]float64, img *image.Gray, y, nc int) []float64 {
+	mat := ed.Mat
+	nr, nc := len(mat), len(mat[0])
+	e := nc / 2 // number of cells to L or R of midpoint
+	n := len(rows[0])
+
+	for c := e; c < n-e; c++ {
+		pv := rows[0][c]
+		pnv := closest(pv)
+		rows[0][c] = pnv
+		err := pv - pnv
+		// Spread the error
+		for i := e + 1; i < nc; i++ {
+			rows[0][c+i-e] += err * mat[0][i]
+		}
+		for r := 1; r < nr; r++ {
+			for i := 0; i < nc; i++ {
+				rows[r][c+i-e] += err * mat[r][i]
+			}
+		}
+	}
+
+	// Capture result and update rows
+	// TODO - use copy()
+	res := rows[0]
+	for i := 1; i < nr; i++ {
+		rows[i-1] = rows[i]
+	}
+	rows[nr-1] = loadImgRow(img, y+nr, nc)
+	return res
+}
+
+func loadImgRow(img *image.Gray, y, nc int) []float64 {
+	r := img.Bounds()
+	dx := r.Dx()
+	w := dx + 2*nc
+	res := make([]float64, w)
+	if y >= r.Max.Y {
+		for i := 0; i < w; i++ {
+			res[i] = 0
+		}
+		return res
+	}
+
+	goffs := img.PixOffset(r.Min.X, y)
+	scale := 1 / float64(0xff)
+	v := float64(img.Pix[goffs]) * scale
+	for i := 0; i < nc; i++ {
+		res[i] = v
+	}
+	for i := nc; i < dx+nc; i++ {
+		v = float64(img.Pix[goffs]) * scale
+		res[i] = v
+		goffs++
+	}
+	for i := dx + nc; i < w; i++ {
+		res[i] = v
+	}
+	return res
 }
