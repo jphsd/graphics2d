@@ -267,9 +267,7 @@ func (ed *ErrorDiffusion) runErrorRow(rows [][]float64, t float64, noise bool) [
 
 	// Capture result and update rows
 	res := rows[0]
-	for i := 1; i < nr; i++ {
-		rows[i-1] = rows[i]
-	}
+	copy(rows[0:], rows[1:])
 	rows[nr-1] = loadRow(t, n)
 	return res
 }
@@ -351,11 +349,8 @@ func (ed *ErrorDiffusion) runImgErrorRow(rows [][]float64, img *image.Gray, y, n
 	}
 
 	// Capture result and update rows
-	// TODO - use copy()
 	res := rows[0]
-	for i := 1; i < nr; i++ {
-		rows[i-1] = rows[i]
-	}
+	copy(rows[0:], rows[1:])
 	rows[nr-1] = loadImgRow(img, y+nr, nc)
 	return res
 }

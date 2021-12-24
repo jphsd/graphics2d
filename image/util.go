@@ -7,6 +7,12 @@ import (
 	"image/draw"
 	"image/png"
 	"os"
+
+	_ "golang.org/x/image/bmp"
+	_ "golang.org/x/image/tiff"
+	_ "golang.org/x/image/webp"
+	_ "image/jpeg"
+	_ "image/png"
 )
 
 // NewRGBA is a wrapper for image.RGBA which returns a new image of the desired size filled with color.
@@ -85,4 +91,18 @@ func SaveImage(img image.Image, name string) error {
 		return err
 	}
 	return nil
+}
+
+// ReadImage is a utility function to read an image from a file.
+func ReadImage(name string) (image.Image, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	img, _, err := image.Decode(f)
+	if err != nil {
+		return nil, err
+	}
+	return img, nil
 }
