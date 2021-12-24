@@ -1,8 +1,6 @@
 name: Create repo diagram
-on:
-  push:
-    branches:
-      - master
+on: workflow_dispatch
+
 jobs:
   get_data:
     runs-on: ubuntu-latest
