@@ -32,7 +32,7 @@ const RenderFlatten = 0.6
 func RenderShapeExt(dst draw.Image, shape *Shape, filler image.Image, foffs image.Point, clip *image.Alpha, coffs image.Point, op draw.Op) {
 	rect := dst.Bounds()
 
-	// To avoid unneccessary work, reduce the rasterizer size to the shape width and height
+	// To avoid unnecessary work, reduce the rasterizer size to the shape width and height
 	// clipped by the destination image bounds
 	srect := shape.Bounds()
 	srect = rect.Intersect(srect)

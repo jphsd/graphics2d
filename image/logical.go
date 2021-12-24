@@ -40,7 +40,7 @@ func Or(img1, img2 image.Image, offs image.Point) *image.Gray {
 	return res
 }
 
-// Xor returns of XORing img1 wih img2, offset by offs (union - intersection). The images are converted to
+// Xor returns of XORing img1 with img2, offset by offs (union - intersection). The images are converted to
 // image.Gray if not already so. For a pair of pixels, p1 ^ p2 returns min(max(p1, p2), 1-min(p1, p2)).
 func Xor(img1, img2 image.Image, offs image.Point) *image.Gray {
 	r := img1.Bounds()
