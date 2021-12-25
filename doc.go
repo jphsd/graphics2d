@@ -25,13 +25,13 @@ A pen is a combination of a color (or image), a stroke and a transformation from
 space. If you're defining operations in the same space as the image, then the transformation is
 simply the identity transformation. If, however, say your operations are in a space [0, 1]^2, then
 you'd specify a transformation that maps [0, 1] => [0, width-1] etc. (i.e. scale by image width and
-height). Note that this transforamtion is applied *after* the stroke, so for a 1 pixel wide stroke
+height). Note that this transformation is applied *after* the stroke, so for a 1 pixel wide stroke
 the stroke width would be 1 / width. You don't have to use pens, you can use the RenderShape, PathProcessor,
 image filler and transformation functions directly. Pens just provide a convenient abstraction.
 
 Note that if the image is written to every graphics operation (as it is with the Draw*() functions), this
-will kill performance as the entire image is written every time. It's better to collect all the operations
-associated with a color in a shape and then render that shape once.
+can kill performance as the image defined by the shape's bounds is written every time. It's better to collect
+all the operations associated with a color in a shape and then render that shape once.
 
 The PathProcessor interface is where the magic happens. Given a path, a function implementing this
 interface returns a collection of paths derived from it. This allows for stroking, dashing and a variety
@@ -59,7 +59,7 @@ of other possibilities:
 
 Shapes are rendered with the render functions. Paths are forced closed when rendered (see shapes
 above). Convenience methods are provided for rendering with a single color or an image (see also pens,
-above). The full render function allows a clip mask and offset to be supplied, and the draw.Op to be specified.
+above). The full render function allows a clip mask to be supplied, and the draw.Op to be specified.
 
 The Aff3 type provides the ability to specify affine transforms on Paths and Shapes.
 
@@ -76,7 +76,9 @@ Utility functions are provided to generate common forms of paths:
   Ellipse
   EllipticalArc
   EllipticalArcFromPoint
+  Lune
   RegularPolygon
+  ReentrantPolygon
 
 A shape function is provided to capture glyphs:
   GlyphToShape

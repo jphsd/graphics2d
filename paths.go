@@ -242,3 +242,65 @@ func ReentrantPolygon(c []float64, r float64, n int, t, ang float64) *Path {
 	np.Close()
 	return np
 }
+
+// Lune returns a closed path made up of two arcs with end points at c plus/minus r, rotated by th. The arcs
+// are calculated from the circumcircles of the two triangles defined by the end points and c displaced by
+// r1 or r2.
+func Lune(c []float64, r0, r1, r2, th float64) *Path {
+	a, b := []float64{c[0], c[1] + r0}, []float64{c[0], c[1] - r0}
+
+	var p1, p2 *Path
+
+	if util.Equals(r1, 0) {
+		p1 = Line(a, b)
+	} else {
+		d := []float64{c[0] + r1, c[1]}
+		cc := util.Circumcircle(a, b, d)
+		var dx float64
+		if c[0] < cc[0] {
+			dx = cc[0] - c[0]
+		} else {
+			dx = c[0] - cc[0]
+		}
+		ang := 2 * math.Atan(r0/dx)
+		// min or maj ang - Does cc lie between c and d?
+		if (c[0] < d[0] && c[0] < cc[0]) || (c[0] > d[0] && cc[0] < c[0]) {
+			ang = 2*math.Pi - ang
+		}
+		// Ang direction
+		if cc[0] < d[0] {
+			ang = -ang
+		}
+		p1 = ArcFromPoint(a, cc, ang, ArcOpen)
+	}
+
+	if util.Equals(r2, 0) {
+		p2 = Line(b, a)
+	} else {
+		d := []float64{c[0] + r2, c[1]}
+		cc := util.Circumcircle(a, b, d)
+		var dx float64
+		if c[0] < cc[0] {
+			dx = cc[0] - c[0]
+		} else {
+			dx = c[0] - cc[0]
+		}
+		ang := 2 * math.Atan(r0/dx)
+		// min or maj ang - Does cc lie between c and d?
+		if (c[0] < d[0] && c[0] < cc[0]) || (c[0] > d[0] && cc[0] < c[0]) {
+			ang = 2*math.Pi - ang
+		}
+		// Ang direction
+		if cc[0] > d[0] {
+			ang = -ang
+		}
+		p2 = ArcFromPoint(b, cc, ang, ArcOpen)
+	}
+
+	p1.Concatenate(p2)
+	p1.Close()
+	xfm := NewAff3()
+	xfm.RotateAbout(th, c[0], c[1])
+	p1 = p1.Transform(xfm)
+	return p1
+}

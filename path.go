@@ -121,7 +121,7 @@ func (p *Path) Concatenate(paths ...*Path) error {
 	return nil
 }
 
-// ConcatenatePaths concatenates all the paths int a new path. If any path is closed then an error
+// ConcatenatePaths concatenates all the paths into a new path. If any path is closed then an error
 // is returned. If the paths aren't coincident, then they are joined with a line.
 func ConcatenatePaths(paths ...*Path) (*Path, error) {
 	if len(paths) == 0 {

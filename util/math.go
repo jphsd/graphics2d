@@ -219,3 +219,17 @@ func MinD(pts ...[]float64) int {
 	}
 	return d
 }
+
+// Circumcircle returns the circle (center and radius) that passes through the three points.
+func Circumcircle(p1, p2, p3 []float64) []float64 {
+	// Translate p1, p2 and p3 s.t. p1 is at the origin
+	b := []float64{p2[0] - p1[0], p2[1] - p1[1]}
+	b2 := b[0]*b[0] + b[1]*b[1]
+	c := []float64{p3[0] - p1[0], p3[1] - p1[1]}
+	c2 := c[0]*c[0] + c[1]*c[1]
+	d := 2 * (b[0]*c[1] - c[0]*b[1])
+	d = 1 / d
+	u := []float64{(c[1]*b2 - b[1]*c2) * d, (b[0]*c2 - c[0]*b2) * d}
+	r2 := u[0]*u[0] + u[1]*u[1]
+	return []float64{u[0] + p1[0], u[1] + p1[1], math.Sqrt(r2)}
+}
