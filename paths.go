@@ -2,6 +2,7 @@ package graphics2d
 
 import (
 	"math"
+	"math/rand"
 
 	"github.com/jphsd/graphics2d/util"
 )
@@ -241,6 +242,74 @@ func ReentrantPolygon(c []float64, r float64, n int, t, ang float64) *Path {
 	}
 	np.Close()
 	return np
+}
+
+// IrregularPolygon returns an n sided polgon guarenteed to be located within a circle of radius r centered on cp.
+// If nr is set to true then polygon is forced to be non-reentrant.
+func IrregularPolygon(cp []float64, r float64, n int, nr bool) *Path {
+	if n < 3 {
+		n = 3
+	}
+	tinc := 2 * math.Pi / float64(n)
+	toffs := 2 * math.Pi * rand.Float64()
+	fs := make([]float64, n)
+	rs := make([][]float64, n)
+	ps := make([][]float64, n)
+	for i := 0; i < n; i++ {
+		f := rand.Float64()
+		if f < 0.1 {
+			f = 0.1
+		}
+		fs[i] = f
+		xr, yr := math.Cos(toffs)*r, math.Sin(toffs)*r
+		rs[i] = []float64{xr + cp[0], yr + cp[1]}
+		ps[i] = []float64{xr*f + cp[0], yr*f + cp[1]}
+		toffs += tinc
+	}
+
+	// Iterate until none are reentrant
+	nrc := 0
+	cur := 0
+	for nr && nrc < n {
+		// See where intersection lies
+		var pre, post []float64
+		if cur == 0 {
+			pre = ps[n-1]
+		} else {
+			pre = ps[cur-1]
+		}
+		if cur == n-1 {
+			post = ps[0]
+		} else {
+			post = ps[cur+1]
+		}
+		isect, _ := util.IntersectionTValsP(cp, rs[cur], pre, post)
+		if isect[0] > fs[cur] {
+			// Move point outwards
+			fs[cur] = isect[0] + 0.1
+			if fs[cur] > 1 {
+				fs[cur] = 1
+			}
+			ps[cur] = []float64{(rs[cur][0]-cp[0])*fs[cur] + cp[0], (rs[cur][1]-cp[1])*fs[cur] + cp[1]}
+			cur++
+			if cur == n {
+				cur = 0
+			}
+			nrc = 0
+			continue
+		}
+		cur++
+		if cur == n {
+			cur = 0
+		}
+		nrc++
+	}
+	path := NewPath(ps[0])
+	for i := 1; i < n; i++ {
+		path.AddStep(ps[i])
+	}
+	path.Close()
+	return path
 }
 
 // Lune returns a closed path made up of two arcs with end points at c plus/minus r, rotated by th. The arcs
