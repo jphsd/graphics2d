@@ -1,5 +1,7 @@
 package util
 
+import "math"
+
 // TriArea returns the signed area of a triangle by finding the determinant of
 // M = {{p1[0] p1[1] 1}
 //      {p2[0] p2[1] 1}
@@ -40,4 +42,46 @@ func Barycentric(p, tp1, tp2, tp3 []float64) (float64, float64, float64) {
 // InverseBarycentric converts Barycentric weights plus the three non-coincident points back into a point on the plane.
 func InverseBarycentric(w1, w2, w3 float64, tp1, tp2, tp3 []float64) []float64 {
 	return []float64{w1*tp1[0] + w2*tp2[0] + w3*tp3[0], w1*tp1[1] + w2*tp2[1] + w3*tp3[1]}
+}
+
+// Dejitter takes a list of points, greater than three long, and removes the one that forms the smallest area triangle
+// with its adjacent points. If closed is true then the end points are candidates for elimination too.
+func Dejitter(closed bool, pts ...[]float64) [][]float64 {
+	n := len(pts)
+	if n < 4 {
+		return pts
+	}
+
+	min := math.MaxFloat64
+	mi := 0
+	if closed {
+		v := TriArea(pts[n-1], pts[0], pts[1])
+		if v < 0 {
+			v = -v
+		}
+		if v < min {
+			min = v
+		}
+		v = TriArea(pts[n-2], pts[n-1], pts[0])
+		if v < 0 {
+			v = -v
+		}
+		if v < min {
+			min = v
+			mi = n - 1
+		}
+	}
+	for i := 1; i < n-1; i++ {
+		v := TriArea(pts[i-1], pts[i], pts[i+1])
+		if v < 0 {
+			v = -v
+		}
+		if v < min {
+			min = v
+			mi = i
+		}
+	}
+	// Remove mi'th point
+	copy(pts[mi:], pts[mi+1:])
+	return pts[:len(pts)-1]
 }

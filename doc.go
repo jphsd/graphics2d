@@ -79,6 +79,7 @@ Utility functions are provided to generate common forms of paths:
   Lune
   RegularPolygon
   ReentrantPolygon
+  IrregularPolygon
 
 A shape function is provided to capture glyphs:
   GlyphToShape

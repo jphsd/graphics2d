@@ -244,7 +244,7 @@ func ReentrantPolygon(c []float64, r float64, n int, t, ang float64) *Path {
 	return np
 }
 
-// IrregularPolygon returns an n sided polgon guarenteed to be located within a circle of radius r centered on cp.
+// IrregularPolygon returns an n sided polgon guaranteed to be located within a circle of radius r centered on cp.
 // If nr is set to true then polygon is forced to be non-reentrant.
 func IrregularPolygon(cp []float64, r float64, n int, nr bool) *Path {
 	if n < 3 {
