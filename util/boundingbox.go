@@ -63,3 +63,14 @@ func BBContains(p []float64, bb [][]float64) bool {
 	}
 	return true
 }
+
+// BBFilter returns only points from pts that are in bb at the smallest dimensionality.
+func BBFilter(pts [][]float64, bb [][]float64) [][]float64 {
+	res := [][]float64{}
+	for _, p := range pts {
+		if BBContains(p, bb) {
+			res = append(res, p)
+		}
+	}
+	return res
+}
