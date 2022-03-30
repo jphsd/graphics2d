@@ -285,3 +285,28 @@ func (a *Aff3) Apply(pts ...[]float64) [][]float64 {
 	}
 	return npts
 }
+
+// ScaleAndInset produces a transform that will scale and translate a set of points bounded by bb so they fit inside the
+// inset box described by width, height, iwidth, iheight located at {0, 0}. If fix is true then the aspect ratio is maintained.
+func ScaleAndInset(width, height, iwidth, iheight float64, fix bool, bb [][]float64) *Aff3 {
+	ox, oy := bb[0][0], bb[0][1]
+	dx, dy := bb[1][0]-ox, bb[1][1]-oy
+
+	w := width - 2*iwidth
+	h := height - 2*iheight
+
+	xfm := NewAff3()
+	xfm.Translate(width/2, height/2)
+	if fix {
+		s := dx
+		if dy > s {
+			s = dy
+		}
+		xfm.Scale(w/s, h/s)
+	} else {
+		xfm.Scale(w/dx, h/dy)
+	}
+	xfm.Translate(-(ox + dx/2), -(oy + dy/2))
+
+	return xfm
+}
