@@ -48,7 +48,11 @@ func (rp *RoundedProc) Process(p *Path) []*Path {
 		}
 	}
 
-	return []*Path{PartsToPath(res...)}
+	path := PartsToPath(res...)
+	if p.Closed() {
+		path.Close()
+	}
+	return []*Path{path}
 }
 
 // Return p1-p2, p2-p3 intercepts and c, and final r and theta

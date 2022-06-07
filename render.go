@@ -24,8 +24,11 @@ func RenderShape(dst draw.Image, shape *Shape, filler image.Image, foffs image.P
 	RenderShapeExt(dst, shape, filler, foffs, nil, image.Point{}, draw.Over)
 }
 
-// RenderFlatten is the standard curve flattening value used when rendering.
-const RenderFlatten = 0.6
+// DefaultRenderFlatten is the standard curve flattening value.
+const DefaultRenderFlatten = 0.6
+
+// RenderFlatten is the curve flattening value used when rendering.
+var RenderFlatten = DefaultRenderFlatten
 
 // RenderShapeExt renders the supplied shape with the fill and clip images into
 // the destination image using op.

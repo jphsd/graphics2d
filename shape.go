@@ -142,3 +142,13 @@ func (s *Shape) String() string {
 	}
 	return str
 }
+
+// PointInShape returns true if the point is contained within any path within the shape.
+func (s *Shape) PointInShape(pt []float64) bool {
+	for _, path := range s.paths {
+		if path.PointInPath(pt) {
+			return true
+		}
+	}
+	return false
+}

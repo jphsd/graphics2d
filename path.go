@@ -243,7 +243,7 @@ func cpWithinD2(d2 float64, pts [][]float64) bool {
 	}
 	start, cpts, end := pts[0], pts[1:l-1], pts[l-1]
 	for _, cp := range cpts {
-		pd2 := util.DistanceToLineSquared(start, end, cp)
+		pd2, _, _ := util.DistanceToLineSquared(start, end, cp)
 		if pd2 > d2 {
 			return false
 		}
@@ -725,4 +725,19 @@ func bs(pt []float64, ts, ds, te, de float64, part [][]float64) ([]float64, floa
 		return pl, d1
 	}
 	return pr, d2
+}
+
+// PointInPath returns if a point is contained within a closed path according to the
+// setting of util.WindingRule. If the path is not closed then false is returned, regardless.
+func (p *Path) PointInPath(pt []float64) bool {
+	if !p.closed {
+		return false
+	}
+	fp := p.Flatten(RenderFlatten)
+	parts := fp.Parts()
+	poly := make([][]float64, len(parts))
+	for i, part := range parts {
+		poly[i] = part[0]
+	}
+	return util.PointInPoly(pt, poly...)
 }

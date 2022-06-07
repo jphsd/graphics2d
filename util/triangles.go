@@ -82,6 +82,13 @@ func Dejitter(closed bool, pts ...[]float64) [][]float64 {
 		}
 	}
 	// Remove mi'th point
-	copy(pts[mi:], pts[mi+1:])
-	return pts[:len(pts)-1]
+	if mi == 0 {
+		pts[0] = nil
+		return pts[1:]
+	} else if mi != n-1 {
+		copy(pts[mi:], pts[mi+1:])
+	}
+	n--
+	pts[n] = nil
+	return pts[:n]
 }

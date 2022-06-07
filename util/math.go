@@ -94,30 +94,32 @@ func DistanceE(p1, p2 []float64) float64 {
 }
 
 // DistanceToLineSquared calculates the squared Euclidean length of the normal from a point to
-// the line.
-func DistanceToLineSquared(lp1, lp2, p []float64) float64 {
+// the line. Returns the distance squared, the line intercept and the t value.
+func DistanceToLineSquared(lp1, lp2, p []float64) (float64, []float64, float64) {
 	dx := lp2[0] - lp1[0]
 	dy := lp2[1] - lp1[1]
 	// Check for line degeneracy
 	if Equals(0, dx) && Equals(0, dy) {
-		return DistanceESquared(lp1, p)
+		return DistanceESquared(lp1, p), lp1, 0
 	}
 	qx := p[0] + dy
 	qy := p[1] - dx
 	ts, err := IntersectionTVals(lp1[0], lp1[1], lp2[0], lp2[1], p[0], p[1], qx, qy)
 	if err != nil {
-		return DistanceESquared(lp1, p)
+		return DistanceESquared(lp1, p), lp1, 0
 	}
-	dx = Lerp(ts[1], p[0], qx) - p[0]
-	dy = Lerp(ts[1], p[1], qy) - p[1]
-	return dx*dx + dy*dy
+	t := ts[1]
+	ip := []float64{Lerp(t, p[0], qx), Lerp(t, p[1], qy)}
+	dx = ip[0] - p[0]
+	dy = ip[1] - p[1]
+	return dx*dx + dy*dy, ip, ts[0]
 }
 
-// SideOfLine calculates which side of a line a point is one by calculating the dot product of the
+// SideOfLine calculates which side of a line a point is one by calculating the cross product of the
 // vector from the line start to the point with the line's normal. If +ve then one side, -ve the other,
 // 0 - on the line.
 func SideOfLine(lp1, lp2, p []float64) float64 {
-	return (p[0]-lp1[0])*(lp2[1]-lp1[1]) - (p[1]-lp1[1])*(lp2[0]-lp1[0])
+	return CrossProduct(lp1, lp2, p)
 }
 
 // ToF64 casts a slice of float32 to float64.
@@ -164,6 +166,8 @@ func Centroid(pts ...[]float64) []float64 {
 }
 
 // CrossProduct returns the cross product of the three points.
+// Since the inputs are all in the x-y plane, only the magnitude of the resultant
+// z vector is returned (the x and y vectors are both 0).
 func CrossProduct(p1, p2, p3 []float64) float64 {
 	return (p3[0]-p1[0])*(p2[1]-p1[1]) - (p3[1]-p1[1])*(p2[0]-p1[0])
 }
