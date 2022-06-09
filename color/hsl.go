@@ -107,7 +107,7 @@ func NewHSL(col color.Color) *HSL {
 }
 
 // Complement returns the color's complement.
-func Complement(col color.Color) color.Color {
+func Complement(col color.Color) *HSL {
 	hsl := NewHSL(col)
 	hsl.H += 0.5
 	if hsl.H > 1 {
@@ -119,11 +119,11 @@ func Complement(col color.Color) color.Color {
 // Monochrome returns the color's monochrome palette (excluding black and white).
 // Note the palette may not contain the original color since the values are equally
 // spaced over L.
-func Monochrome(col color.Color, n int) []color.Color {
+func Monochrome(col color.Color, n int) []*HSL {
 	if n < 2 {
-		return []color.Color{NewHSL(col)}
+		return []*HSL{NewHSL(col)}
 	}
-	res := make([]color.Color, n)
+	res := make([]*HSL, n)
 	dl := 1.0 / float64(n-1)
 	l := dl
 	for i := 0; i < n; i++ {
@@ -136,7 +136,7 @@ func Monochrome(col color.Color, n int) []color.Color {
 }
 
 // Analogous returns the color's analogous colors.
-func Analogous(col color.Color) []color.Color {
+func Analogous(col color.Color) []*HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	d := 1 / float64(12)
 	a1.H += d
@@ -147,11 +147,11 @@ func Analogous(col color.Color) []color.Color {
 	if a2.H < 0 {
 		a2.H += 1
 	}
-	return []color.Color{a1, a2}
+	return []*HSL{a1, a2}
 }
 
 // Triad returns the color's other two triadics.
-func Triad(col color.Color) []color.Color {
+func Triad(col color.Color) []*HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	d := 1 / float64(3)
 	a1.H += d
@@ -162,11 +162,11 @@ func Triad(col color.Color) []color.Color {
 	if a2.H < 0 {
 		a2.H += 1
 	}
-	return []color.Color{a1, a2}
+	return []*HSL{a1, a2}
 }
 
 // Tetrad returns the color's other three tetradics.
-func Tetrad(col color.Color) []color.Color {
+func Tetrad(col color.Color) []*HSL {
 	a1, a2, a3 := NewHSL(col), NewHSL(col), NewHSL(col)
 	d := 0.25
 	a1.H += d
@@ -181,11 +181,11 @@ func Tetrad(col color.Color) []color.Color {
 	if a3.H > 1 {
 		a3.H -= 1
 	}
-	return []color.Color{a1, a3, a2}
+	return []*HSL{a1, a3, a2}
 }
 
 // Warmer returns the color shifted towards red.
-func Warmer(col color.Color) color.Color {
+func Warmer(col color.Color) *HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.H, 0) {
 		return hsl
@@ -207,7 +207,7 @@ func Warmer(col color.Color) color.Color {
 }
 
 // Cooler returns the color shifted toward cyan.
-func Cooler(col color.Color) color.Color {
+func Cooler(col color.Color) *HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.H, 0.5) {
 		return hsl
@@ -229,7 +229,7 @@ func Cooler(col color.Color) color.Color {
 }
 
 // Tint returns the color shifted towards white.
-func Tint(col color.Color) color.Color {
+func Tint(col color.Color) *HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.L, 1) {
 		return hsl
@@ -243,7 +243,7 @@ func Tint(col color.Color) color.Color {
 }
 
 // Shade returns the color shifted towards black.
-func Shade(col color.Color) color.Color {
+func Shade(col color.Color) *HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.L, 0) {
 		return hsl
@@ -257,7 +257,7 @@ func Shade(col color.Color) color.Color {
 }
 
 // Boost returns the color shifted away from gray.
-func Boost(col color.Color) color.Color {
+func Boost(col color.Color) *HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.S, 1) {
 		return hsl
@@ -271,7 +271,7 @@ func Boost(col color.Color) color.Color {
 }
 
 // Tone returns the color shifted towards gray.
-func Tone(col color.Color) color.Color {
+func Tone(col color.Color) *HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.S, 0) {
 		return hsl
@@ -285,11 +285,11 @@ func Tone(col color.Color) color.Color {
 }
 
 // Compound returns the colors analogous to the color's complement.
-func Compound(col color.Color) []color.Color {
+func Compound(col color.Color) []*HSL {
 	return Analogous(Complement(col))
 }
 
 // RandomHue returns an HSL color with a randon hue, fully saturated and 50% lightness.
-func RandomHue() color.Color {
+func RandomHue() *HSL {
 	return &HSL{rand.Float64(), 1, 0.5, 1}
 }
