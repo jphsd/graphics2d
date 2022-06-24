@@ -1,6 +1,7 @@
 package graphics2d
 
 import (
+	"encoding/json"
 	"fmt"
 	"image"
 	"math"
@@ -151,4 +152,30 @@ func (s *Shape) PointInShape(pt []float64) bool {
 		}
 	}
 	return false
+}
+
+type shapeJSON struct {
+	Paths []*Path
+}
+
+// MarshalJSON implements the encoding.json.Marshaler interface
+func (s *Shape) MarshalJSON() ([]byte, error) {
+	return json.Marshal(shapeJSON{s.paths})
+}
+
+// UnmarshalJSON implements the encoding.json.Unmarshaler interface
+func (s *Shape) UnmarshalJSON(b []byte) error {
+	var sj shapeJSON
+	err := json.Unmarshal(b, &sj)
+	if err != nil {
+		return err
+	}
+	s.paths = sj.Paths
+
+	// Reset everything else
+	s.bounds = image.Rectangle{}
+	s.mask = nil
+	s.parent = nil
+
+	return nil
 }
