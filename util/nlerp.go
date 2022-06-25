@@ -111,8 +111,8 @@ func (nl *NLCube) InvTransform(v float64) float64 {
 
 // NLExponential v = (exp(t*k) - 1) * scale
 type NLExponential struct {
-	k     float64
-	scale float64
+	K     float64
+	Scale float64
 }
 
 func NewNLExponential(k float64) *NLExponential {
@@ -120,17 +120,17 @@ func NewNLExponential(k float64) *NLExponential {
 }
 
 func (nl *NLExponential) Transform(t float64) float64 {
-	return (math.Exp(t*nl.k) - 1) * nl.scale
+	return (math.Exp(t*nl.K) - 1) * nl.Scale
 }
 
 func (nl *NLExponential) InvTransform(v float64) float64 {
-	return math.Log1p(v/nl.scale) / nl.k
+	return math.Log1p(v/nl.Scale) / nl.K
 }
 
 // NLLogarithmic v = log(1+t*k) * scale
 type NLLogarithmic struct {
-	k     float64
-	scale float64
+	K     float64
+	Scale float64
 }
 
 func NewNLLogarithmic(k float64) *NLLogarithmic {
@@ -138,11 +138,11 @@ func NewNLLogarithmic(k float64) *NLLogarithmic {
 }
 
 func (nl *NLLogarithmic) Transform(t float64) float64 {
-	return math.Log1p(t*nl.k) * nl.scale
+	return math.Log1p(t*nl.K) * nl.Scale
 }
 
 func (nl *NLLogarithmic) InvTransform(v float64) float64 {
-	return (math.Exp(v/nl.scale) - 1) / nl.k
+	return (math.Exp(v/nl.Scale) - 1) / nl.K
 }
 
 // NLSin v = sin(t) with t mapped to [-Pi/2,Pi/2]
@@ -213,7 +213,7 @@ func (nl *NLCatenary) InvTransform(v float64) float64 {
 
 // NLGauss v = gauss(t, k)
 type NLGauss struct {
-	k, offs, scale float64
+	K, Offs, Scale float64
 }
 
 func NewNLGauss(k float64) *NLGauss {
@@ -223,23 +223,23 @@ func NewNLGauss(k float64) *NLGauss {
 }
 
 func (nl *NLGauss) Transform(t float64) float64 {
-	x := nl.k * (t - 1)
+	x := nl.K * (t - 1)
 	x *= -0.5 * x
-	return (math.Exp(x) - nl.offs) * nl.scale
+	return (math.Exp(x) - nl.Offs) * nl.Scale
 }
 
 func (nl *NLGauss) InvTransform(v float64) float64 {
-	v /= nl.scale
-	v += nl.offs
+	v /= nl.Scale
+	v += nl.Offs
 	v = math.Log(v)
 	v *= -2
 	v = math.Sqrt(v)
-	return 1 - v/nl.k
+	return 1 - v/nl.K
 }
 
 // NLLogistic v = logistic(t, k, mp)
 type NLLogistic struct {
-	k, mp, offs, scale float64
+	K, Mp, Offs, Scale float64
 }
 
 // k > 0 and mp (0,1) - not checked
@@ -252,15 +252,15 @@ func NewNLLogistic(k, mp float64) *NLLogistic {
 }
 
 func (nl *NLLogistic) Transform(t float64) float64 {
-	t = (t - nl.mp) * nl.k
-	return (logisticTransform(t) - nl.offs) * nl.scale
+	t = (t - nl.Mp) * nl.K
+	return (logisticTransform(t) - nl.Offs) * nl.Scale
 }
 
 func (nl *NLLogistic) InvTransform(v float64) float64 {
-	v /= nl.scale
-	v += nl.offs
+	v /= nl.Scale
+	v += nl.Offs
 	v = logisticInvTransform(v)
-	return v/nl.k + nl.mp
+	return v/nl.K + nl.Mp
 }
 
 // L = 1, k = 1, mp = 0
@@ -297,7 +297,7 @@ func (nl *NLP5) InvTransform(v float64) float64 {
 
 // NLCompound v = nl[0](nl[1](nl[2](...nl[n-1](t))))
 type NLCompound struct {
-	fs []NonLinear
+	Fs []NonLinear
 }
 
 func NewNLCompound(fs []NonLinear) *NLCompound {
@@ -305,7 +305,7 @@ func NewNLCompound(fs []NonLinear) *NLCompound {
 }
 
 func (nl *NLCompound) Transform(t float64) float64 {
-	for _, f := range nl.fs {
+	for _, f := range nl.Fs {
 		t = f.Transform(t)
 	}
 
@@ -313,15 +313,15 @@ func (nl *NLCompound) Transform(t float64) float64 {
 }
 
 func (nl *NLCompound) InvTransform(v float64) float64 {
-	for i := len(nl.fs) - 1; i > -1; i-- {
-		v = nl.fs[i].InvTransform(v)
+	for i := len(nl.Fs) - 1; i > -1; i-- {
+		v = nl.Fs[i].InvTransform(v)
 	}
 	return v
 }
 
 // NLOmt v = 1-f(1-t)
 type NLOmt struct {
-	f NonLinear
+	F NonLinear
 }
 
 func NewNLOmt(f NonLinear) *NLOmt {
@@ -329,11 +329,11 @@ func NewNLOmt(f NonLinear) *NLOmt {
 }
 
 func (nl *NLOmt) Transform(t float64) float64 {
-	return 1 - nl.f.Transform(1-t)
+	return 1 - nl.F.Transform(1-t)
 }
 
 func (nl *NLOmt) InvTransform(v float64) float64 {
-	return 1 - nl.f.InvTransform(1-v)
+	return 1 - nl.F.InvTransform(1-v)
 }
 
 // NewRandNL calculates a collection of ascending values [0,1] with an average increment of mean
