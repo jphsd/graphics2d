@@ -245,9 +245,9 @@ func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {
 	return xfm
 }
 
-// LineTransform2 produces a transform that maps the line {p1, p2} to {p1', p2'} and
+// BoxTransform produces a transform that maps the line {p1, p2} to {p1', p2'} and
 // scales the perpendicular by hp / h. Assumes neither of the lines nor h are degenerate.
-func LineTransform2(x1, y1, x2, y2, h, x1p, y1p, x2p, y2p, hp float64) *Aff3 {
+func BoxTransform(x1, y1, x2, y2, h, x1p, y1p, x2p, y2p, hp float64) *Aff3 {
 	// Calculate the offset, the rotation and the scale
 	ox, oy := x1p-x1, y1p-y1
 	dx, dy, dxp, dyp := x2-x1, y2-y1, x2p-x1p, y2p-y1p
