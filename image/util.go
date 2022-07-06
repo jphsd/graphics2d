@@ -86,11 +86,7 @@ func SaveImage(img image.Image, name string) error {
 		return err
 	}
 	defer fDst.Close()
-	err = png.Encode(fDst, img)
-	if err != nil {
-		return err
-	}
-	return nil
+	return png.Encode(fDst, img)
 }
 
 // ReadImage is a utility function to read an image from a file.
