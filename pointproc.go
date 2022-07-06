@@ -46,6 +46,8 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 		if pp.Points[cp] != nil {
 			var xfm *Aff3
 			switch pp.Rotate {
+			default:
+				fallthrough
 			case RotFixed:
 				xfm = CreateTransform(part[0][0], part[0][1], 1, 0)
 			case RotRelative:
