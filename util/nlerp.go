@@ -336,6 +336,12 @@ func (nl *NLOmt) InvTransform(v float64) float64 {
 	return 1 - nl.F.InvTransform(1-v)
 }
 
+// NLRand uses random incremental steps from a normal distribution, smoothed with a cubic.
+type NLRand struct {
+	Steps []float64
+	Dt    float64
+}
+
 // NewRandNL calculates a collection of ascending values [0,1] with an average increment of mean
 // and standard deviation of std.
 func NewNLRand(mean, std float64, sharp bool) *NLRand {
@@ -343,8 +349,8 @@ func NewNLRand(mean, std float64, sharp bool) *NLRand {
 	steps := []float64{0, 0} // 0 prefix
 	for sum < 1 {
 		v := rand.NormFloat64()*std + mean
-		if v < 0 {
-			v = 0
+		if v < 0.00001 {
+			v = 0.00001
 		}
 		sum += v
 		if sum > 1 {
@@ -361,12 +367,6 @@ func NewNLRand(mean, std float64, sharp bool) *NLRand {
 	return &NLRand{steps, 1.0 / float64(len(steps)-3)}
 }
 
-// NLRand uses random incremental steps from a normal distribution, smoothed with a cubic.
-type NLRand struct {
-	Steps []float64
-	Dt    float64
-}
-
 func (nl *NLRand) Transform(t float64) float64 {
 	// Find steps t is between and use cubic interpolation
 	// to calc v
@@ -374,6 +374,9 @@ func (nl *NLRand) Transform(t float64) float64 {
 	fr := t - fn*nl.Dt
 	frt := fr / nl.Dt
 	n := int(fn)
+	if n+4 > len(nl.Steps) {
+		return 1
+	}
 	p := nl.Steps[n : n+4]
 	return Cubic(frt, p)
 }
