@@ -10,6 +10,8 @@ const (
 // WindingRule defines how edges in an edge crossing polygon are treated.
 var WindingRule = OddEven
 
+// See https://wrfranklin.org/Research/Short_Notes/pnpoly.html for another implementation of the OE rule.
+
 // PointInPoly returns true is a point is within the polygon defined by the list of vertices according to the
 // setting of WindingRule (OddEven or NonZero).
 func PointInPoly(pt []float64, poly ...[]float64) bool {

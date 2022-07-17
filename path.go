@@ -731,8 +731,13 @@ func bs(pt []float64, ts, ds, te, de float64, part [][]float64) ([]float64, floa
 // PointInPath returns if a point is contained within a closed path according to the
 // setting of util.WindingRule. If the path is not closed then false is returned, regardless.
 func (p *Path) PointInPath(pt []float64) bool {
+	return util.PointInPoly(pt, p.Poly()...)
+}
+
+// Poly converts a path into a flat sided polygon. Returns an empty slice if the path isn't closed.
+func (p *Path) Poly() [][]float64 {
 	if !p.closed {
-		return false
+		return [][]float64{}
 	}
 	fp := p.Flatten(RenderFlatten)
 	parts := fp.Parts()
@@ -740,7 +745,7 @@ func (p *Path) PointInPath(pt []float64) bool {
 	for i, part := range parts {
 		poly[i] = part[0]
 	}
-	return util.PointInPoly(pt, poly...)
+	return poly
 }
 
 type pathJSON struct {

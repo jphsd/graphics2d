@@ -17,8 +17,8 @@ var (
 		{false, true, false},
 	}
 
-	// X3 3x3 X
-	X3 = [][]bool{
+	// X4 3x3 X
+	X4 = [][]bool{
 		{true, false, true},
 		{false, true, false},
 		{true, false, true},
