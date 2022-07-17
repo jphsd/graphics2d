@@ -310,3 +310,13 @@ func ScaleAndInset(width, height, iwidth, iheight float64, fix bool, bb [][]floa
 
 	return xfm
 }
+
+// FlipY is a convenience function to create a transform that has +ve Y point up rather than down.
+func FlipY(height float64) *Aff3 {
+	yoffs := height / 2
+	xfm := NewAff3()
+	xfm.Translate(0, yoffs)
+	xfm.Scale(1, -1)
+	xfm.Translate(0, -yoffs)
+	return xfm
+}
