@@ -275,12 +275,16 @@ func CreateTransform(x, y, scale, rotation float64) *Aff3 {
 func (a *Aff3) Apply(pts ...[]float64) [][]float64 {
 	npts := make([][]float64, len(pts))
 	for i, pt := range pts {
-		npt := make([]float64, 2)
+		d := len(pt)
+		npt := make([]float64, d)
 		x, y := pt[0], pt[1]
 		// x' = a[3*0+0]*x + a[3*0+1]*y + a[3*0+2]
 		// y' = a[3*1+0]*x + a[3*1+1]*y + a[3*1+2]
 		npt[0] = a[0]*x + a[1]*y + a[2]
 		npt[1] = a[3]*x + a[4]*y + a[5]
+		for i := 2; i < d; i++ {
+			npt[i] = pt[i]
+		}
 		npts[i] = npt
 	}
 	return npts
