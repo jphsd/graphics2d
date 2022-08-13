@@ -27,6 +27,17 @@ var (
 	Magenta = NewPen(g2dc.Magenta, 1)
 	Cyan    = NewPen(g2dc.Cyan, 1)
 	Orange  = NewPen(g2dc.Orange, 1)
+
+	BlackPen   = Black
+	WhitePen   = White
+	RedPen     = Red
+	GreenPen   = Green
+	BluePen    = Blue
+	YellowPen  = Yellow
+	MagentaPen = Magenta
+	CyanPen    = Cyan
+	OrangePen  = Orange
+	RandomPen  = NewPen(g2dc.Random(), 1)
 )
 
 // NewPen returns a pen that will render a shape with the given pen
