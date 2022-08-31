@@ -31,6 +31,13 @@ func NewRGBAVal(w, h int, r, g, b, a uint8) *image.RGBA {
 	return res
 }
 
+// CopyRGBA clones an RGBA image.
+func CopyRGBA(in *image.RGBA) *image.RGBA {
+	res := &image.RGBA{make([]uint8, len(in.Pix)), in.Stride, in.Rect}
+	copy(res.Pix, in.Pix)
+	return res
+}
+
 // NewAlpha is a wrapper for image.Alpha which returns a new image of the desired size filled with color.
 func NewAlpha(w, h int, col color.Color) *image.Alpha {
 	res := image.NewAlpha(image.Rect(0, 0, w, h))
@@ -44,6 +51,13 @@ func NewAlphaVal(w, h int, a uint8) *image.Alpha {
 	res := image.NewAlpha(image.Rect(0, 0, w, h))
 	bg := image.NewUniform(color.Alpha{a})
 	draw.Draw(res, res.Bounds(), bg, image.Point{}, draw.Src)
+	return res
+}
+
+// CopyAlpha clones an Alpha image.
+func CopyAlpha(in *image.Alpha) *image.Alpha {
+	res := &image.Alpha{make([]uint8, len(in.Pix)), in.Stride, in.Rect}
+	copy(res.Pix, in.Pix)
 	return res
 }
 
@@ -63,6 +77,13 @@ func NewGrayVal(w, h int, g uint8) *image.Gray {
 	return res
 }
 
+// CopyGray clones a Gray image.
+func CopyGray(in *image.Gray) *image.Gray {
+	res := &image.Gray{make([]uint8, len(in.Pix)), in.Stride, in.Rect}
+	copy(res.Pix, in.Pix)
+	return res
+}
+
 // NewGray16 is a wrapper for image.Gray16 which returns a new image of the desired size filled with color.
 func NewGray16(w, h int, col color.Color) *image.Gray16 {
 	res := image.NewGray16(image.Rect(0, 0, w, h))
@@ -76,6 +97,13 @@ func NewGray16Val(w, h int, g uint16) *image.Gray16 {
 	res := image.NewGray16(image.Rect(0, 0, w, h))
 	bg := image.NewUniform(color.Gray16{g})
 	draw.Draw(res, res.Bounds(), bg, image.Point{}, draw.Src)
+	return res
+}
+
+// CopyGray16 clones a Gray16 image.
+func CopyGray16(in *image.Gray16) *image.Gray16 {
+	res := &image.Gray16{make([]uint8, len(in.Pix)), in.Stride, in.Rect}
+	copy(res.Pix, in.Pix)
 	return res
 }
 
