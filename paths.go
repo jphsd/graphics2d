@@ -67,6 +67,19 @@ func PolyLine(pts ...[]float64) *Path {
 	return np
 }
 
+// Polygon returns a closed path with lines joining successive points.
+func Polygon(pts ...[]float64) *Path {
+	if len(pts) == 0 {
+		return nil
+	}
+	np := NewPath(pts[0])
+	for i := 1; i < len(pts); i++ {
+		np.AddStep(pts[i])
+	}
+	np.Close()
+	return np
+}
+
 // Curve returns a path describing the polynomial curve.
 func Curve(pts ...[]float64) *Path {
 	if len(pts) == 0 {
