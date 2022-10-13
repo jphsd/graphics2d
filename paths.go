@@ -185,8 +185,25 @@ func Ellipse(c []float64, rx, ry, xang float64) *Path {
 
 // EllipticalArc returns a path describing an ellipse arc with rx and ry rotated by xang from the x axis.
 func EllipticalArc(c []float64, rx, ry, offs, ang, xang float64, s ArcStyle) *Path {
+	// Angle conversion from elliptical space to circular: offs -> toffs, ang -> tang,
+	// by generating points on unit circle for start and end, transforming them and finding
+	// the new angles.
+	xfm := NewAff3()
+	xfm.Scale(1, rx/ry) // vs inverting the other
+	sx, sy := math.Cos(offs), math.Sin(offs)
+	end := offs + ang
+	ex, ey := math.Cos(end), math.Sin(end)
+	inv := xfm.Apply([]float64{sx, sy}, []float64{ex, ey})
+	toffs, tend := math.Atan2(inv[0][1], inv[0][0]), math.Atan2(inv[1][1], inv[1][0])
+	tang := tend - toffs
+	if ang < 0 && tang > 0 {
+		tang -= math.Pi * 2
+	} else if ang > 0 && tang < 0 {
+		tang += math.Pi * 2
+	}
+
 	ax, ay := c[0], c[1]
-	np := PartsToPath(MakeArcParts(ax, ay, rx, offs-xang, ang)...)
+	np := PartsToPath(MakeArcParts(ax, ay, rx, toffs-xang, tang)...)
 
 	switch s {
 	case ArcChord:
@@ -196,7 +213,7 @@ func EllipticalArc(c []float64, rx, ry, offs, ang, xang float64, s ArcStyle) *Pa
 		np.Close()
 	}
 
-	xfm := NewAff3()
+	xfm = NewAff3()
 	// Reverse order
 	xfm.Translate(ax, ay)
 	xfm.Rotate(xang)
