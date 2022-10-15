@@ -7,6 +7,7 @@ import (
 	"github.com/jphsd/graphics2d/util"
 )
 
+// Mathematical constant.
 const (
 	TwoPi = 2 * math.Pi
 )
