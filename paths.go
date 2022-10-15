@@ -7,12 +7,15 @@ import (
 	"github.com/jphsd/graphics2d/util"
 )
 
+const (
+	TwoPi = 2 * math.Pi
+)
+
 // A collection of part and path creation functions.
 
 // MakeArcParts creates at least one cubic bezier that describes a curve from offs to
 // offs+ang centered on {cx, cy} with radius r.
 func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
-	n := 1
 	a := ang
 	rev := ang < 0
 	if rev {
@@ -21,6 +24,7 @@ func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 
 	// Calculate number of curves to create - necessary since curve errors
 	// are apparent for angles > Pi/2
+	n := 1
 	for true {
 		if a < math.Pi/2 {
 			break
@@ -114,6 +118,20 @@ const (
 
 // Arc returns a path with an arc centered on c with radius r from offs in the direction and length of ang.
 func Arc(c []float64, r, offs, ang float64, s ArcStyle) *Path {
+	// Limit offs and ang to +/- 2 pi
+	for offs > TwoPi {
+		offs -= TwoPi
+	}
+	for offs < -TwoPi {
+		offs += TwoPi
+	}
+	for ang > TwoPi {
+		ang -= TwoPi
+	}
+	for ang < -TwoPi {
+		ang += TwoPi
+	}
+
 	parts := MakeArcParts(c[0], c[1], r, offs, ang)
 	np := PartsToPath(parts...)
 	switch s {
@@ -164,7 +182,7 @@ func PolyArcFromPoint(pt []float64, cs [][]float64, angs []float64) *Path {
 // Circle returns a closed path describing a circle centered on c with radius r.
 func Circle(c []float64, r float64) *Path {
 	ax, ay := c[0], c[1]
-	np := PartsToPath(MakeArcParts(ax, ay, r, 0, 2*math.Pi)...)
+	np := PartsToPath(MakeArcParts(ax, ay, r, 0, TwoPi)...)
 	np.Close()
 	return np
 }
@@ -172,7 +190,7 @@ func Circle(c []float64, r float64) *Path {
 // Ellipse returns a closed path describing an ellipse with rx and ry rotated by xang from the x axis.
 func Ellipse(c []float64, rx, ry, xang float64) *Path {
 	ax, ay := c[0], c[1]
-	np := PartsToPath(MakeArcParts(ax, ay, rx, 0, 2*math.Pi)...)
+	np := PartsToPath(MakeArcParts(ax, ay, rx, 0, TwoPi)...)
 	np.Close()
 	xfm := NewAff3()
 	// Reverse order
@@ -197,9 +215,9 @@ func EllipticalArc(c []float64, rx, ry, offs, ang, xang float64, s ArcStyle) *Pa
 	toffs, tend := math.Atan2(inv[0][1], inv[0][0]), math.Atan2(inv[1][1], inv[1][0])
 	tang := tend - toffs
 	if ang < 0 && tang > 0 {
-		tang -= math.Pi * 2
+		tang -= TwoPi
 	} else if ang > 0 && tang < 0 {
-		tang += math.Pi * 2
+		tang += TwoPi
 	}
 
 	ax, ay := c[0], c[1]
@@ -238,7 +256,7 @@ func EllipticalArcFromPoint(pt, c []float64, rxy, ang, xang float64, s ArcStyle)
 
 // RegularPolygon returns a closed path describing an n-sided polygon given the initial edge.
 func RegularPolygon(pt1, pt2 []float64, n int) *Path {
-	da := 2 * math.Pi / float64(n)
+	da := TwoPi / float64(n)
 	cosDa, sinDa := math.Cos(da), math.Sin(da)
 	dx, dy := pt2[0]-pt1[0], pt2[1]-pt1[1]
 	np := NewPath(pt1)
@@ -257,7 +275,7 @@ func RegularPolygon(pt1, pt2 []float64, n int) *Path {
 // ReentrantPolygon returns a closed path describing an n pointed star.
 func ReentrantPolygon(c []float64, r float64, n int, t, ang float64) *Path {
 	ang -= math.Pi / 2 // So ang = 0 has the start of the polygon pointing up
-	da := 2 * math.Pi / float64(n)
+	da := TwoPi / float64(n)
 	cosDa, sinDa := math.Cos(da), math.Sin(da)
 	ri := r * math.Cos(da/2) * t
 	dxe, dye := r*math.Cos(ang), r*math.Sin(ang)
@@ -280,8 +298,8 @@ func IrregularPolygon(cp []float64, r float64, n int, nr bool) *Path {
 	if n < 3 {
 		n = 3
 	}
-	tinc := 2 * math.Pi / float64(n)
-	toffs := 2 * math.Pi * rand.Float64()
+	tinc := TwoPi / float64(n)
+	toffs := TwoPi * rand.Float64()
 	fs := make([]float64, n)
 	rs := make([][]float64, n)
 	ps := make([][]float64, n)
@@ -364,7 +382,7 @@ func Lune(c []float64, r0, r1, r2, th float64) *Path {
 		ang := 2 * math.Atan(r0/dx)
 		// min or maj ang - Does cc lie between c and d?
 		if (c[0] < d[0] && c[0] < cc[0]) || (c[0] > d[0] && cc[0] < c[0]) {
-			ang = 2*math.Pi - ang
+			ang = TwoPi - ang
 		}
 		// Ang direction
 		if cc[0] < d[0] {
@@ -387,7 +405,7 @@ func Lune(c []float64, r0, r1, r2, th float64) *Path {
 		ang := 2 * math.Atan(r0/dx)
 		// min or maj ang - Does cc lie between c and d?
 		if (c[0] < d[0] && c[0] < cc[0]) || (c[0] > d[0] && cc[0] < c[0]) {
-			ang = 2*math.Pi - ang
+			ang = TwoPi - ang
 		}
 		// Ang direction
 		if cc[0] > d[0] {

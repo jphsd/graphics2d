@@ -32,7 +32,7 @@ func PointDiamond(pt []float64, w float64) [][][]float64 {
 
 // PointCircle renders points as circles/
 func PointCircle(pt []float64, w float64) [][][]float64 {
-	return MakeArcParts(pt[0], pt[1], w/2, 0, math.Pi*2)
+	return MakeArcParts(pt[0], pt[1], w/2, 0, TwoPi)
 }
 
 // Joins take the two parts to be joined, p1 and p2, and some center point, p.
@@ -51,9 +51,9 @@ func JoinRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
 	a2 := util.LineAngle(p, s2)
 	da := a2 - a1
 	if da < -math.Pi {
-		da += 2 * math.Pi
+		da += TwoPi
 	} else if da > math.Pi {
-		da -= 2 * math.Pi
+		da -= TwoPi
 	}
 	if da < 0 {
 		// inside angle
@@ -86,9 +86,9 @@ func (mj *MiterJoin) JoinMiter(p1 [][]float64, p []float64, p2 [][]float64) [][]
 	a2 := math.Atan2(dy2, dx2)
 	da := a2 - a1
 	if da < -math.Pi {
-		da += 2 * math.Pi
+		da += TwoPi
 	} else if da > math.Pi {
-		da -= 2 * math.Pi
+		da -= TwoPi
 	}
 	if da < 0 {
 		// inside angle

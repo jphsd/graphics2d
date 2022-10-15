@@ -55,7 +55,7 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 				xfm = CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
 			case RotRandom:
 				t0 := util.DeCasteljau(part, 0)
-				xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*math.Pi*2)
+				xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*TwoPi)
 			}
 			res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
 		}
@@ -75,7 +75,7 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 			xfm = CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
 		case RotRandom:
 			t0 := util.DeCasteljau(part, 1)
-			xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*math.Pi*2)
+			xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*TwoPi)
 		}
 		res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
 	}

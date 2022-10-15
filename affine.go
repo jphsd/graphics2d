@@ -220,7 +220,7 @@ func (a *Aff3) Reflect(x1, y1, x2, y2 float64) {
 	}
 	th := math.Atan2(dy, dx)
 	if th < 0 {
-		th += math.Pi * 2
+		th += TwoPi
 	}
 	a.Translate(x1, y1)
 	a.Rotate(th)

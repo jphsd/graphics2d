@@ -3,10 +3,11 @@ Package graphics2d contains types and functions for 2D graphics rendering.
 
 If all you want to do is render a point, line, arc or path of a particular color into an image, then
 use the draw functions which hide all of the mechanics described below from you:
-  DrawPoint
-  DrawLine
-  DrawArc
-  DrawPath
+
+	DrawPoint
+	DrawLine
+	DrawArc
+	DrawPath
 
 However, to take full advantage of the package, here's a few more things you'll need to know.
 
@@ -36,26 +37,27 @@ all the operations associated with a color in a shape and then render that shape
 The PathProcessor interface is where the magic happens. Given a path, a function implementing this
 interface returns a collection of paths derived from it. This allows for stroking, dashing and a variety
 of other possibilities:
-  CapsProc - adds shapes at the start and end of a path
-  CompoundProc - allows multiple path processors to be run in sequence
-  CurvesToLinesProc - replaces curved steps with lines between the points
-  DashProc - wraps SnipProc to produce a dashed path
-  FlattenProc - wraps Path.Flatten
-  JitterProc - randomly move segment endpoints by some percentage of the segment's length
-  LineProc - wraps Path.Line
-  MunchProc - converts a path into length sized line paths
-  OpenProc - wraps Path.Open
-  PointsProc - adds shapes at the start of each step and the end of the last step
-  ReverseProc - wraps Path.Reverse
-  RoundedProc - rounds the corners of adjacent line segments in a path
-  SimplifyProc - wraps Path.Simplify
-  ShapesProc - distributes shapes along a path separated by some distance
-  SnipProc - cuts up a path into smaller pieces according to a pattern
-  SplitProc - splits each step into its own path
-  StrokeProc - creates a fixed width outline of a path with options for the cap and
-  join styles
-  TraceProc - creates a new path by tracing the normals of the path at a fixed distance
-  TransformProc - wraps Path.Transform
+
+	CapsProc - adds shapes at the start and end of a path
+	CompoundProc - allows multiple path processors to be run in sequence
+	CurvesToLinesProc - replaces curved steps with lines between the points
+	DashProc - wraps SnipProc to produce a dashed path
+	FlattenProc - wraps Path.Flatten
+	JitterProc - randomly move segment endpoints by some percentage of the segment's length
+	LineProc - wraps Path.Line
+	MunchProc - converts a path into length sized line paths
+	OpenProc - wraps Path.Open
+	PointsProc - adds shapes at the start of each step and the end of the last step
+	ReverseProc - wraps Path.Reverse
+	RoundedProc - rounds the corners of adjacent line segments in a path
+	SimplifyProc - wraps Path.Simplify
+	ShapesProc - distributes shapes along a path separated by some distance
+	SnipProc - cuts up a path into smaller pieces according to a pattern
+	SplitProc - splits each step into its own path
+	StrokeProc - creates a fixed width outline of a path with options for the cap and
+	join styles
+	TraceProc - creates a new path by tracing the normals of the path at a fixed distance
+	TransformProc - wraps Path.Transform
 
 Shapes are rendered with the render functions. Paths are forced closed when rendered (see shapes
 above). Convenience methods are provided for rendering with a single color or an image (see also pens,
@@ -64,24 +66,26 @@ above). The full render function allows a clip mask to be supplied, and the draw
 The Aff3 type provides the ability to specify affine transforms on Paths and Shapes.
 
 Utility functions are provided to generate common forms of paths:
-  Point
-  Line
-  PolyLine
-  Curve
-  PolyCurve
-  Arc
-  ArcFromPoint
-  PolyArcFromPoint
-  Circle
-  Ellipse
-  EllipticalArc
-  EllipticalArcFromPoint
-  Lune
-  RegularPolygon
-  ReentrantPolygon
-  IrregularPolygon
+
+	Point
+	Line
+	PolyLine
+	Curve
+	PolyCurve
+	Arc
+	ArcFromPoint
+	PolyArcFromPoint
+	Circle
+	Ellipse
+	EllipticalArc
+	EllipticalArcFromPoint
+	Lune
+	RegularPolygon
+	ReentrantPolygon
+	IrregularPolygon
 
 A shape function is provided to capture glyphs:
-  GlyphToShape
+
+	GlyphToShape
 */
 package graphics2d
