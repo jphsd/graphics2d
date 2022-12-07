@@ -48,6 +48,12 @@ func NewPen(color color.Color, width float64) *Pen {
 	return &Pen{image.NewUniform(color), NewStrokeProc(width), nil}
 }
 
+// NewProcessorPen returns a pen that will render a shape with the given pen
+// width and color into an image after applying the supplied path processor.
+func NewProcessorPen(color color.Color, width float64, proc PathProcessor) *Pen {
+	return &Pen{image.NewUniform(color), NewCompoundProc(proc, NewStrokeProc(width)), nil}
+}
+
 // NewNamedPen returns a pen that will render a shape with the given width and named color
 // into an image. If the name is not matched then a black pen will be returned.
 func NewNamedPen(name string, width float64) *Pen {
