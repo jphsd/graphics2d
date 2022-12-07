@@ -66,7 +66,7 @@ func NewShape(paths ...*Path) *Shape {
 	return res
 }
 
-// AddPaths adds paths to the shape and closes them if not already closed.
+// AddPaths adds paths to the shape.
 func (s *Shape) AddPaths(paths ...*Path) {
 	for _, p := range paths {
 		lp := p.Copy()

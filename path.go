@@ -43,6 +43,9 @@ type Path struct {
 func NewPath(start []float64) *Path {
 	np := &Path{}
 	np.steps = make([][][]float64, 1)
+	if InvalidPoint(start) {
+		panic("invalid point (NaN) for path start")
+	}
 	np.steps[0] = [][]float64{start}
 	return np
 }
@@ -61,7 +64,10 @@ func (p *Path) AddStep(points ...[]float64) error {
 	lastStep := p.steps[len(p.steps)-1]
 	last := lastStep[len(lastStep)-1]
 	npoints := make([][]float64, 0, n)
-	for _, pt := range points {
+	for i, pt := range points {
+		if InvalidPoint(pt) {
+			panic(fmt.Sprintf("invalid step point (NaN) at %d", i))
+		}
 		if util.EqualsP(last, pt) {
 			// Ignore coincident points
 			continue
@@ -184,10 +190,20 @@ func PartsToPath(parts ...[][]float64) *Path {
 		return res
 	}
 
-	for _, part := range parts {
+	for i, part := range parts {
+		for j, pt := range part {
+			if InvalidPoint(pt) {
+				panic(fmt.Sprintf("invalid point (NaN) in part %d,%d", i, j))
+			}
+		}
 		res.AddStep(part[1:]...)
 	}
 	return res
+}
+
+// InvalidPoint checks that both values are valid (i.e. not NaN)
+func InvalidPoint(p []float64) bool {
+	return p[0] != p[0] || p[1] != p[1]
 }
 
 // Flatten works by recursively subdividing the path until the control points are within d of
