@@ -17,6 +17,12 @@ const (
 // MakeArcParts creates at least one cubic bezier that describes a curve from offs to
 // offs+ang centered on {cx, cy} with radius r.
 func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
+	if util.Equals(ang, 0) {
+		// Return just a point
+		pt := []float64{cx+r*math.Cos(offs), cy+r*math.Sin(offs)}
+		return [][][]float64{{pt, pt}}
+	}
+
 	a := ang
 	rev := ang < 0
 	if rev {
@@ -34,6 +40,7 @@ func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 		n *= 2
 	}
 	cp := util.CalcPointsForArc(a)
+
 	if rev {
 		cp = [][]float64{cp[3], cp[2], cp[1], cp[0]}
 		a = -a

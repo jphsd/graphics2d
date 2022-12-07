@@ -126,6 +126,9 @@ func SideOfLine(lp1, lp2, p []float64) float64 {
 func ToF64(pts ...float32) []float64 {
 	res := make([]float64, len(pts))
 	for i, v := range pts {
+		if v != v {
+			panic("casting NaN")
+		}
 		res[i] = float64(v)
 	}
 	return res
@@ -135,6 +138,9 @@ func ToF64(pts ...float32) []float64 {
 func ToF32(pts ...float64) []float32 {
 	res := make([]float32, len(pts))
 	for i, v := range pts {
+		if v != v {
+			panic("casting NaN")
+		}
 		res[i] = float32(v)
 	}
 	return res
@@ -166,8 +172,8 @@ func Centroid(pts ...[]float64) []float64 {
 }
 
 // CrossProduct returns the cross product of the three points.
-// Since the inputs are all in the x-y plane, only the magnitude of the resultant
-// z vector is returned (the x and y vectors are both 0).
+// Since the inputs are all in the x-y plane (i.e. z = 0), only the magnitude of the
+// resultant z vector is returned (the x and y vectors are both 0).
 func CrossProduct(p1, p2, p3 []float64) float64 {
 	return (p3[0]-p1[0])*(p2[1]-p1[1]) - (p3[1]-p1[1])*(p2[0]-p1[0])
 }

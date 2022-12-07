@@ -8,7 +8,12 @@ import (
 // points for a Bezier cubic to describe it on a circle centered
 // on (0,0) with radius 1. Mid-point of the curve is (1,0)
 // Error increases for values > Pi/2
+// Returns nil if the angle is zero
 func CalcPointsForArc(theta float64) [][]float64 {
+	if Equals(theta, 0) {
+		// No curve
+		return nil
+	}
 	phi := theta / 2
 	x0 := math.Cos(phi)
 	y0 := math.Sin(phi)
