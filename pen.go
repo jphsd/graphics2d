@@ -40,6 +40,7 @@ var (
 	MagentaPen   = Magenta
 	CyanPen      = Cyan
 	OrangePen    = Orange
+	BrownPen     = NewPen(g2dc.Brown, 1)
 )
 
 // NewPen returns a pen that will render a shape with the given pen
