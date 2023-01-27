@@ -199,7 +199,7 @@ func VecNormalize(v []float64) []float64 {
 	return []float64{v[0] / d, v[1] / d}
 }
 
-// LineAngle returns the angle of a line.
+// LineAngle returns the angle of a line. Result is in range [-Pi, Pi]
 func LineAngle(p1, p2 []float64) float64 {
 	return math.Atan2(p2[1]-p1[1], p2[0]-p1[0])
 }

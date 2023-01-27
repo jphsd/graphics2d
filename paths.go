@@ -19,7 +19,7 @@ const (
 func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 	if util.Equals(ang, 0) {
 		// Return just a point
-		pt := []float64{cx+r*math.Cos(offs), cy+r*math.Sin(offs)}
+		pt := []float64{cx + r*math.Cos(offs), cy + r*math.Sin(offs)}
 		return [][][]float64{{pt, pt}}
 	}
 
@@ -209,6 +209,43 @@ func Ellipse(c []float64, rx, ry, xang float64) *Path {
 	return np.Transform(xfm)
 }
 
+// EllipseFromPoints returns a path describing the smallest ellipse containing points p1 and p2.
+// If p1, p2 and c are colinear and not equidistant then nil is returned.
+func EllipseFromPoints(p1, p2, c []float64) *Path {
+	d1, d2 := util.DistanceESquared(p1, c), util.DistanceESquared(p2, c)
+	if util.Collinear(p1, p2, c) {
+		if !util.Equals(d1, d2) {
+			return nil
+		}
+		// Points are on a circle
+		return Circle(c, math.Sqrt(d1))
+	}
+
+	swap := d1 < d2
+	if swap {
+		p1, p2 = p2, p1
+	}
+
+	xang := util.LineAngle(c, p1)
+
+	// Transform p1, p2 and c so that c is at the origin and p1 lies on the x axis.
+	// Figure rx and ry from the transformed points.
+	xfm := NewAff3()
+	xfm.Rotate(-xang)
+	xfm.Translate(-c[0], -c[1])
+	pts := xfm.Apply(p1, p2, c)
+	rx := pts[0][0]
+	if rx < 0 {
+		rx = -rx
+	}
+	rx2 := rx * rx
+	// From x^2/rx^2 + y^2/ry^2 = 1
+	ry2 := rx2 * pts[1][1] * pts[1][1] / (rx2 - pts[1][0]*pts[1][0])
+	ry := math.Sqrt(ry2)
+
+	return Ellipse(c, rx, ry, xang)
+}
+
 // EllipticalArc returns a path describing an arc starting at offs and ending at offs+ang on the ellipse
 // defined by rx and ry rotated by xang from the x axis.
 func EllipticalArc(c []float64, rx, ry, offs, ang, xang float64, s ArcStyle) *Path {
@@ -258,9 +295,65 @@ func EllipticalArcFromPoint(pt, c []float64, rxy, ang, xang float64, s ArcStyle)
 	dy := pt[1] - c[1]
 	offs := math.Atan2(dy, dx)
 
-	// calc rx and ry from dx, dy and rxy
-	ry := math.Sqrt(dx*dx/rxy*rxy + dy*dy)
+	// calc rx and ry from pt and rxy
+	xfm := NewAff3()
+	xfm.Rotate(-xang)
+	xfm.Translate(-c[0], -c[1])
+	pts := xfm.Apply(pt)
+	dx, dy = pts[0][0], pts[0][1]
+	ry := math.Sqrt(dx*dx/(rxy*rxy) + dy*dy)
 	rx := rxy * ry
+
+	return EllipticalArc(c, rx, ry, offs, ang, xang, s)
+}
+
+// EllipticalArcFromPoints returns a path describing the smallest ellipse arc from a point p1 to p2 (ccw).
+// If p1, p2 and c are colinear and not equidistant then nil is returned.
+func EllipticalArcFromPoints(p1, p2, c []float64, s ArcStyle) *Path {
+	d1, d2 := util.DistanceESquared(p1, c), util.DistanceESquared(p2, c)
+	if util.Collinear(p1, p2, c) && !util.Equals(d1, d2) {
+		// No solution
+		return nil
+	}
+
+	p1a := util.LineAngle(c, p1)
+	p2a := util.LineAngle(c, p2)
+
+	offs := p1a
+	xang := p1a
+	swap := d1 < d2
+	if swap {
+		xang = p2a
+		p1, p2 = p2, p1
+	}
+
+	// Map [-pi,pi] to [0,2pi]
+	if p1a < 0 {
+		p1a = TwoPi + p1a
+	}
+	if p2a < 0 {
+		p2a = TwoPi + p2a
+	}
+	var ang float64
+	if p1a < p2a {
+		ang = p2a - p1a
+	} else {
+		ang = TwoPi - p1a + p2a
+	}
+
+	// Transform p1, p2 and c so that c is at the origin and p1 lies on the x axis
+	xfm := NewAff3()
+	xfm.Rotate(-xang)
+	xfm.Translate(-c[0], -c[1])
+	pts := xfm.Apply(p1, p2, c)
+	rx := pts[0][0]
+	if rx < 0 {
+		rx = -rx
+	}
+	rx2 := rx * rx
+	// From x^2/rx^2 + y^2/ry^2 = 1
+	ry2 := rx2 * pts[1][1] * pts[1][1] / (rx2 - pts[1][0]*pts[1][0])
+	ry := math.Sqrt(ry2)
 
 	return EllipticalArc(c, rx, ry, offs, ang, xang, s)
 }

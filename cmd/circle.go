@@ -3,9 +3,7 @@
 package main
 
 import (
-	"math"
-
-	. "github.com/jphsd/graphics2d"
+	g2d "github.com/jphsd/graphics2d"
 	"github.com/jphsd/graphics2d/color"
 	"github.com/jphsd/graphics2d/image"
 )
@@ -20,10 +18,10 @@ func main() {
 	c := []float64{200, 200}
 
 	// Draw circle
-	DrawArc(img, p1, c, math.Pi*2, Red)
+	g2d.DrawArc(img, p1, c, g2d.TwoPi, g2d.RedPen)
 
 	// Draw point at center in black
-	DrawPoint(img, c, Black)
+	g2d.DrawPoint(img, c, g2d.BlackPen)
 
 	// Capture image output
 	image.SaveImage(img, "circle")
