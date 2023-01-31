@@ -311,7 +311,7 @@ func (p *Path) Bounds() image.Rectangle {
 	return p.bounds
 }
 
-// Copy performs a Deepish copy - points themselves aren't duplicated.
+// Copy performs a deepish copy - points themselves aren't duplicated.
 func (p *Path) Copy() *Path {
 	steps := make([][][]float64, len(p.steps))
 	copy(steps, p.steps)
@@ -324,7 +324,7 @@ func (p *Path) Copy() *Path {
 	return path
 }
 
-// Open performs a Deepish copy like Copy() but leaves the path open.
+// Open performs a deepish copy like Copy() but leaves the path open.
 func (p *Path) Open() *Path {
 	path := p.Copy()
 	path.closed = false
@@ -380,7 +380,7 @@ func (p *Path) Transform(xfm *Aff3) *Path {
 
 // Simplify breaks up a path into steps where for any step, its control points are all on the
 // same side and its midpoint is well behaved. If a step doesn't meet the criteria, it is
-// recursively subdivide in half until it does.
+// recursively subdivided in half until it does.
 func (p *Path) Simplify() *Path {
 	if p.simplified != nil {
 		return p.simplified

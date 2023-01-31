@@ -12,7 +12,7 @@ type PathProcessor interface {
 // CompoundProc applies a collection of PathProcessors to a path.
 type CompoundProc struct {
 	Procs       []PathProcessor
-	Concatenate bool
+	Concatenate bool // If set, concatenate processed paths into a single path after every processor
 }
 
 // NewCompoundProc creates a new CompundProcessor with the supplied path processors.

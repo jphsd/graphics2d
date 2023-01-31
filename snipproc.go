@@ -28,8 +28,7 @@ func NewSnipProc(n int, pattern []float64, offs float64) *SnipProc {
 	}
 	s := sum(pat)
 
-	// Default flattening value is 1
-	res := &SnipProc{n, pat, 1, 0, s, 0, 0}
+	res := &SnipProc{n, pat, RenderFlatten, 0, s, 0, 0}
 	res.Offset(offs)
 	return res
 }
