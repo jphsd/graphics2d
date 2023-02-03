@@ -9,6 +9,7 @@ import (
 // on (0,0) with radius 1. Mid-point of the curve is (1,0)
 // Error increases for values > Pi/2
 // Returns nil if the angle is zero
+// Ref: https://www.tinaja.com/glib/bezcirc2.pdf
 func CalcPointsForArc(theta float64) [][]float64 {
 	if Equals(theta, 0) {
 		// No curve

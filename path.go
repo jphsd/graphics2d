@@ -571,6 +571,23 @@ func (p *Path) Line() *Path {
 	return path
 }
 
+// Lines reduces a path to a line for every step.
+func (p *Path) Lines() *Path {
+	first := p.steps[0][0]
+	path := NewPath(first)
+
+	for _, step := range p.steps {
+		last := step[len(step)-1]
+		path.AddStep(last)
+	}
+
+	if p.closed {
+		path.Close()
+	}
+
+	return path
+}
+
 // Tangents returns the normalized start and end tangents of every part in the path.
 // [part][start/end][normalized x/y]
 func (p *Path) Tangents() [][][]float64 {

@@ -38,11 +38,21 @@ func (psp *PathSnipProc) Process(p *Path) []*Path {
 					npparts = append(npparts, ppart)
 					continue
 				}
-				npparts = append(npparts, splitparts[0])
-				npaths = append(npaths, npparts)
-				npparts = [][][]float64{splitparts[1]}
+				if splitparts[0] != nil {
+					npparts = append(npparts, splitparts[0])
+				}
+				if len(npparts) != 0 {
+					npaths = append(npaths, npparts)
+				}
+				if splitparts[1] != nil {
+					npparts = [][][]float64{splitparts[1]}
+				} else {
+					npparts = [][][]float64{}
+				}
 			}
-			npaths = append(npaths, npparts)
+			if len(npparts) != 0 {
+				npaths = append(npaths, npparts)
+			}
 		}
 		paths = npaths
 	}
@@ -55,14 +65,24 @@ func (psp *PathSnipProc) Process(p *Path) []*Path {
 }
 
 func partsplit(sppart, ppart [][]float64) [][][]float64 {
+	// TODO - is this faster than using PartsIntersection() which uses BB?
 	tvals, err := util.IntersectionTValsP(sppart[0], sppart[1], ppart[0], ppart[1])
 	if err != nil || tvals[0] < 0 || tvals[0] > 1 || tvals[1] < 0 || tvals[1] > 1 {
 		return nil
 	}
-	// Split ppart into two
-	dx, dy := ppart[1][0]-ppart[0][0], ppart[1][1]-ppart[0][1]
-	dx *= tvals[1]
-	dy *= tvals[1]
-	ip := []float64{ppart[0][0] + dx, ppart[0][1] + dy}
-	return [][][]float64{{ppart[0], ip}, {ip, ppart[1]}}
+	t := tvals[1]
+	if t > 0 && t < 1 {
+		// Split ppart into two
+		dx, dy := ppart[1][0]-ppart[0][0], ppart[1][1]-ppart[0][1]
+		dx *= t
+		dy *= t
+		ip := []float64{ppart[0][0] + dx, ppart[0][1] + dy}
+		return [][][]float64{{ppart[0], ip}, {ip, ppart[1]}}
+	}
+	if t < 1 {
+		// t is at start of part
+		return [][][]float64{nil, ppart}
+	}
+	// t is at end of part
+	return [][][]float64{ppart, nil}
 }

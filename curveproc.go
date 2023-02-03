@@ -10,6 +10,7 @@ type CurveStyle int
 // Constants for curve styles.
 const (
 	Bezier CurveStyle = iota
+	Quad
 	CatmullRom
 )
 
@@ -69,6 +70,37 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 			c1 = Lerp(cp.Scale, mp[ns-1], points[0])
 			c2 = Lerp(cp.Scale, mp[0], points[0])
 			res[0].AddStep(c1, c2, mp[0])
+			res[0].Close()
+		} else {
+			res[0].AddStep(points[ns-1])
+		}
+
+		return res
+	}
+
+	// Quad
+
+	if cp.Style == Quad {
+		// Calc mid points
+		mp := make([][]float64, ns)
+		for i := 0; i < ns-1; i++ {
+			mp[i] = util.Centroid(points[i], points[i+1])
+		}
+		mp[ns-1] = util.Centroid(points[ns-1], points[0])
+
+		// Create path
+		if p.closed {
+			res = append(res, NewPath(mp[0]))
+		} else {
+			res = append(res, NewPath(points[0]))
+			res[0].AddStep(mp[0])
+		}
+		for i := 1; i < ns-1; i++ {
+			res[0].AddStep(points[i], mp[i])
+		}
+		if p.closed {
+			res[0].AddStep(points[ns-1], mp[ns-1])
+			res[0].AddStep(points[0], mp[0])
 			res[0].Close()
 		} else {
 			res[0].AddStep(points[ns-1])

@@ -66,6 +66,15 @@ func (lp *LineProc) Process(p *Path) []*Path {
 	return []*Path{path}
 }
 
+// LinesProc replaces a path step with a line.
+type LinesProc struct{}
+
+// Process implements the PathProcessor interface.
+func (lp *LinesProc) Process(p *Path) []*Path {
+	path := p.Lines()
+	return []*Path{path}
+}
+
 // OpenProc replaces a path with its open version.
 type OpenProc struct{}
 
