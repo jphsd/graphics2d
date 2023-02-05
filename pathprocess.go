@@ -15,7 +15,7 @@ type CompoundProc struct {
 	Concatenate bool // If set, concatenate processed paths into a single path after every processor
 }
 
-// NewCompoundProc creates a new CompundProcessor with the supplied path processors.
+// NewCompoundProc creates a new CompoundProcessor with the supplied path processors.
 func NewCompoundProc(procs ...PathProcessor) *CompoundProc {
 	return &CompoundProc{procs, false}
 }
