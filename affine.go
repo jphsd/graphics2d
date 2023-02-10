@@ -282,6 +282,7 @@ func (a *Aff3) Apply(pts ...[]float64) [][]float64 {
 		// y' = a[3*1+0]*x + a[3*1+1]*y + a[3*1+2]
 		npt[0] = a[0]*x + a[1]*y + a[2]
 		npt[1] = a[3]*x + a[4]*y + a[5]
+		// Preserve other values
 		for i := 2; i < d; i++ {
 			npt[i] = pt[i]
 		}

@@ -7,10 +7,10 @@ type TriangleWaveProc struct {
 	HalfLambda float64 // Half wave length
 	Scale      float64 // Ratio of amplitude to lambda
 	KeepZero   bool    // Keeps internal zero-point crossings if set
-	Flip       bool    // Flips the wave phase by 180 if set
+	Flip       bool    // Flips the wave phase by 180 (pi) if set
 }
 
-// NewTriangleWaveProc creates a new TriangleWaveProc with the supplied path processors.
+// NewTriangleWaveProc creates a new TriangleWaveProc with the supplied wave length and amplitutde.
 func NewTriangleWaveProc(lambda, amplitude float64) *TriangleWaveProc {
 	return &TriangleWaveProc{lambda / 2, amplitude / lambda, false, false}
 }
@@ -33,7 +33,7 @@ func (tp *TriangleWaveProc) Process(p *Path) []*Path {
 		if left {
 			ndx, ndy = -ndx, -ndy
 		}
-		mid := []float64{(last[0]+cur[0])/2, (last[1]+cur[1])/2}
+		mid := []float64{(last[0] + cur[0]) / 2, (last[1] + cur[1]) / 2}
 		path.AddStep([]float64{mid[0] + ndx, mid[1] + ndy})
 		path.AddStep([]float64{cur[0], cur[1]})
 		last = cur

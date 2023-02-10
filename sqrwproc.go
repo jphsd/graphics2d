@@ -7,10 +7,10 @@ type SquareWaveProc struct {
 	HalfLambda float64 // Half wave length
 	Scale      float64 // Ratio of amplitude to lambda
 	KeepZero   bool    // Keeps internal zero-point crossings if set
-	Flip       bool    // Flips the wave phase by 180 if set
+	Flip       bool    // Flips the wave phase by 180 (pi) if set
 }
 
-// NewSquareWaveProc creates a new SquareWaveProc with the supplied path processors.
+// NewSquareWaveProc creates a new SquareWaveProc with the supplied wave length and amplitude.
 func NewSquareWaveProc(lambda, amplitude float64) *SquareWaveProc {
 	return &SquareWaveProc{lambda / 2, amplitude / lambda, false, false}
 }

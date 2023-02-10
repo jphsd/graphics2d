@@ -19,7 +19,7 @@ const (
 	RotRandom
 )
 
-// PointsProc contains a slice of shapes, one of which will be placed using at the start of each step in the
+// PointsProc contains a slice of shapes, one of which will be placed at the start of each step in the
 // path and at the path end, if not closed. If any shape is nil, then it is skipped. The rotation flag
 // indicates if the shapes should be rotated relative to the path's tangent at that point.
 type PointsProc struct {
