@@ -102,6 +102,21 @@ func (sp *SimplifyProc) Process(p *Path) []*Path {
 	return []*Path{path}
 }
 
+// StepsProc converts each path step into its own path.
+type StepsProc struct{}
+
+// Process implements the PathProcessor interface.
+func (sp *StepsProc) Process(p *Path) []*Path {
+	parts := p.Parts()
+	np := len(parts)
+	paths := make([]*Path, np)
+	for i, part := range parts {
+		paths[i] = PartsToPath(part)
+	}
+
+	return paths
+}
+
 // TransformProc is a wrapper around Path.Transform() and contains the Aff3
 // transform to be applied.
 type TransformProc struct {
