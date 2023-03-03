@@ -385,32 +385,22 @@ func (p *Path) Simplify() *Path {
 	if p.simplified != nil {
 		return p.simplified
 	}
-	res := make([][][]float64, 1)
-	res[0] = p.steps[0]
-	cp := res[0][0]
-	for i := 1; i < len(p.steps); i++ {
-		points := toPoints(cp, p.steps[i])
-		if len(points) > 2 {
+	res := [][][]float64{}
+	parts := p.Parts()
+	for _, part := range parts {
+		if len(part) > 2 {
 			// Split based on extremities
-			parts := simplifyExtremities(points)
-			fp := [][][]float64{}
-			for _, part := range parts {
-				// check parts are simple
-				fp = append(fp, simplifyStep(part)...)
-			}
-			// Turn points back into path step
-			for _, ns := range fp {
-				res = append(res, ns[1:])
-				cp = ns[len(ns)-1]
+			nparts := SimplifyExtremities(part)
+			for _, npart := range nparts {
+				// check simplified parts are simple
+				res = append(res, SimplifyPart(npart)...)
 			}
 		} else {
-			res = append(res, points[1:])
-			cp = points[len(points)-1]
+			res = append(res, part)
 		}
 	}
 
-	path := &Path{}
-	path.steps = res
+	path := PartsToPath(res...)
 	path.closed = p.closed
 	path.parent = p
 	p.simplified = path
@@ -418,12 +408,12 @@ func (p *Path) Simplify() *Path {
 	return path
 }
 
-// Chop curve into pieces based on maxima, minima and inflections in x and y.
-func simplifyExtremities(points [][]float64) [][][]float64 {
-	tvals := util.CalcExtremities(points)
+// SimplifyExtremities chops curve into pieces based on maxima, minima and inflections in x and y.
+func SimplifyExtremities(part [][]float64) [][][]float64 {
+	tvals := util.CalcExtremities(part)
 	nt := len(tvals)
 	if nt < 3 {
-		return [][][]float64{points}
+		return [][][]float64{part}
 	}
 	// Convert tvals to relative tvals
 	rtvals := make([]float64, nt)
@@ -444,7 +434,7 @@ func simplifyExtremities(points [][]float64) [][][]float64 {
 		ll -= d
 	}
 
-	rhs := points
+	rhs := part
 	res := make([][][]float64, nt-1)
 	for i := 1; i < nt-1; i++ {
 		lr := util.SplitCurve(rhs, rtvals[i])
@@ -455,27 +445,33 @@ func simplifyExtremities(points [][]float64) [][][]float64 {
 	return res
 }
 
-// simplifyStep recursively cuts the curve in half until cpSafe is
+// SimplifyPart recursively cuts the curve in half until cpSafe is
 // satisfied.
-func simplifyStep(points [][]float64) [][][]float64 {
-	if cpSafe(points) {
-		return [][][]float64{points}
+func SimplifyPart(part [][]float64) [][][]float64 {
+	if cpSafe(part) {
+		return [][][]float64{part}
 	}
-	lr := util.SplitCurve(points, 0.5)
-	res := append([][][]float64{}, simplifyStep(lr[0])...)
-	res = append(res, simplifyStep(lr[1])...)
+	lr := util.SplitCurve(part, 0.5)
+	res := append([][][]float64{}, SimplifyPart(lr[0])...)
+	res = append(res, SimplifyPart(lr[1])...)
 	return res
 }
 
+// SafeFraction if greater than 0 causes Simplify to perform a check of the mid-point against
+// the part centroid. If the two are within SafeFraction of the distance from p[0] to the centroid
+// then no further subdivision of the curve is performed.
+var SafeFraction float64 = -1
+
 // cpSafe returns true if all the control points are on the same side of
-// the line formed by start and the last point in step.
+// the line formed by start and the last point in step and the point at t = 0.5 is close
+// to the centroid of the curve points.
 func cpSafe(points [][]float64) bool {
-	if len(points) < 3 {
+	n := len(points)
+	if n < 3 {
 		// Either a point or line
 		return true
 	}
 
-	n := len(points)
 	start := points[0]
 	end := points[n-1]
 	side := util.CrossProduct(start, end, points[1]) < 0
@@ -484,6 +480,25 @@ func cpSafe(points [][]float64) bool {
 			return false
 		}
 	}
+
+	if n == 3 {
+		return true
+	}
+
+	if SafeFraction > 0 {
+		// Check mid-point against centroid
+		// scale against distance between p0 and centroid
+		centroid := util.Centroid(points...)
+		hp := util.DeCasteljau(points, 0.5)
+		p0dx := centroid[0] - points[0][0]
+		p0dy := centroid[1] - points[0][1]
+		p0ds := p0dx*p0dx + p0dy*p0dy
+		hpdx := centroid[0] - hp[0]
+		hpdy := centroid[1] - hp[1]
+		hpds := hpdx*hpdx + hpdy*hpdy
+		return math.Sqrt(hpds) < math.Sqrt(p0ds)*SafeFraction
+	}
+
 	return true
 }
 
