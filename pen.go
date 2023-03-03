@@ -70,3 +70,9 @@ func NewNamedPen(name string, width float64) *Pen {
 func NewRandomPen(width float64) *Pen {
 	return &Pen{image.NewUniform(g2dc.Random()), NewStrokeProc(width), nil}
 }
+
+// NewRandomHuePen returns a pen that will render a shape with the given pen
+// width and a random hued color into an image.
+func NewRandomHuePen(width float64) *Pen {
+	return &Pen{image.NewUniform(g2dc.RandomHue()), NewStrokeProc(width), nil}
+}
