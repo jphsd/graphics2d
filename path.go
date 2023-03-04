@@ -403,6 +403,7 @@ func (p *Path) Simplify() *Path {
 	path := PartsToPath(res...)
 	path.closed = p.closed
 	path.parent = p
+	path.simplified = path // self reference
 	p.simplified = path
 
 	return path
@@ -445,10 +446,10 @@ func SimplifyExtremities(part [][]float64) [][][]float64 {
 	return res
 }
 
-// SimplifyPart recursively cuts the curve in half until cpSafe is
+// SimplifyPart recursively cuts the curve in half until CPSafe is
 // satisfied.
 func SimplifyPart(part [][]float64) [][][]float64 {
-	if cpSafe(part) {
+	if CPSafe(part) {
 		return [][][]float64{part}
 	}
 	lr := util.SplitCurve(part, 0.5)
@@ -462,21 +463,21 @@ func SimplifyPart(part [][]float64) [][][]float64 {
 // then no further subdivision of the curve is performed.
 var SafeFraction float64 = -1
 
-// cpSafe returns true if all the control points are on the same side of
-// the line formed by start and the last point in step and the point at t = 0.5 is close
-// to the centroid of the curve points.
-func cpSafe(points [][]float64) bool {
-	n := len(points)
+// CPSafe returns true if all the control points are on the same side of
+// the line formed by start and the last part points and the point at t = 0.5 is close
+// to the centroid of the part.
+func CPSafe(part [][]float64) bool {
+	n := len(part)
 	if n < 3 {
 		// Either a point or line
 		return true
 	}
 
-	start := points[0]
-	end := points[n-1]
-	side := util.CrossProduct(start, end, points[1]) < 0
+	start := part[0]
+	end := part[n-1]
+	side := util.CrossProduct(start, end, part[1]) < 0
 	for i := 2; i < n-1; i++ {
-		if (util.CrossProduct(start, end, points[i]) < 0) != side {
+		if (util.CrossProduct(start, end, part[i]) < 0) != side {
 			return false
 		}
 	}
@@ -488,10 +489,10 @@ func cpSafe(points [][]float64) bool {
 	if SafeFraction > 0 {
 		// Check mid-point against centroid
 		// scale against distance between p0 and centroid
-		centroid := util.Centroid(points...)
-		hp := util.DeCasteljau(points, 0.5)
-		p0dx := centroid[0] - points[0][0]
-		p0dy := centroid[1] - points[0][1]
+		centroid := util.Centroid(part...)
+		hp := util.DeCasteljau(part, 0.5)
+		p0dx := centroid[0] - part[0][0]
+		p0dy := centroid[1] - part[0][1]
 		p0ds := p0dx*p0dx + p0dy*p0dy
 		hpdx := centroid[0] - hp[0]
 		hpdy := centroid[1] - hp[1]
@@ -516,7 +517,11 @@ func (p *Path) Reverse() *Path {
 		path.tolerance = p.tolerance
 	}
 	if p.simplified != nil {
-		path.simplified = p.simplified.Reverse()
+		if p != p.simplified {
+			path.simplified = p.simplified.Reverse()
+		} else {
+			path.simplified = path
+		}
 	}
 	if p.tangents != nil {
 		path.tangents = reverseTangents(p.tangents)
@@ -531,11 +536,11 @@ func (p *Path) Reverse() *Path {
 }
 
 // ReverseParts reverses the order (and points) of the supplied part slice.
-func ReverseParts(pts [][][]float64) [][][]float64 {
-	n := len(pts)
+func ReverseParts(parts [][][]float64) [][][]float64 {
+	n := len(parts)
 	res := make([][][]float64, n)
 	for i, j := 0, n-1; i < n; i++ {
-		res[i] = reversePoints(pts[j])
+		res[i] = reversePoints(parts[j])
 		j--
 	}
 	return res
