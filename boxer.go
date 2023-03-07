@@ -1,7 +1,5 @@
 package graphics2d
 
-import "math"
-
 // BoxerProc is a path processor that converts a path into a set of boxes along the path with the
 // specified width. If the offset is 0 then the box is centered on the path.
 type BoxerProc struct {
@@ -29,10 +27,7 @@ func (bp *BoxerProc) Process(p *Path) []*Path {
 // Convert start and end points into a set of box corners.
 func box(p1, p2 []float64, hw, offs float64) [][]float64 {
 	dx, dy := p2[0]-p1[0], p2[1]-p1[1]
-	nx, ny := -dy, dx
-	d := math.Sqrt(nx*nx + ny*ny)
-	nx /= d
-	ny /= d
+	nx, ny := unit(-dy, dx)
 	l, r := hw-offs, hw+offs
 	lnx, lny := l*nx, l*ny
 	rnx, rny := r*nx, r*ny
