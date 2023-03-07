@@ -43,7 +43,7 @@ func (cp *CompoundProc) Process(p *Path) []*Path {
 	return paths
 }
 
-// PathProcessor wrappers for Flatten, Simplify and Linepath functions
+// PathProcessor wrappers for Flatten, Simplify and Line path functions
 
 // FlattenProc is a wrapper around Path.Flatten() and contains the minimum required
 // distance to the control points.
@@ -67,11 +67,13 @@ func (lp *LineProc) Process(p *Path) []*Path {
 }
 
 // LinesProc replaces a path step with a line.
-type LinesProc struct{}
+type LinesProc struct{
+	IncludeCP bool
+}
 
 // Process implements the PathProcessor interface.
 func (lp *LinesProc) Process(p *Path) []*Path {
-	path := p.Lines()
+	path := p.Lines(lp.IncludeCP)
 	return []*Path{path}
 }
 

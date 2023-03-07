@@ -592,13 +592,18 @@ func (p *Path) Line() *Path {
 }
 
 // Lines reduces a path to a line for every step.
-func (p *Path) Lines() *Path {
+func (p *Path) Lines(inccp bool) *Path {
 	first := p.steps[0][0]
 	path := NewPath(first)
 
 	for _, step := range p.steps {
-		last := step[len(step)-1]
-		path.AddStep(last)
+		ls := len(step)
+		if inccp {
+			for i := 0; i < ls-1; i++ {
+				path.AddStep(step[i])
+			}
+		}
+		path.AddStep(step[ls-1])
 	}
 
 	if p.closed {
