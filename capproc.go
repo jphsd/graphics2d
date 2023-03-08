@@ -27,10 +27,12 @@ func (cp *CapsProc) Process(p *Path) []*Path {
 			xfm := CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
 			res = append(res, cp.Start.Transform(xfm).Paths()...)
 		}
-		for i := 1; i < lp; i++ {
-			t0 := util.DeCasteljau(parts[i], 0)
-			xfm := CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
-			res = append(res, cp.Mid.Transform(xfm).Paths()...)
+		if cp.Mid != nil {
+			for i := 1; i < lp; i++ {
+				t0 := util.DeCasteljau(parts[i], 0)
+				xfm := CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
+				res = append(res, cp.Mid.Transform(xfm).Paths()...)
+			}
 		}
 		// Only apply end cap to open paths
 		if cp.End != nil && !p.Closed() {
