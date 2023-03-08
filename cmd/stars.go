@@ -3,7 +3,7 @@
 package main
 
 import (
-	. "github.com/jphsd/graphics2d"
+	g2d "github.com/jphsd/graphics2d"
 	"github.com/jphsd/graphics2d/color"
 	"github.com/jphsd/graphics2d/image"
 )
@@ -18,17 +18,18 @@ func main() {
 	cx, cy := dx/2, dy/2
 	r := float64(dx) / 2 * 0.9
 	a := 0.0
-	shape := &Shape{}
+	shape := &g2d.Shape{}
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			cp := []float64{float64(cx), float64(cy)}
-			shape.AddPaths(ReentrantPolygon(cp, r, i+3, float64(j*25+1)/100.0, a))
+			shape.AddPaths(g2d.ReentrantPolygon(cp, r, i+3, float64(j*25+1)/100.0, a))
 			cx += dx
 		}
 		cx = dx / 2
 		cy += dy
 	}
-	RenderColoredShape(img, shape, color.Red)
+	g2d.RenderColoredShape(img, shape, color.Red)
+	g2d.DrawShape(img, shape, g2d.BlackPen)
 
 	// Capture image output
 	image.SaveImage(img, "stars")
