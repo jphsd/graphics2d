@@ -525,3 +525,45 @@ func Lune(c []float64, r0, r1, r2, th float64) *Path {
 	p1 = p1.Transform(xfm)
 	return p1
 }
+
+// Square returns a closed path describing a square with side s, centered on c.
+func Square(c []float64, s float64) *Path {
+	hs := s / 2
+	sx, sy := c[0]-hs, c[1]-hs
+	points := [][]float64{
+		{sx, sy},
+		{sx + s, sy},
+		{sx + s, sy + s},
+		{sx, sy + s},
+	}
+	return Polygon(points...)
+}
+
+// Rectangle returns a closed path describing a rectangle with sides w and h, centered on c.
+func Rectangle(c []float64, w, h float64) *Path {
+	hw, hh := w/2, h/2
+	sx, sy := c[0]-hw, c[1]-hh
+	points := [][]float64{
+		{sx, sy},
+		{sx + w, sy},
+		{sx + w, sy + h},
+		{sx, sy + h},
+	}
+	return Polygon(points...)
+}
+
+// Sqrt3 is the square root of 3
+const Sqrt3 = 1.7320508075688772935274463415058723669428052538103806280558069794519330169088
+
+// Equilateral returns a closed path describing an equliateral traingle with side s, centered on c.
+func Equilateral(c []float64, s float64) *Path {
+	sx, sy := c[0], c[1]-s/Sqrt3
+	hs := s / 2
+	dy := hs * Sqrt3
+	points := [][]float64{
+		{sx, sy},
+		{sx + hs, sy + dy},
+		{sx - hs, sy + dy},
+	}
+	return Polygon(points...)
+}
