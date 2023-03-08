@@ -18,28 +18,18 @@ type Pen struct {
 
 // Predefined pens.
 var (
-	Black   = NewPen(g2dc.Black, 1)
-	White   = NewPen(g2dc.White, 1)
-	Red     = NewPen(g2dc.Red, 1)
-	Green   = NewPen(g2dc.Green, 1)
-	Blue    = NewPen(g2dc.Blue, 1)
-	Yellow  = NewPen(g2dc.Yellow, 1)
-	Magenta = NewPen(g2dc.Magenta, 1)
-	Cyan    = NewPen(g2dc.Cyan, 1)
-	Orange  = NewPen(g2dc.Orange, 1)
-
-	BlackPen     = Black
+	BlackPen     = NewPen(g2dc.Black, 1)
 	DarkGrayPen  = NewPen(g2dc.DarkGray, 1)
 	GrayPen      = NewPen(g2dc.Gray, 1)
 	LightGrayPen = NewPen(g2dc.LightGray, 1)
-	WhitePen     = White
-	RedPen       = Red
-	GreenPen     = Green
-	BluePen      = Blue
-	YellowPen    = Yellow
-	MagentaPen   = Magenta
-	CyanPen      = Cyan
-	OrangePen    = Orange
+	WhitePen     = NewPen(g2dc.White, 1)
+	RedPen       = NewPen(g2dc.Red, 1)
+	GreenPen     = NewPen(g2dc.Green, 1)
+	BluePen      = NewPen(g2dc.Blue, 1)
+	YellowPen    = NewPen(g2dc.Yellow, 1)
+	MagentaPen   = NewPen(g2dc.Magenta, 1)
+	CyanPen      = NewPen(g2dc.Cyan, 1)
+	OrangePen    = NewPen(g2dc.Orange, 1)
 	BrownPen     = NewPen(g2dc.Brown, 1)
 )
 
