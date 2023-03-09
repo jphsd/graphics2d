@@ -14,7 +14,7 @@ func main() {
 	img := image.NewRGBA(width, height, color.White)
 
 	// Define points
-	points := [][]float64 {
+	points := [][]float64{
 		{100, 200},
 		{200, 0},
 		{200, 400},

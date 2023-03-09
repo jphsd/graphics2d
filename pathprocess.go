@@ -67,7 +67,7 @@ func (lp *LineProc) Process(p *Path) []*Path {
 }
 
 // LinesProc replaces a path step with a line.
-type LinesProc struct{
+type LinesProc struct {
 	IncludeCP bool
 }
 

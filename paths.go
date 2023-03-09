@@ -555,7 +555,7 @@ func Rectangle(c []float64, w, h float64) *Path {
 // Sqrt3 is the square root of 3
 const Sqrt3 = 1.7320508075688772935274463415058723669428052538103806280558069794519330169088
 
-// Equilateral returns a closed path describing an equliateral traingle with side s, centered on c.
+// Equilateral returns a closed path describing an equliateral triangle with side s, centered on c.
 func Equilateral(c []float64, s float64) *Path {
 	sx, sy := c[0], c[1]-s/Sqrt3
 	hs := s / 2
