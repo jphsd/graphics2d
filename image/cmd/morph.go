@@ -5,24 +5,24 @@ package main
 import (
 	"flag"
 	"fmt"
-	"image"
+	stdimg "image"
 	"image/draw"
 
-	. "github.com/jphsd/graphics2d/image"
+	"github.com/jphsd/graphics2d/image"
 )
 
 func main() {
 	// Read in image file indicated in command line
 	flag.Parse()
 	args := flag.Args()
-	img, err := ReadImage(args[0])
+	img, err := image.ReadImage(args[0])
 	if err != nil {
 		panic(err)
 	}
 
 	// Convert to Gray
-	gray := image.NewGray(img.Bounds())
-	draw.Draw(gray, gray.Bounds(), img, image.Point{}, draw.Src)
+	gray := stdimg.NewGray(img.Bounds())
+	draw.Draw(gray, gray.Bounds(), img, stdimg.Point{}, draw.Src)
 
 	// Invert and undo anti-aliasing and compression
 	lut := make([]uint8, 256)
@@ -33,37 +33,37 @@ func main() {
 			lut[i] = 0
 		}
 	}
-	gray = RemapGray(gray, lut)
-	SaveImage(gray, "out")
+	gray = image.RemapGray(gray, lut)
+	image.SaveImage(gray, "out")
 
 	// Perform a selection of operators
-	suppt := Z8
-	out := Open(gray, suppt)
-	SaveImage(out, "out-open")
-	out = Close(gray, suppt)
-	SaveImage(out, "out-close")
-	out = TopHat(gray, suppt)
-	SaveImage(out, "out-top")
-	out = BotHat(gray, suppt)
-	SaveImage(out, "out-bot")
+	suppt := image.Z8
+	out := image.Open(gray, suppt)
+	image.SaveImage(out, "out-open")
+	out = image.Close(gray, suppt)
+	image.SaveImage(out, "out-close")
+	out = image.TopHat(gray, suppt)
+	image.SaveImage(out, "out-top")
+	out = image.BotHat(gray, suppt)
+	image.SaveImage(out, "out-bot")
 	out = gray
-	prev := &image.Gray{}
+	prev := &stdimg.Gray{}
 	n := 0
-	for !Equal(out, prev, image.Point{}) {
+	for !image.Equal(out, prev, stdimg.Point{}) {
 		prev = out
-		out = Thin(out)
+		out = image.Thin(out)
 		n++
 		//		if n%10 == 0 {
-		//			SaveImage(out, fmt.Sprintf("out%d", n))
+		//			image.SaveImage(out, fmt.Sprintf("out%d", n))
 		//			v, n := Variance(prev, out)
 		//			fmt.Printf("Variance %f over %d\n", v*float64(out.Bounds().Dx()*out.Bounds().Dy())/float64(n), n)
 		//		}
 	}
-	SaveImage(Not(out), fmt.Sprintf("out-skel%d", n))
+	image.SaveImage(image.Not(out), fmt.Sprintf("out-skel%d", n))
 
-	outs := LJSkeleton(gray, Z4, 32)
-	SaveImage(Not(outs[32]), fmt.Sprintf("out-ljskel%d", 32))
+	outs := image.LJSkeleton(gray, image.Z4, 32)
+	image.SaveImage(image.Not(outs[32]), fmt.Sprintf("out-ljskel%d", 32))
 
-	out1 := LJReconstitute(outs[:32], Z4)
-	SaveImage(Not(out1), "out-ljrecon")
+	out1 := image.LJReconstitute(outs[:32], image.Z4)
+	image.SaveImage(image.Not(out1), "out-ljrecon")
 }

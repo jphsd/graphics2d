@@ -4,73 +4,41 @@ package main
 
 import (
 	"flag"
-	"image"
+	stdimg "image"
 	"image/draw"
-	"os"
 
-	. "github.com/jphsd/graphics2d/image"
+	"github.com/jphsd/graphics2d/image"
 	"github.com/jphsd/graphics2d/util"
-
-	// For image output only
-	"image/png"
-	"log"
-
-	_ "golang.org/x/image/bmp"
-	_ "golang.org/x/image/tiff"
-	_ "golang.org/x/image/webp"
-	_ "image/jpeg"
-	//	_ "image/png"
 )
 
 func main() {
 	// Read in image file indicated in command line
 	flag.Parse()
 	args := flag.Args()
-	f, err := os.Open(args[0])
+	img, err := image.ReadImage(args[0])
 	if err != nil {
 		panic(err)
 	}
-	img, _, err := image.Decode(f)
-	if err != nil {
-		panic(err)
-	}
-	_ = f.Close()
 
 	// Convert to RGBA
-	rgba := image.NewRGBA(img.Bounds())
-	draw.Draw(rgba, rgba.Bounds(), img, image.Point{}, draw.Src)
+	rgba := stdimg.NewRGBA(img.Bounds())
+	draw.Draw(rgba, rgba.Bounds(), img, stdimg.Point{}, draw.Src)
 
-	//	imgC := ExtractChannel(rgba, 0)
-	//	imgC := ExtractChannel(rgba, 1)
-	imgC := ExtractChannel(rgba, 2)
+	//	imgC := image.ExtractChannel(rgba, 0)
+	//	imgC := image.ExtractChannel(rgba, 1)
+	imgC := image.ExtractChannel(rgba, 2)
 
 	// Create linear contrast expansion
-	hist, start, end := Histogram(imgC)
-	lcelut := NLExpansionLut(start, end+1, &util.NLLinear{})
-	rgbaLCE := RemapRGBSingle(rgba, lcelut)
+	hist, start, end := image.Histogram(imgC)
+	lcelut := image.NLExpansionLut(end-start+1, start, end+1, &util.NLLinear{})
+	rgbaLCE := image.RemapRGBSingle(rgba, lcelut)
 
 	// Create histogram equalization
-	cdf := CDF(hist)
-	helut := CreateLutFromValues(cdf)
-	rgbaHE := RemapRGBSingle(rgba, helut)
+	cdf := image.CDF(hist)
+	helut := image.CreateLutFromValues(cdf)
+	rgbaHE := image.RemapRGBSingle(rgba, helut)
 
 	// Output images
-	fLCEDst, err := os.Create("outLCE.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer fLCEDst.Close()
-	err = png.Encode(fLCEDst, rgbaLCE)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fHEDst, err := os.Create("outHE.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer fHEDst.Close()
-	err = png.Encode(fHEDst, rgbaHE)
-	if err != nil {
-		log.Fatal(err)
-	}
+	image.SaveImage(rgbaLCE, "outLCE")
+	image.SaveImage(rgbaHE, "outHE")
 }
