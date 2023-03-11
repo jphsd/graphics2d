@@ -8,7 +8,7 @@ import (
 	"github.com/jphsd/graphics2d/util"
 )
 
-// HSL describes a color in HSL space. All values are in range [0,1].
+// HSL describes a color in Hue Saturation Lightness space. All values are in range [0,1].
 type HSL struct {
 	H, S, L, A float64
 }
@@ -289,7 +289,7 @@ func Compound(col color.Color) []*HSL {
 	return Analogous(Complement(col))
 }
 
-// RandomHue returns an HSL color with a randon hue, fully saturated and 50% lightness.
+// RandomHue returns an HSL color with a random hue, fully saturated and 50% lightness.
 func RandomHue() *HSL {
 	return &HSL{rand.Float64(), 1, 0.5, 1}
 }
