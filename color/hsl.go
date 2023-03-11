@@ -289,6 +289,63 @@ func Compound(col color.Color) []*HSL {
 	return Analogous(Complement(col))
 }
 
+// HuePair returns a pair of colors d away on either side of the color. d is in range [0,1]
+func HuePair(col color.Color, d float64) []*HSL {
+	a1, a2 := NewHSL(col), NewHSL(col)
+	if d < 0 {
+		d = 0
+	} else if d > 1 {
+		d = 1
+	}
+	a1.H += d
+	if a1.H > 1 {
+		a1.H -= 1
+	}
+	a2.H -= d
+	if a2.H < 0 {
+		a2.H += 1
+	}
+	return []*HSL{a1, a2}
+}
+
+// SatPair returns a pair of colors d away on either side of the color. d is in range [0,1]
+func SatPair(col color.Color, d float64) []*HSL {
+	a1, a2 := NewHSL(col), NewHSL(col)
+	if d < 0 {
+		d = 0
+	} else if d > 1 {
+		d = 1
+	}
+	a1.S += d
+	if a1.S > 1 {
+		a1.S = 1
+	}
+	a2.S -= d
+	if a2.S < 0 {
+		a2.S = 0
+	}
+	return []*HSL{a1, a2}
+}
+
+// LightPair returns a pair of colors d away on either side of the color. d is in range [0,1]
+func LightPair(col color.Color, d float64) []*HSL {
+	a1, a2 := NewHSL(col), NewHSL(col)
+	if d < 0 {
+		d = 0
+	} else if d > 1 {
+		d = 1
+	}
+	a1.L += d
+	if a1.L > 1 {
+		a1.L = 1
+	}
+	a2.L -= d
+	if a2.L < 0 {
+		a2.L = 0
+	}
+	return []*HSL{a1, a2}
+}
+
 // RandomHue returns an HSL color with a random hue, fully saturated and 50% lightness.
 func RandomHue() *HSL {
 	return &HSL{rand.Float64(), 1, 0.5, 1}

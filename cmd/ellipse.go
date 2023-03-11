@@ -15,16 +15,20 @@ func main() {
 	width, height := 1000, 1000
 	img := image.NewRGBA(width, height, color.White)
 
-	r := 200.0
+	r := 400.0
 	c := []float64{500, 500}
 	a := math.Pi / 4
 	offs := a
 	ang := 2 * (math.Pi - a)
-	cs := g2d.NewShape(g2d.Arc(c, r, offs, ang, g2d.ArcPie))
+	//style := g2d.ArcPie
+	style := g2d.ArcOpen
+	factor := 0.5
+	//factor := 0.618034 // Golden
+	cs := g2d.NewShape(g2d.Arc(c, r, offs, ang, style))
 	g2d.DrawShape(img, cs, g2d.BlackPen)
-	e1s := g2d.NewShape(g2d.EllipticalArc(c, r, 2*r, offs, ang, 0, g2d.ArcPie))
+	e1s := g2d.NewShape(g2d.EllipticalArc(c, r, factor*r, offs, ang, 0, style))
 	g2d.DrawShape(img, e1s, g2d.RedPen)
-	e2s := g2d.NewShape(g2d.EllipticalArc(c, 2*r, r, offs, ang, 0, g2d.ArcPie))
+	e2s := g2d.NewShape(g2d.EllipticalArc(c, factor*r, r, offs, ang, 0, style))
 	g2d.DrawShape(img, e2s, g2d.GreenPen)
 
 	image.SaveImage(img, "ellipse")
