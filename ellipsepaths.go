@@ -207,7 +207,9 @@ func IrregularEllipse(c []float64, rx1, rx2, ry1, ry2, disp, xang float64) *Path
 	xfm.Translate(c[0], c[1])
 	xfm.Rotate(xang)
 
-	return PartsToPath(parts...).Transform(xfm)
+	path := PartsToPath(parts...).Transform(xfm)
+	path.Close()
+	return path
 }
 
 // Egg uses IrregularEllipse to generate an egg shape with the specified width and height. The waist is
