@@ -5,7 +5,7 @@ import (
 	"math/rand"
 )
 
-// MPDProc contains the vairables that control the degree to which a step is chopped up into smaller
+// MPDProc contains the variables that control the degree to which a step is chopped up into smaller
 // line segments. Unlike JitterProc, the step end points don't vary. Can be used with MunchProc to get
 // a hand drawn look.
 type MPDProc struct {
