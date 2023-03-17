@@ -27,7 +27,7 @@ func main() {
 	imgG := image.SwitchChannels(rgba, 0, 2)
 	imgB := image.SwitchChannels(rgba, 0, 1)
 
-	image.SaveImage(imgR, "outR.png")
-	image.SaveImage(imgG, "outG.png")
-	image.SaveImage(imgB, "outB.png")
+	image.SaveImage(imgR, "outR")
+	image.SaveImage(imgG, "outG")
+	image.SaveImage(imgB, "outB")
 }

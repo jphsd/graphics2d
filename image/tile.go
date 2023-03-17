@@ -8,13 +8,13 @@ import (
 
 // Tile is an infinite image covered with a tile.
 type Tile struct {
-	Tile   *image.RGBA
-	Width  int
-	Height int
-	OffsX  int
-	OffsY  int
-	StagX  int
-	StagY  int
+	TileImg *image.RGBA
+	Width   int
+	Height  int
+	OffsX   int
+	OffsY   int
+	StagX   int
+	StagY   int
 }
 
 // NewTile creates a new image with the supplied image tile.
@@ -28,7 +28,7 @@ func NewTile(img image.Image) *Tile {
 
 // ColorModel implements the ColorModel function in the Image interface.
 func (t *Tile) ColorModel() color.Model {
-	return t.Tile.ColorModel()
+	return t.TileImg.ColorModel()
 }
 
 // Bounds implements the Bounds function in the Image interface.
@@ -49,7 +49,7 @@ func (t *Tile) At(x, y int) color.Color {
 		if y < 0 {
 			y = t.Height - y
 		}
-		return t.Tile.At(x, y)
+		return t.TileImg.At(x, y)
 	}
 	x += t.OffsX
 	x %= t.Width
@@ -61,5 +61,5 @@ func (t *Tile) At(x, y int) color.Color {
 	if y < 0 {
 		y = t.Height - y
 	}
-	return t.Tile.At(x, y)
+	return t.TileImg.At(x, y)
 }

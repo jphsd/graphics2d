@@ -9,11 +9,6 @@
 
 The gopher rendered with two different path processors.
 
-Still very much under development although the image functions are about as complete as I'm going to make them.
-
-Note - the go:embed feature from v1.16 is required to build and go vet will fail for go versions < 1.17 due
-to the new way of handling build tags.
-
 The top level Path and Shape types are complete, and the majority of PathProcessors implemented, including:
 - StrokeProc - fixed width strokes with a variety of cap and join types.
 - SnipProc - chops up a path according to a pattern
