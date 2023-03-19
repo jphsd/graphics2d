@@ -17,7 +17,7 @@ type Bit struct {
 	Rect   image.Rectangle
 }
 
-// NewTile creates a new image with the supplied image tile.
+// NewTile creates a new image with the supplied bounds.
 func NewBit(r image.Rectangle) *Bit {
 	w, h := r.Dx(), r.Dy()
 	bits := datastruct.NewBits(w * h)

@@ -62,3 +62,24 @@ func DrawShape(dst draw.Image, shape *Shape, pen *Pen) {
 	}
 	RenderShapeExt(dst, shape, pen.Filler, r.Min, nil, image.Point{}, draw.Over)
 }
+
+// Fill functions ignore the pen stroke and if any path isn't closed, it's forced so.
+
+// FillPath renders a path with the pen filler image and transform into the destination image.
+func FillPath(dst draw.Image, path *Path, pen *Pen) {
+	r := dst.Bounds()
+	shape := NewShape(path)
+	if pen.Xfm != nil {
+		shape = shape.Transform(pen.Xfm)
+	}
+	RenderShapeExt(dst, shape, pen.Filler, r.Min, nil, image.Point{}, draw.Over)
+}
+
+// FillShape renders a shape with the pen filler and transform into the destination image.
+func FillShape(dst draw.Image, shape *Shape, pen *Pen) {
+	r := dst.Bounds()
+	if pen.Xfm != nil {
+		shape = shape.Transform(pen.Xfm)
+	}
+	RenderShapeExt(dst, shape, pen.Filler, r.Min, nil, image.Point{}, draw.Over)
+}

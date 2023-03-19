@@ -18,10 +18,10 @@ func RenderColoredShape(dst draw.Image, shape *Shape, fill color.Color) {
 	RenderShapeExt(dst, shape, filler, image.Point{}, nil, image.Point{}, draw.Over)
 }
 
-// RenderShape renders the supplied shape with the fill image into
+// RenderShape renders the supplied shape with the offset fill image into
 // the destination image.
-func RenderShape(dst draw.Image, shape *Shape, filler image.Image, foffs image.Point) {
-	RenderShapeExt(dst, shape, filler, foffs, nil, image.Point{}, draw.Over)
+func RenderShape(dst draw.Image, shape *Shape, filler image.Image, fx, fy int) {
+	RenderShapeExt(dst, shape, filler, image.Point{fx, fy}, nil, image.Point{}, draw.Over)
 }
 
 // DefaultRenderFlatten is the standard curve flattening value.
