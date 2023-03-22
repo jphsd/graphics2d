@@ -42,24 +42,24 @@ func (t *Tile) At(x, y int) color.Color {
 		x += t.OffsX + t.StagX
 		x %= t.Width
 		if x < 0 {
-			x = t.Width - x
+			x = t.Width + x
 		}
 		y += t.OffsY
 		y %= t.Height
 		if y < 0 {
-			y = t.Height - y
+			y = t.Height + y
 		}
 		return t.TileImg.At(x, y)
 	}
 	x += t.OffsX
 	x %= t.Width
 	if x < 0 {
-		x = t.Width - x
+		x = t.Width + x
 	}
 	y += t.OffsY + t.StagY
 	y %= t.Height
 	if y < 0 {
-		y = t.Height - y
+		y = t.Height + y
 	}
 	return t.TileImg.At(x, y)
 }

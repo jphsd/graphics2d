@@ -43,8 +43,10 @@ func RenderShapeExt(dst draw.Image, shape *Shape, filler image.Image, foffs imag
 	rasterizer := vector.NewRasterizer(size.X, size.Y) // Rasterizer has implicit r.Min of {0, 0}
 	rasterizer.DrawOp = op
 
-	// Process paths translated by -srect.Min
+	// Process paths translated by -srect.Min and add srect.Min fo filler offest
+	foffs = image.Point{foffs.X + srect.Min.X, foffs.Y + srect.Min.Y}
 	minx, miny := float32(srect.Min.X), float32(srect.Min.Y)
+
 	for _, path := range shape.paths {
 		fp := path.Flatten(RenderFlatten) // tolerance 0.6
 		step := util.ToF32(fp.steps[0][0]...)
