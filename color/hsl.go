@@ -16,7 +16,7 @@ type HSL struct {
 // HSL conversions (see https://www.w3.org/TR/css-color-3/#hsl-color)
 
 // RGBA implements the RGBA function from the color.Color interface.
-func (c *HSL) RGBA() (uint32, uint32, uint32, uint32) {
+func (c HSL) RGBA() (uint32, uint32, uint32, uint32) {
 	m2 := 0.0
 	if c.L > 0.5 {
 		m2 = c.L + c.S - c.L*c.S
@@ -51,7 +51,7 @@ func hueConv(m1, m2, h float64) float64 {
 var HSLModel color.Model = color.ModelFunc(hslModel)
 
 func hslModel(col color.Color) color.Color {
-	hsl, ok := col.(*HSL)
+	hsl, ok := col.(HSL)
 	if !ok {
 		hsl = NewHSL(col)
 	}
@@ -59,10 +59,10 @@ func hslModel(col color.Color) color.Color {
 }
 
 // NewHSL returns the color as an HSL triplet.
-func NewHSL(col color.Color) *HSL {
+func NewHSL(col color.Color) HSL {
 	ir, ig, ib, ia := col.RGBA()
 	if ia == 0 {
-		return &HSL{0, 0, 0, 0}
+		return HSL{0, 0, 0, 0}
 	}
 
 	// Convert to [0,1]
@@ -103,11 +103,11 @@ func NewHSL(col color.Color) *HSL {
 		}
 	}
 
-	return &HSL{h, s, l, a}
+	return HSL{h, s, l, a}
 }
 
 // Complement returns the color's complement.
-func Complement(col color.Color) *HSL {
+func Complement(col color.Color) HSL {
 	hsl := NewHSL(col)
 	hsl.H += 0.5
 	if hsl.H > 1 {
@@ -119,11 +119,11 @@ func Complement(col color.Color) *HSL {
 // Monochrome returns the color's monochrome palette (excluding black and white).
 // Note the palette may not contain the original color since the values are equally
 // spaced over L.
-func Monochrome(col color.Color, n int) []*HSL {
+func Monochrome(col color.Color, n int) []HSL {
 	if n < 2 {
-		return []*HSL{NewHSL(col)}
+		return []HSL{NewHSL(col)}
 	}
-	res := make([]*HSL, n)
+	res := make([]HSL, n)
 	dl := 1.0 / float64(n-1)
 	l := dl
 	for i := 0; i < n; i++ {
@@ -136,7 +136,7 @@ func Monochrome(col color.Color, n int) []*HSL {
 }
 
 // Analogous returns the color's analogous colors.
-func Analogous(col color.Color) []*HSL {
+func Analogous(col color.Color) []HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	d := 1 / float64(12)
 	a1.H += d
@@ -147,11 +147,11 @@ func Analogous(col color.Color) []*HSL {
 	if a2.H < 0 {
 		a2.H += 1
 	}
-	return []*HSL{a1, a2}
+	return []HSL{a1, a2}
 }
 
 // Triad returns the color's other two triadics.
-func Triad(col color.Color) []*HSL {
+func Triad(col color.Color) []HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	d := 1 / float64(3)
 	a1.H += d
@@ -162,11 +162,11 @@ func Triad(col color.Color) []*HSL {
 	if a2.H < 0 {
 		a2.H += 1
 	}
-	return []*HSL{a1, a2}
+	return []HSL{a1, a2}
 }
 
 // Tetrad returns the color's other three tetradics.
-func Tetrad(col color.Color) []*HSL {
+func Tetrad(col color.Color) []HSL {
 	a1, a2, a3 := NewHSL(col), NewHSL(col), NewHSL(col)
 	d := 0.25
 	a1.H += d
@@ -181,11 +181,11 @@ func Tetrad(col color.Color) []*HSL {
 	if a3.H > 1 {
 		a3.H -= 1
 	}
-	return []*HSL{a1, a3, a2}
+	return []HSL{a1, a3, a2}
 }
 
 // Warmer returns the color shifted towards red.
-func Warmer(col color.Color) *HSL {
+func Warmer(col color.Color) HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.H, 0) {
 		return hsl
@@ -207,7 +207,7 @@ func Warmer(col color.Color) *HSL {
 }
 
 // Cooler returns the color shifted toward cyan.
-func Cooler(col color.Color) *HSL {
+func Cooler(col color.Color) HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.H, 0.5) {
 		return hsl
@@ -229,7 +229,7 @@ func Cooler(col color.Color) *HSL {
 }
 
 // Tint returns the color shifted towards white.
-func Tint(col color.Color) *HSL {
+func Tint(col color.Color) HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.L, 1) {
 		return hsl
@@ -243,7 +243,7 @@ func Tint(col color.Color) *HSL {
 }
 
 // Shade returns the color shifted towards black.
-func Shade(col color.Color) *HSL {
+func Shade(col color.Color) HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.L, 0) {
 		return hsl
@@ -257,7 +257,7 @@ func Shade(col color.Color) *HSL {
 }
 
 // Boost returns the color shifted away from gray.
-func Boost(col color.Color) *HSL {
+func Boost(col color.Color) HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.S, 1) {
 		return hsl
@@ -271,7 +271,7 @@ func Boost(col color.Color) *HSL {
 }
 
 // Tone returns the color shifted towards gray.
-func Tone(col color.Color) *HSL {
+func Tone(col color.Color) HSL {
 	hsl := NewHSL(col)
 	if util.Equals(hsl.S, 0) {
 		return hsl
@@ -285,12 +285,12 @@ func Tone(col color.Color) *HSL {
 }
 
 // Compound returns the colors analogous to the color's complement.
-func Compound(col color.Color) []*HSL {
+func Compound(col color.Color) []HSL {
 	return Analogous(Complement(col))
 }
 
 // HuePair returns a pair of colors d away on either side of the color. d is in range [0,1]
-func HuePair(col color.Color, d float64) []*HSL {
+func HuePair(col color.Color, d float64) []HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	if d < 0 {
 		d = 0
@@ -305,11 +305,11 @@ func HuePair(col color.Color, d float64) []*HSL {
 	if a2.H < 0 {
 		a2.H += 1
 	}
-	return []*HSL{a1, a2}
+	return []HSL{a1, a2}
 }
 
 // SatPair returns a pair of colors d away on either side of the color. d is in range [0,1]
-func SatPair(col color.Color, d float64) []*HSL {
+func SatPair(col color.Color, d float64) []HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	if d < 0 {
 		d = 0
@@ -324,11 +324,11 @@ func SatPair(col color.Color, d float64) []*HSL {
 	if a2.S < 0 {
 		a2.S = 0
 	}
-	return []*HSL{a1, a2}
+	return []HSL{a1, a2}
 }
 
 // LightPair returns a pair of colors d away on either side of the color. d is in range [0,1]
-func LightPair(col color.Color, d float64) []*HSL {
+func LightPair(col color.Color, d float64) []HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	if d < 0 {
 		d = 0
@@ -343,10 +343,10 @@ func LightPair(col color.Color, d float64) []*HSL {
 	if a2.L < 0 {
 		a2.L = 0
 	}
-	return []*HSL{a1, a2}
+	return []HSL{a1, a2}
 }
 
 // RandomHue returns an HSL color with a random hue, fully saturated and 50% lightness.
-func RandomHue() *HSL {
-	return &HSL{rand.Float64(), 1, 0.5, 1}
+func RandomHue() HSL {
+	return HSL{rand.Float64(), 1, 0.5, 1}
 }
