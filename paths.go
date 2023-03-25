@@ -301,9 +301,9 @@ func IrregularPolygon(cp []float64, r float64, n int, nr bool) *Path {
 	return path
 }
 
-// Lune returns a closed path made up of two arcs with end points at c plus/minus r0, rotated by th. The arcs
-// are calculated from the circumcircles of the two triangles defined by the end points and c displaced by
-// r1 or r2.
+// Lune returns a closed path made up of two arcs with end points at c plus/minus r0 in y, all rotated by th.
+// The arcs are calculated from the circumcircles of the two triangles defined by the end points, and c displaced
+// by r1 or r2 in x.
 func Lune(c []float64, r0, r1, r2, th float64) *Path {
 	a, b := []float64{c[0], c[1] + r0}, []float64{c[0], c[1] - r0}
 
