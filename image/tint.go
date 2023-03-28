@@ -1,9 +1,9 @@
 package image
 
 import (
+	g2dcol "github.com/jphsd/graphics2d/color"
 	"image"
 	"image/color"
-	"math"
 )
 
 // Tinter uses the gray or red channel of an image to create an image tinted with a lerp'd gradient
@@ -23,7 +23,7 @@ func NewTinter(img image.Image, c1, c2 color.Color) *Tinter {
 	dt := 1.0 / 256.0
 	t := 0.0
 	for i := 0; i < 256; i++ {
-		lut[i] = ColorRGBALerp(t, c1, c2)
+		lut[i] = g2dcol.ColorRGBALerp(t, c1, c2)
 		t += dt
 	}
 	cm := img.ColorModel()
@@ -59,21 +59,4 @@ func (t *Tinter) At(x, y int) color.Color {
 	}
 	v = (v & 0xff00) >> 8
 	return t.Lut[v]
-}
-
-// TODO - is this the right place for this?
-
-// ColorRGBALerp calculates the color value at t [0,1] given a start and end color in RGB space.
-func ColorRGBALerp(t float64, start, end color.Color) color.RGBA {
-	rs, gs, bs, as := start.RGBA() // uint32 [0,0xffff]
-	re, ge, be, ae := end.RGBA()
-	rt := uint32(math.Floor((1-t)*float64(rs) + t*float64(re) + 0.5))
-	gt := uint32(math.Floor((1-t)*float64(gs) + t*float64(ge) + 0.5))
-	bt := uint32(math.Floor((1-t)*float64(bs) + t*float64(be) + 0.5))
-	at := uint32(math.Floor((1-t)*float64(as) + t*float64(ae) + 0.5))
-	rt >>= 8 // uint32 [0,0xff]
-	gt >>= 8
-	bt >>= 8
-	at >>= 8
-	return color.RGBA{uint8(rt), uint8(gt), uint8(bt), uint8(at)}
 }
