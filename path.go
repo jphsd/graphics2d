@@ -385,6 +385,7 @@ func (p *Path) Transform(xfm *Aff3) *Path {
 		tmp.closed = p.closed
 		tmp.parent = path
 		path.flattened = tmp
+		path.tolerance = p.tolerance
 	}
 	if p.reversed != nil {
 		steps = make([][][]float64, len(p.reversed.steps))
