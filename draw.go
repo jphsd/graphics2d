@@ -5,7 +5,7 @@ import (
 	"image/draw"
 )
 
-// Simple drawing functions with pens
+// Simple immediate drawing and filling functions with pens
 
 // DrawPoint renders a point with the pen into the destination image.
 func DrawPoint(dst draw.Image, at []float64, pen *Pen) {

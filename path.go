@@ -375,6 +375,39 @@ func (p *Path) Transform(xfm *Aff3) *Path {
 	path.steps = steps
 	path.closed = p.closed
 	path.parent = p
+	if p.flattened != nil {
+		steps = make([][][]float64, len(p.flattened.steps))
+		for i, step := range p.flattened.steps {
+			steps[i] = xfm.Apply(step...)
+		}
+		tmp := &Path{}
+		tmp.steps = steps
+		tmp.closed = p.closed
+		tmp.parent = path
+		path.flattened = tmp
+	}
+	if p.reversed != nil {
+		steps = make([][][]float64, len(p.reversed.steps))
+		for i, step := range p.reversed.steps {
+			steps[i] = xfm.Apply(step...)
+		}
+		tmp := &Path{}
+		tmp.steps = steps
+		tmp.closed = p.closed
+		tmp.parent = path
+		path.reversed = tmp
+	}
+	if p.simplified != nil {
+		steps = make([][][]float64, len(p.simplified.steps))
+		for i, step := range p.simplified.steps {
+			steps[i] = xfm.Apply(step...)
+		}
+		tmp := &Path{}
+		tmp.steps = steps
+		tmp.closed = p.closed
+		tmp.parent = path
+		path.simplified = tmp
+	}
 	return path
 }
 
