@@ -6,7 +6,7 @@
 
 ![Gophers rendered with graphics2d](./doc/gopher2.png)
 
-The face of the gopher rendered with two different path processors.
+Dancing gophers rendered with graphics2d primitives.
 
 The top level Path and Shape types are complete, and the majority of PathProcessors implemented, including:
 - StrokeProc - fixed width strokes with a variety of cap and join types.
