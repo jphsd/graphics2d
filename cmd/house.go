@@ -3,9 +3,9 @@
 package main
 
 import (
+	"fmt"
 	g2d "github.com/jphsd/graphics2d"
 	"github.com/jphsd/graphics2d/image"
-	stdimg "image"
 	"image/color"
 	"math"
 	"math/rand"
@@ -71,112 +71,118 @@ var (
 	}
 )
 
-// Demonstrate use of IrregularEllipses and fills to draw house
+// Demonstrate use of IrregularEllipses and Renderables to draw house
 func main() {
 	// Create image to write into
 	width, height := 1000, 1000
 	img := image.NewRGBA(width, height, color.White)
+
+	// Make house
+	house := MakeHouse()
+	rect := house.Bounds()
+	fmt.Printf("%d,%d -> %d,%d (%d,%d)\n", rect.Min.X, rect.Min.Y, rect.Max.X, rect.Max.Y, rect.Dx(), rect.Dy())
 
 	// Locate and scale
 	xfm := g2d.NewAff3()
 	xfm.Translate(250, 250)
 	xfm.Scale(2, 2)
 
-	// Draw house
-	DrawHouse(img, xfm)
+	house.Render(img, xfm)
 
 	// Save image
-	image.SaveImage(img, "house")
+	image.SaveImage(img, "house2")
 }
 
-func DrawHouse(img *stdimg.RGBA, xfm *g2d.Aff3) {
+func MakeHouse() *g2d.Renderable {
 	// Order is important - furthest from eye obejcts first
-	DrawChimney(img, xfm)
-	DrawFirstFloor(img, xfm)
-	DrawSecondFloor(img, xfm)
-	DrawRoof(img, xfm)
+	res := MakeChimney()
+	res.AddRenderable(MakeFirstFloor(), nil)
+	res.AddRenderable(MakeSecondFloor(), nil)
+	res.AddRenderable(MakeRoof(), nil)
+
+	return res
 }
 
-func DrawFirstFloor(img *stdimg.RGBA, xfm *g2d.Aff3) {
-	// Rendering offset
-	ofirst := xfm.Apply(first...)
-	odoor := xfm.Apply(door...)
-	owindow := xfm.Apply(window...)
+func MakeFirstFloor() *g2d.Renderable {
+	res := &g2d.Renderable{}
 
 	// Flats
-	poly := g2d.Polygon(ofirst...)
-	g2d.RenderColoredShape(img, g2d.NewShape(poly), gray)
-	poly = g2d.Polygon(odoor...)
-	g2d.RenderColoredShape(img, g2d.NewShape(poly), brown)
+	poly := g2d.Polygon(first...)
+	res.AddColoredShape(g2d.NewShape(poly), gray, nil)
+	poly = g2d.Polygon(door...)
+	res.AddColoredShape(g2d.NewShape(poly), brown, nil)
 
 	// Shadows and highlights
-	shad := InkStroke([]float64{ofirst[2][0] - 10, ofirst[2][1]}, []float64{ofirst[1][0] - 10, ofirst[1][1]}, 7, 5, 0)
-	g2d.RenderColoredShape(img, g2d.NewShape(shad), grayshad)
-	high := InkStroke([]float64{ofirst[3][0] + 10, ofirst[3][1]}, []float64{ofirst[0][0] + 10, ofirst[0][1]}, 7, 5, 0)
-	g2d.RenderColoredShape(img, g2d.NewShape(high), grayhigh)
+	shad := InkStroke([]float64{first[2][0] - 10, first[2][1]}, []float64{first[1][0] - 10, first[1][1]}, 7, 5, 0)
+	res.AddColoredShape(g2d.NewShape(shad), grayshad, nil)
+	high := InkStroke([]float64{first[3][0] + 10, first[3][1]}, []float64{first[0][0] + 10, first[0][1]}, 7, 5, 0)
+	res.AddColoredShape(g2d.NewShape(high), grayhigh, nil)
 
 	// Lines
-	lshape := g2d.NewShape(PolyStroke(ofirst, 3, 3, 2)...)
-	lshape.AddPaths(PolyStroke(owindow, 1, 2, 2)...)
-	lshape.AddPaths(PolyStroke(odoor, 1, 2, 2)...)
-	g2d.RenderColoredShape(img, lshape, color.Black)
+	lshape := g2d.NewShape(PolyStroke(first, 3, 3, 2)...)
+	lshape.AddPaths(PolyStroke(window, 1, 2, 2)...)
+	lshape.AddPaths(PolyStroke(door, 1, 2, 2)...)
+	res.AddColoredShape(lshape, color.Black, nil)
+
+	return res
 }
 
-func DrawSecondFloor(img *stdimg.RGBA, xfm *g2d.Aff3) {
-	// Rendering offset
-	osecond := xfm.Apply(second...)
-	ostringer := xfm.Apply(stringer...)
-	ostuds := xfm.Apply(studs...)
+func MakeSecondFloor() *g2d.Renderable {
+	res := &g2d.Renderable{}
 
 	// Flats
-	poly := g2d.Polygon(osecond...)
-	g2d.RenderColoredShape(img, g2d.NewShape(poly), brown)
+	poly := g2d.Polygon(second...)
+	res.AddColoredShape(g2d.NewShape(poly), brown, nil)
 
 	// Shadows
-	shad1 := InkStroke([]float64{osecond[2][0] + 5, osecond[2][1]}, []float64{osecond[0][0] + 5, osecond[0][1]}, 3, 4, 0)
-	shad2 := InkStroke([]float64{osecond[2][0] - 5, osecond[2][1]}, []float64{osecond[1][0] - 5, osecond[1][1]}, 3, 4, 0)
-	g2d.RenderColoredShape(img, g2d.NewShape(shad1, shad2), brownshad)
+	shad1 := InkStroke([]float64{second[2][0] + 5, second[2][1]}, []float64{second[0][0] + 5, second[0][1]}, 3, 4, 0)
+	shad2 := InkStroke([]float64{second[2][0] - 5, second[2][1]}, []float64{second[1][0] - 5, second[1][1]}, 3, 4, 0)
+	res.AddColoredShape(g2d.NewShape(shad1, shad2), brownshad, nil)
 
 	// Lines
-	lshape := g2d.NewShape(PolyStroke(osecond, 3, 3, 2)...)
-	lshape.AddPaths(InkStroke(ostringer[0], ostringer[1], 1, 2, 2))
-	lshape.AddPaths(InkStroke(ostuds[0], ostuds[1], 1, 2, 2))
-	lshape.AddPaths(InkStroke(ostuds[2], ostuds[3], 1, 2, 2))
-	lshape.AddPaths(InkStroke(ostuds[4], ostuds[5], 1, 2, 2))
-	lshape.AddPaths(InkStroke(ostuds[6], ostuds[7], 1, 2, 2))
-	g2d.RenderColoredShape(img, lshape, color.Black)
+	lshape := g2d.NewShape(PolyStroke(second, 3, 3, 2)...)
+	lshape.AddPaths(InkStroke(stringer[0], stringer[1], 1, 2, 2))
+	lshape.AddPaths(InkStroke(studs[0], studs[1], 1, 2, 2))
+	lshape.AddPaths(InkStroke(studs[2], studs[3], 1, 2, 2))
+	lshape.AddPaths(InkStroke(studs[4], studs[5], 1, 2, 2))
+	lshape.AddPaths(InkStroke(studs[6], studs[7], 1, 2, 2))
+	res.AddColoredShape(lshape, color.Black, nil)
+
+	return res
 }
 
-func DrawRoof(img *stdimg.RGBA, xfm *g2d.Aff3) {
-	// Rendering offset
-	oroof := xfm.Apply(roof...)
+func MakeRoof() *g2d.Renderable {
+	res := &g2d.Renderable{}
 
 	// Flats
-	poly := g2d.Polygon(oroof...)
-	g2d.RenderColoredShape(img, g2d.NewShape(poly), brown)
+	poly := g2d.Polygon(roof...)
+	res.AddColoredShape(g2d.NewShape(poly), brown, nil)
 
 	// Shadows and highlights
-	shad := InkStroke([]float64{oroof[5][0] - 5, oroof[5][1] + 5}, []float64{oroof[4][0] - 5, oroof[4][1]}, 3, 4, 0)
-	g2d.RenderColoredShape(img, g2d.NewShape(shad), brownshad)
-	high := InkStroke([]float64{oroof[5][0] + 5, oroof[5][1] + 5}, []float64{oroof[0][0] + 5, oroof[0][1]}, 3, 4, 0)
-	g2d.RenderColoredShape(img, g2d.NewShape(high), brownhigh)
+	shad := InkStroke([]float64{roof[5][0] - 5, roof[5][1] + 5}, []float64{roof[4][0] - 5, roof[4][1]}, 3, 4, 0)
+	res.AddColoredShape(g2d.NewShape(shad), brownshad, nil)
+	high := InkStroke([]float64{roof[5][0] + 5, roof[5][1] + 5}, []float64{roof[0][0] + 5, roof[0][1]}, 3, 4, 0)
+	res.AddColoredShape(g2d.NewShape(high), brownhigh, nil)
 
 	// Lines
-	lshape := g2d.NewShape(PolyStroke(oroof, 3, 3, 2)...)
-	g2d.RenderColoredShape(img, lshape, color.Black)
+	lshape := g2d.NewShape(PolyStroke(roof, 3, 3, 2)...)
+	res.AddColoredShape(lshape, color.Black, nil)
+
+	return res
 }
 
-func DrawChimney(img *stdimg.RGBA, xfm *g2d.Aff3) {
-	// Rendering offset
-	ochimney := xfm.Apply(chimney...)
+func MakeChimney() *g2d.Renderable {
+	res := &g2d.Renderable{}
 
 	// Flats
-	poly := g2d.Polygon(ochimney...)
-	g2d.RenderColoredShape(img, g2d.NewShape(poly), gray)
+	poly := g2d.Polygon(chimney...)
+	res.AddColoredShape(g2d.NewShape(poly), gray, nil)
 
 	// Lines
-	lshape := g2d.NewShape(PolyStroke(ochimney, 3, 3, 2)...)
-	g2d.RenderColoredShape(img, lshape, color.Black)
+	lshape := g2d.NewShape(PolyStroke(chimney, 3, 3, 2)...)
+	res.AddColoredShape(lshape, color.Black, nil)
+
+	return res
 }
 
 func PolyStroke(points [][]float64, mw, dw, ec float64) []*g2d.Path {

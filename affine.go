@@ -21,19 +21,76 @@ func NewAff3() *Aff3 {
 	return &res
 }
 
+// Translate creates a translation transform.
+func Translate(x, y float64) *Aff3 {
+	xfm := NewAff3()
+	xfm.Translate(x, y)
+	return xfm
+}
+
+// Rotate creates a rotation transform.
+func Rotate(th float64) *Aff3 {
+	xfm := NewAff3()
+	xfm.Rotate(th)
+	return xfm
+}
+
+// RotateAbout creates a rotation transform about a point.
+func RotateAbout(th, ax, ay float64) *Aff3 {
+	xfm := NewAff3()
+	xfm.RotateAbout(th, ax, ay)
+	return xfm
+}
+
+// Scale creates a scale transform.
+func Scale(sx, sy float64) *Aff3 {
+	xfm := NewAff3()
+	xfm.Scale(sx, sy)
+	return xfm
+}
+
+// ScaleAbout creates a scale transform about a point.
+func ScaleAbout(sx, sy, ax, ay float64) *Aff3 {
+	xfm := NewAff3()
+	xfm.ScaleAbout(sx, sy, ax, ay)
+	return xfm
+}
+
+// Shear creates a shear transform.
+func Shear(shx, shy float64) *Aff3 {
+	xfm := NewAff3()
+	xfm.Shear(shx, shy)
+	return xfm
+}
+
+// ShearAbout creates a shear transform about a point.
+func ShearAbout(shx, shy, ax, ay float64) *Aff3 {
+	xfm := NewAff3()
+	xfm.ShearAbout(shx, shy, ax, ay)
+	return xfm
+}
+
+// Reflect creates a reflection transform.
+func Reflect(x1, y1, x2, y2 float64) *Aff3 {
+	xfm := NewAff3()
+	xfm.Reflect(x1, y1, x2, y2)
+	return xfm
+}
+
 // Determinant calculates the transform's matrix determinant.
 func (a *Aff3) Determinant() float64 {
 	return a[3*0+0]*a[3*1+1] - a[3*0+1]*a[3*1+0]
 }
 
 // Translate adds a translation to the transform.
-func (a *Aff3) Translate(x, y float64) {
+func (a *Aff3) Translate(x, y float64) *Aff3 {
 	a[3*0+2] = x*a[3*0+0] + y*a[3*0+1] + a[3*0+2]
 	a[3*1+2] = x*a[3*1+0] + y*a[3*1+1] + a[3*1+2]
+	return a
 }
 
 // Rotate adds a rotation to the transform. The rotation is about {0, 0}.
-func (a *Aff3) Rotate(th float64) {
+func (a *Aff3) Rotate(th float64) *Aff3 {
 	sin, cos := math.Sin(th), math.Cos(th)
 	m0, m1 := a[3*0+0], a[3*0+1]
 	a[3*0+0] = cos*m0 + sin*m1
@@ -41,19 +98,21 @@ func (a *Aff3) Rotate(th float64) {
 	m0, m1 = a[3*1+0], a[3*1+1]
 	a[3*1+0] = cos*m0 + sin*m1
 	a[3*1+1] = -sin*m0 + cos*m1
+	return a
 }
 
 // RotateAbout adds a rotation about a point to the transform.
-func (a *Aff3) RotateAbout(th, ax, ay float64) {
+func (a *Aff3) RotateAbout(th, ax, ay float64) *Aff3 {
 	// Reverse order
 	a.Translate(ax, ay)
 	a.Rotate(th)
 	a.Translate(-ax, -ay)
+	return a
 }
 
 // QuadrantRotate adds a rotation (n * 90 degrees) to the transform. The rotation is about {0, 0}.
 // It avoids rounding issues with the trig functions.
-func (a *Aff3) QuadrantRotate(n int) {
+func (a *Aff3) QuadrantRotate(n int) *Aff3 {
 	n %= 4
 	switch n {
 	case 0: // 360
@@ -65,35 +124,39 @@ func (a *Aff3) QuadrantRotate(n int) {
 	case 3: // 270
 		a[3*0+0], a[3*0+1], a[3*1+0], a[3*1+1] = -a[3*0+1], a[3*0+0], -a[3*1+1], a[3*1+0]
 	}
+	return a
 }
 
 // QuadrantRotateAbout adds a rotation (n * 90 degrees) about a point to the transform.
 // It avoids rounding issues with the trig functions.
-func (a *Aff3) QuadrantRotateAbout(n int, ax, ay float64) {
+func (a *Aff3) QuadrantRotateAbout(n int, ax, ay float64) *Aff3 {
 	// Reverse order
 	a.Translate(ax, ay)
 	a.QuadrantRotate(n)
 	a.Translate(-ax, -ay)
+	return a
 }
 
 // Scale adds a scaling to the transform centered on {0, 0}.
-func (a *Aff3) Scale(sx, sy float64) {
+func (a *Aff3) Scale(sx, sy float64) *Aff3 {
 	a[3*0+0] *= sx
 	a[3*1+1] *= sy
 	a[3*0+1] *= sy
 	a[3*1+0] *= sx
+	return a
 }
 
 // ScaleAbout adds a scale about a point to the transform.
-func (a *Aff3) ScaleAbout(sx, sy, ax, ay float64) {
+func (a *Aff3) ScaleAbout(sx, sy, ax, ay float64) *Aff3 {
 	// Reverse order
 	a.Translate(ax, ay)
 	a.Scale(sx, sy)
 	a.Translate(-ax, -ay)
+	return a
 }
 
 // Shear adds a shear to the transform centered on {0, 0}.
-func (a *Aff3) Shear(shx, shy float64) {
+func (a *Aff3) Shear(shx, shy float64) *Aff3 {
 	m0, m1 := a[3*0+0], a[3*0+1]
 	a[3*0+0] = m0 + m1*shy
 	a[3*0+1] = m0*shx + m1
@@ -101,18 +164,20 @@ func (a *Aff3) Shear(shx, shy float64) {
 	m0, m1 = a[3*1+0], a[3*1+1]
 	a[3*1+0] = m0 + m1*shy
 	a[3*1+1] = m0*shx + m1
+	return a
 }
 
 // ShearAbout adds a shear about a point to the transform.
-func (a *Aff3) ShearAbout(shx, shy, ax, ay float64) {
+func (a *Aff3) ShearAbout(shx, shy, ax, ay float64) *Aff3 {
 	// Reverse order
 	a.Translate(ax, ay)
 	a.Shear(shx, shy)
 	a.Translate(-ax, -ay)
+	return a
 }
 
 // Concatenate concatenates a transform to the transform.
-func (a *Aff3) Concatenate(aff Aff3) {
+func (a *Aff3) Concatenate(aff Aff3) *Aff3 {
 	m00, m01, m10, m11 := a[3*0+0], a[3*0+1], a[3*1+0], a[3*1+1]
 	t00, t01, t02, t10, t11, t12 := aff[3*0+0], aff[3*0+1], aff[3*0+2], aff[3*1+0], aff[3*1+1], aff[3*1+2]
 
@@ -123,10 +188,11 @@ func (a *Aff3) Concatenate(aff Aff3) {
 	a[3*1+0] = t00*m10 + t10*m11
 	a[3*1+1] = t01*m10 + t11*m11
 	a[3*1+2] += t02*m10 + t12*m11
+	return a
 }
 
 // PreConcatenate preconcatenates a transform to the transform.
-func (a *Aff3) PreConcatenate(aff Aff3) {
+func (a *Aff3) PreConcatenate(aff Aff3) *Aff3 {
 	m00, m01, m02, m10, m11, m12 := a[3*0+0], a[3*0+1], a[3*0+2], a[3*1+0], a[3*1+1], a[3*1+2]
 	t00, t01, t02, t10, t11, t12 := aff[3*0+0], aff[3*0+1], aff[3*0+2], aff[3*1+0], aff[3*1+1], aff[3*1+2]
 
@@ -140,6 +206,7 @@ func (a *Aff3) PreConcatenate(aff Aff3) {
 
 	a[3*0+1] = m01*t00 + m11*t01
 	a[3*1+1] = m01*t10 + m11*t11
+	return a
 }
 
 // InverseOf returns the inverse of the transform.
@@ -202,21 +269,21 @@ func (a *Aff3) Copy() *Aff3 {
 }
 
 // Reflect performs a reflection along the axis defined by the two non-coincident points.
-func (a *Aff3) Reflect(x1, y1, x2, y2 float64) {
+func (a *Aff3) Reflect(x1, y1, x2, y2 float64) *Aff3 {
 	dx, dy := x2-x1, y2-y1
 	if util.Equals(dy, 0) {
 		// Horizontal - no rotation required
 		a.Translate(0, y1)
 		a.Scale(1, -1)
 		a.Translate(0, -y1)
-		return
+		return a
 	}
 	if util.Equals(dx, 0) {
 		// Vertical - no rotation required
 		a.Translate(x1, 0)
 		a.Scale(-1, 1)
 		a.Translate(-x1, 0)
-		return
+		return a
 	}
 	th := math.Atan2(dy, dx)
 	if th < 0 {
@@ -227,6 +294,7 @@ func (a *Aff3) Reflect(x1, y1, x2, y2 float64) {
 	a.Scale(1, -1)
 	a.Rotate(-th)
 	a.Translate(-x1, -y1)
+	return a
 }
 
 // LineTransform produces a transform that maps the line {p1, p2} to {p1', p2'}.

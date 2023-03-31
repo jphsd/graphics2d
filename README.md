@@ -4,8 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jphsd/graphics2d)](https://goreportcard.com/report/github.com/jphsd/graphics2d)
 [![Build Status](https://travis-ci.com/jphsd/graphics2d.svg?branch=master)](https://travis-ci.com/github/jphsd/graphics2d)
 
-![Gopher rendered with graphics2d](./doc/gopher.png)
-![Gopher rendered with graphics2d](./doc/hdgopher.png)
+![Gophers rendered with graphics2d](./doc/gopher2.png)
 
 The face of the gopher rendered with two different path processors.
 
