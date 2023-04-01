@@ -19,12 +19,14 @@ func (j *JitterProc) Process(p *Path) []*Path {
 		return []*Path{p}
 	}
 
+	// Path start and end are left unchanged
 	res := NewPath(parts[0][0])
 	if len(parts[0]) == 1 {
 		return []*Path{res}
 	}
 
-	for _, part := range parts {
+	for i := 0; i < np-1; i++ {
+		part := parts[i]
 		end := len(part) - 1
 		dx, dy := part[end][0]-part[0][0], part[end][1]-part[0][1]
 		l := math.Sqrt(dx*dx + dy*dy)
@@ -33,6 +35,11 @@ func (j *JitterProc) Process(p *Path) []*Path {
 		part[end][0] += nx * l
 		part[end][1] += ny * l
 		res.AddStep(part[1:]...)
+	}
+	res.AddStep(parts[np-1][1:]...)
+
+	if p.closed {
+		res.Close()
 	}
 
 	return []*Path{res}

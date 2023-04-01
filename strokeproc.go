@@ -14,8 +14,9 @@ import (
 
 // StrokeProc defines the width, join and cap types of the stroke.
 type StrokeProc struct {
-	RTraceProc *TraceProc
-	LTraceProc *TraceProc
+	RTraceProc    *TraceProc
+	LTraceProc    *TraceProc
+	PostTraceProc PathProcessor
 	// (pt, r) []part
 	PointFunc func([]float64, float64) [][][]float64
 	// (part1, pt, part2) []part
@@ -43,7 +44,7 @@ func NewStrokeProcExt(rw, lw float64,
 	if lw > 0 {
 		lw = -lw
 	}
-	return &StrokeProc{&TraceProc{rw, d, rjf}, &TraceProc{lw, d, ljf}, PointCircle, CapButt, nil, nil}
+	return &StrokeProc{&TraceProc{rw, d, rjf}, &TraceProc{lw, d, ljf}, nil, PointCircle, CapButt, nil, nil}
 }
 
 // Process implements the PathProcessor interface and will return either one or two paths
@@ -61,6 +62,12 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 	// Calculate traces for each side
 	rhs := sp.RTraceProc.ProcessParts(p)
 	lhs := sp.LTraceProc.ProcessParts(p)
+
+	if sp.PostTraceProc != nil {
+		// Run the post trace path processor on both traces
+		rhs = PartsToPath(rhs...).Process(sp.PostTraceProc)[0].Parts()
+		lhs = PartsToPath(lhs...).Process(sp.PostTraceProc)[0].Parts()
+	}
 
 	if p.closed {
 		// ProcessParts has already performed the last join
