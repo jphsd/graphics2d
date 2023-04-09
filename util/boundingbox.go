@@ -74,3 +74,10 @@ func BBFilter(pts [][]float64, bb [][]float64) [][]float64 {
 	}
 	return res
 }
+
+// BBOutline returns a rectangle describing bb.
+func BBOutline(bb [][]float64) [][]float64 {
+	x1, x2 := bb[0][0], bb[1][0]
+	y1, y2 := bb[0][1], bb[1][1]
+	return [][]float64{{x1, y1}, {x2, y1}, {x2, y2}, {x1, y2}}
+}
