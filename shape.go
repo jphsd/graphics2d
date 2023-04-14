@@ -3,6 +3,7 @@ package graphics2d
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/jphsd/graphics2d/util"
 	"image"
 	"math"
 )
@@ -11,21 +12,34 @@ import (
 // it must be closed, so paths added to the shape are forced closed on rendering.
 type Shape struct {
 	paths  []*Path
-	bounds image.Rectangle
+	bbox   [][]float64
 	mask   *image.Alpha
 	parent *Shape
 }
 
+// BoundingBox calculates a bounding box that the Shape is guaranteed to fit within.
+func (s *Shape) BoundingBox() [][]float64 {
+	if s.bbox == nil {
+		var bb [][]float64
+		for _, path := range s.paths {
+			if bb == nil {
+				bb = path.BoundingBox()
+			} else {
+				bbp := path.BoundingBox()
+				bb = util.BoundingBox(bb[0], bb[1], bbp[0], bbp[1])
+			}
+		}
+		s.bbox = bb
+	}
+	return s.bbox
+}
+
 // Bounds calculates the union of the bounds of the paths the shape contains.
 func (s *Shape) Bounds() image.Rectangle {
-	if s.bounds.Empty() && s.paths != nil && len(s.paths) > 0 {
-		rect := s.paths[0].Bounds()
-		for i := 1; i < len(s.paths); i++ {
-			rect = rect.Union(s.paths[i].Bounds())
-		}
-		s.bounds = rect
-	}
-	return s.bounds
+	bb := s.BoundingBox()
+	fx, fy := int(math.Floor(bb[0][0])), int(math.Floor(bb[0][1]))
+	cx, cy := int(math.Ceil(bb[1][0])), int(math.Ceil(bb[1][1]))
+	return image.Rectangle{image.Point{fx, fy}, image.Point{cx, cy}}
 }
 
 // Mask returns an Alpha image, the size of the shape bounds, containing the result
@@ -77,7 +91,7 @@ func (s *Shape) AddPaths(paths ...*Path) {
 			s.paths = append(s.paths, lp)
 		}
 	}
-	s.bounds = image.Rectangle{}
+	s.bbox = nil
 	s.mask = nil
 }
 
@@ -97,7 +111,7 @@ func (s *Shape) Paths() []*Path {
 func (s *Shape) Copy() *Shape {
 	np := make([]*Path, len(s.paths))
 	copy(np, s.paths)
-	return &Shape{np, s.bounds, s.mask, s.parent}
+	return &Shape{np, nil, nil, s.parent}
 }
 
 // Transform applies an affine transform to all the paths in the shape
@@ -107,7 +121,7 @@ func (s *Shape) Transform(xfm *Aff3) *Shape {
 	for i, path := range s.paths {
 		np[i] = path.Transform(xfm)
 	}
-	return &Shape{np, image.Rectangle{}, nil, s}
+	return &Shape{np, nil, nil, s}
 }
 
 // Process applies a shape processor to the shape and
@@ -132,7 +146,7 @@ func (s *Shape) ProcessPaths(proc PathProcessor) *Shape {
 		}
 	}
 
-	return &Shape{np, image.Rectangle{}, nil, s}
+	return &Shape{np, nil, nil, s}
 }
 
 // String converts a shape into a string.
@@ -173,7 +187,7 @@ func (s *Shape) UnmarshalJSON(b []byte) error {
 	s.paths = sj.Paths
 
 	// Reset everything else
-	s.bounds = image.Rectangle{}
+	s.bbox = nil
 	s.mask = nil
 	s.parent = nil
 

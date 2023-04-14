@@ -28,7 +28,7 @@ type Path struct {
 	// step, point, ordinal
 	steps  [][][]float64
 	closed bool
-	bounds image.Rectangle
+	bbox   [][]float64
 	// Caching flattened, simplified and reversed paths, and tangents
 	flattened  *Path
 	tolerance  float64
@@ -80,7 +80,7 @@ func (p *Path) AddStep(points ...[]float64) error {
 	}
 
 	p.steps = append(p.steps, npoints)
-	p.bounds = image.Rectangle{}
+	p.bbox = nil
 	p.flattened = nil
 	p.simplified = nil
 	p.tangents = nil
@@ -275,40 +275,29 @@ func FlattenPart(d float64, pts [][]float64) [][][]float64 {
 	return flattenPart(d*d, pts)
 }
 
+// BoundingBox calculates a bounding box that the Path is guaranteed to fit within. It's unlikely to
+// be the minimal bounding box for the path since the control points are also included.
+// If a tight bounding box is required then use CalcExtremities().
+func (p *Path) BoundingBox() [][]float64 {
+	if p.bbox == nil {
+		bb := [][]float64{p.steps[0][0], p.steps[0][0]}
+		for _, step := range p.steps {
+			bbp := util.BoundingBox(step...)
+			bb = util.BoundingBox(bb[0], bb[1], bbp[0], bbp[1])
+		}
+		p.bbox = bb
+	}
+	return p.bbox
+}
+
 // Bounds calculates a rectangle that the Path is guaranteed to fit within. It's unlikely to
 // be the minimal bounding rectangle for the path since the control points are also included.
 // If a tight bounding rectangle is required then use CalcExtremities().
 func (p *Path) Bounds() image.Rectangle {
-	if p.bounds.Empty() {
-		rect := image.Rectangle{}
-		for _, pts := range p.steps {
-			for _, s := range pts {
-				fx, fy := int(math.Floor(s[0])), int(math.Floor(s[1]))
-				cx, cy := int(math.Ceil(s[0])), int(math.Ceil(s[1]))
-				if rect.Empty() {
-					rect.Min.X = fx
-					rect.Min.Y = fy
-					rect.Max.X = cx + 1
-					rect.Max.Y = cy + 1
-				} else {
-					if rect.Min.X > fx {
-						rect.Min.X = fx
-					}
-					if rect.Min.Y > fy {
-						rect.Min.Y = fy
-					}
-					if rect.Max.X <= cx {
-						rect.Max.X = cx + 1
-					}
-					if rect.Max.Y <= cy {
-						rect.Max.Y = cy + 1
-					}
-				}
-			}
-		}
-		p.bounds = rect
-	}
-	return p.bounds
+	bb := p.BoundingBox()
+	fx, fy := int(math.Floor(bb[0][0])), int(math.Floor(bb[0][1]))
+	cx, cy := int(math.Ceil(bb[1][0])), int(math.Ceil(bb[1][1]))
+	return image.Rectangle{image.Point{fx, fy}, image.Point{cx, cy}}
 }
 
 // Copy performs a deepish copy - points themselves aren't duplicated.
@@ -319,7 +308,7 @@ func (p *Path) Copy() *Path {
 	path := &Path{}
 	path.steps = steps
 	path.closed = p.closed
-	path.bounds = p.bounds
+	path.bbox = nil
 	path.parent = p.parent
 	return path
 }
@@ -861,7 +850,7 @@ func (p *Path) UnmarshalJSON(b []byte) error {
 	p.closed = pj.Closed
 
 	// Reset everything else
-	p.bounds = image.Rectangle{}
+	p.bbox = nil
 	p.flattened = nil
 	p.tolerance = 0
 	p.simplified = nil
