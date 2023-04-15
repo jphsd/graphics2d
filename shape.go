@@ -37,6 +37,9 @@ func (s *Shape) BoundingBox() [][]float64 {
 // Bounds calculates the union of the bounds of the paths the shape contains.
 func (s *Shape) Bounds() image.Rectangle {
 	bb := s.BoundingBox()
+	if bb == nil {
+		return image.Rectangle{}
+	}
 	fx, fy := int(math.Floor(bb[0][0])), int(math.Floor(bb[0][1]))
 	cx, cy := int(math.Ceil(bb[1][0])), int(math.Ceil(bb[1][1]))
 	return image.Rectangle{image.Point{fx, fy}, image.Point{cx, cy}}

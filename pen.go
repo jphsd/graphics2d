@@ -39,6 +39,17 @@ func NewPen(color color.Color, width float64) *Pen {
 	return &Pen{image.NewUniform(color), NewStrokeProc(width), nil}
 }
 
+// NewPens constructs a slice of n pens with the given color starting at width and increasing by winc.
+func NewPens(color color.Color, n int, width, winc float64) []*Pen {
+	res := make([]*Pen, n)
+	uc := image.NewUniform(color)
+	for i := 0; i < n; i++ {
+		res[i] = &Pen{uc, NewStrokeProc(width), nil}
+		width += winc
+	}
+	return res
+}
+
 // NewProcessorPen returns a pen that will render a shape with the given pen
 // width and color into an image after applying the supplied path processor.
 func NewProcessorPen(color color.Color, width float64, proc PathProcessor) *Pen {
