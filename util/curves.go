@@ -201,7 +201,7 @@ func KappaC(p1, p2, p3 []float64) float64 {
 	c := []float64{s1[0] + ts[0]*n1[0], s1[1] + ts[0]*n1[1]} // cc center
 	dx := p1[0] - c[0]
 	dy := p1[1] - c[1]
-	r := math.Sqrt(dx*dx + dy*dy) // distance p1-c
+	r := math.Hypot(dx, dy) // distance p1-c
 	if ts[0] < 0 {
 		return -1 / r
 	}

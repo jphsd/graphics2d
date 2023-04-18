@@ -114,7 +114,7 @@ func EllipticalArcFromPoint(pt, c []float64, rxy, ang, xang float64, s ArcStyle)
 	xfm.Translate(-c[0], -c[1])
 	pts := xfm.Apply(pt)
 	dx, dy = pts[0][0], pts[0][1]
-	ry := math.Sqrt(dx*dx/(rxy*rxy) + dy*dy)
+	ry := math.Hypot(dx/rxy, dy)
 	rx := rxy * ry
 
 	return EllipticalArc(c, rx, ry, offs, ang, xang, s)

@@ -304,7 +304,7 @@ func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {
 	ox, oy := x1p-x1, y1p-y1
 	dx, dy, dxp, dyp := x2-x1, y2-y1, x2p-x1p, y2p-y1p
 	th := math.Atan2(dyp, dxp) - math.Atan2(dy, dx)
-	s := math.Sqrt(dxp*dxp+dyp*dyp) / math.Sqrt(dx*dx+dy*dy)
+	s := math.Hypot(dxp, dyp) / math.Hypot(dx, dy)
 	xfm := NewAff3()
 	// Reverse order
 	xfm.RotateAbout(th, x1p, y1p)
@@ -320,7 +320,7 @@ func BoxTransform(x1, y1, x2, y2, h, x1p, y1p, x2p, y2p, hp float64) *Aff3 {
 	ox, oy := x1p-x1, y1p-y1
 	dx, dy, dxp, dyp := x2-x1, y2-y1, x2p-x1p, y2p-y1p
 	th := math.Atan2(dyp, dxp) - math.Atan2(dy, dx)
-	s := math.Sqrt(dxp*dxp+dyp*dyp) / math.Sqrt(dx*dx+dy*dy)
+	s := math.Hypot(dxp, dyp) / math.Hypot(dx, dy)
 	xfm := NewAff3()
 	// Reverse order
 	xfm.RotateAbout(th, x1p, y1p)

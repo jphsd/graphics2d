@@ -59,7 +59,7 @@ func JoinRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
 		// inside angle
 		return [][][]float64{{e1, s2}}
 	}
-	r := math.Sqrt(dx*dx + dy*dy)
+	r := math.Hypot(dx, dy)
 	return MakeArcParts(p[0], p[1], r, a1, da)
 }
 

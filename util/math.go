@@ -90,7 +90,8 @@ func DistanceESquaredN(p1, p2 []float64) float64 {
 
 // DistanceE returns the Euclidean distance between two points.
 func DistanceE(p1, p2 []float64) float64 {
-	return math.Sqrt(DistanceESquared(p1, p2))
+	dx, dy := p2[0]-p1[0], p2[1]-p1[1]
+	return math.Hypot(dx, dy)
 }
 
 // DistanceToLineSquared calculates the squared Euclidean length of the normal from a point to
@@ -190,7 +191,7 @@ func Vec(p1, p2 []float64) []float64 {
 
 // VecMag returns the magnitude of the vector.
 func VecMag(v []float64) float64 {
-	return math.Sqrt(v[0]*v[0] + v[1]*v[1])
+	return math.Hypot(v[0], v[1])
 }
 
 // VecNormalize scales a vector to unit length.

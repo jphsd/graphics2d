@@ -38,7 +38,7 @@ func main() {
 func InkStroke(p1, p2 []float64, mw, dw, ec float64) *g2d.Path {
 	dx, dy := p2[0]-p1[0], p2[1]-p1[1]
 	th := math.Atan2(dy, dx)
-	d := math.Sqrt(dx*dx + dy*dy)
+	d := math.Hypot(dx, dy)
 	mw /= 2
 
 	rx2 := rand.Float64() * 0.1 * d

@@ -158,7 +158,7 @@ func Arc(c []float64, r, offs, ang float64, s ArcStyle) *Path {
 func ArcFromPoint(pt, c []float64, ang float64, s ArcStyle) *Path {
 	dx := pt[0] - c[0]
 	dy := pt[1] - c[1]
-	r := math.Sqrt(dx*dx + dy*dy)
+	r := math.Hypot(dx, dy)
 	offs := math.Atan2(dy, dx)
 	return Arc(c, r, offs, ang, s)
 }
@@ -175,7 +175,7 @@ func PolyArcFromPoint(pt []float64, cs [][]float64, angs []float64) *Path {
 	for i := 0; i < n; i++ {
 		dx := cp[0] - cs[i][0]
 		dy := cp[1] - cs[i][1]
-		r := math.Sqrt(dx*dx + dy*dy)
+		r := math.Hypot(dx, dy)
 		offs := math.Atan2(dy, dx)
 		tmp := MakeArcParts(cs[i][0], cs[i][1], r, offs, angs[i])
 		last := tmp[len(tmp)-1]

@@ -29,7 +29,7 @@ func (j *JitterProc) Process(p *Path) []*Path {
 		part := parts[i]
 		end := len(part) - 1
 		dx, dy := part[end][0]-part[0][0], part[end][1]-part[0][1]
-		l := math.Sqrt(dx*dx + dy*dy)
+		l := math.Hypot(dx, dy)
 		nx, ny := dy/l, -dx/l
 		l *= (rand.Float64()*2 - 1) * j.Perc / 2
 		part[end][0] += nx * l

@@ -214,7 +214,7 @@ func getLengths(parts [][][][]float64) [][][]float64 {
 		res[i] = make([][]float64, n)
 		for j, lineseg := range part {
 			dx, dy := lineseg[1][0]-lineseg[0][0], lineseg[1][1]-lineseg[0][1]
-			len := math.Sqrt(dx*dx + dy*dy)
+			len := math.Hypot(dx, dy)
 			res[i][j] = []float64{sumPart, len}
 			sumPart += len
 		}

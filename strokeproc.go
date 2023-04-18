@@ -111,7 +111,7 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 
 // unit converts a normal to a unit normal
 func unit(dx, dy float64) (float64, float64) {
-	d := math.Sqrt(dx*dx + dy*dy)
+	d := math.Hypot(dx, dy)
 	if util.Equals(0, d) {
 		return 0, 0
 	}
