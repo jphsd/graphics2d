@@ -385,6 +385,47 @@ func (nl *NLRand) InvTransform(v float64) float64 {
 	return bsInv(v, nl)
 }
 
+// NewStoppedNL uses linear interpolation between the supplied stops
+type NLStopped struct {
+	Stops [][]float64 // Pairs of t, v - both strictly ascending in [0,1]
+}
+
+func NewNLStopped(stops [][]float64) *NLStopped {
+	// Assumes valid stops
+	return &NLStopped{stops}
+}
+
+func (nl *NLStopped) Transform(t float64) float64 {
+	t0, v0 := 0.0, 0.0
+	ns := len(nl.Stops)
+	var i int
+	for i = 0; i < ns; i++ {
+		if nl.Stops[i][0] > t {
+			if i > 1 {
+				t0 = nl.Stops[i-1][0]
+				v0 = nl.Stops[i-1][1]
+			}
+			break
+		}
+	}
+	if i == ns {
+		t0 = nl.Stops[ns-1][0]
+		v0 = nl.Stops[ns-1][1]
+	}
+	t1, v1 := 1.0, 1.0
+	if i < ns {
+		t1 = nl.Stops[i][0]
+		v1 = nl.Stops[i][1]
+	}
+	dt := t1 - t0
+	t = (t - t0) / dt
+	return (1-t)*v0 + t*v1
+}
+
+func (nl *NLStopped) InvTransform(v float64) float64 {
+	return bsInv(v, nl)
+}
+
 // Numerical method to find inverse
 func bsInv(v float64, f NonLinear) float64 {
 	n := 16
