@@ -39,6 +39,10 @@ func RenderShapeExt(dst draw.Image, shape *Shape, filler image.Image, foffs imag
 	// clipped by the destination image bounds
 	srect := shape.Bounds()
 	srect = rect.Intersect(srect)
+	if srect.Empty() {
+		// shape doesn't overlap dst
+		return
+	}
 	size := srect.Size()
 	rasterizer := vector.NewRasterizer(size.X, size.Y) // Rasterizer has implicit r.Min of {0, 0}
 	rasterizer.DrawOp = op
@@ -48,6 +52,12 @@ func RenderShapeExt(dst draw.Image, shape *Shape, filler image.Image, foffs imag
 	minx, miny := float32(srect.Min.X), float32(srect.Min.Y)
 
 	for _, path := range shape.paths {
+		prect := path.Bounds()
+		prect = srect.Intersect(prect)
+		if prect.Empty() {
+			// path doesn't overlap dst
+			continue
+		}
 		fp := path.Flatten(RenderFlatten) // tolerance 0.6
 		step := util.ToF32(fp.steps[0][0]...)
 		rasterizer.MoveTo(step[0]-minx, step[1]-miny)
