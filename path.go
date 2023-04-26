@@ -705,11 +705,13 @@ func (p *Path) Length(flat float64) float64 {
 	return sum
 }
 
-// ProjectPoint returns the point on the path closest to pt.
-func (p *Path) ProjectPoint(pt []float64) []float64 {
+// ProjectPoint returns the point and it's t on the path closest to pt.
+// Note t can be very non-linear.
+func (p *Path) ProjectPoint(pt []float64) ([]float64, float64) {
 	sp := p.Simplify()
 	parts := sp.Parts()
 	n := len(parts)
+	dtp := 1.0 / float64(n)
 
 	// Iterate through the parts of the simplified path to
 	// find the closest parts.
@@ -725,49 +727,52 @@ func (p *Path) ProjectPoint(pt []float64) []float64 {
 		}
 	}
 	// Check end point
-	d2 := dist2(pt, parts[n-1][len(parts[n-1])])
+	d2 := dist2(pt, parts[n-1][len(parts[n-1])-1])
 	d[n] = d2
 	if d2 < cd {
 		cp = n
 	}
 
 	if cp == 0 {
-		pr, dr := bs(pt, 0, d[0], 1, d[1], parts[0])
+		pr, dr, tr := bs(pt, 0, d[0], 1, d[1], parts[0])
 		if !p.closed {
 			// point lies in first part
-			return pr
+			return pr, tr * dtp
 		}
 		// else test parts[n-1]
-		pl, dl := bs(pt, 0, d[n-1], 1, d[n], parts[n-1])
+		pl, dl, tl := bs(pt, 0, d[n-1], 1, d[n], parts[n-1])
 		if dl < dr {
-			return pl
+			cp = n - 1
+			return pl, (float64(cp) + tl) * dtp
 		}
-		return pr
+		return pr, tr * dtp
 	}
 
 	if cp == n {
-		pl, dl := bs(pt, 0, d[n-1], 1, d[n], parts[n-1])
+		pl, dl, tl := bs(pt, 0, d[n-1], 1, d[n], parts[n-1])
 		if !p.closed {
 			// point lies in last part
-			return pl
+			cp = n - 1
+			return pl, (float64(cp) + tl) * dtp
 		}
 		// else test parts[0]
-		pr, dr := bs(pt, 0, d[0], 1, d[1], parts[0])
+		pr, dr, tr := bs(pt, 0, d[0], 1, d[1], parts[0])
 		if dl < dr {
-			return pl
+			return pl, (float64(cp) + tl) * dtp
 		}
-		return pr
+		return pr, tr * dtp
 	}
 
 	// point lies in either cp-1 to ci or, ci to cp+1
-	pl, dl := bs(pt, 0, d[cp-1], 1, d[cp], parts[cp-1])
-	pr, dr := bs(pt, 0, d[cp], 1, d[cp+1], parts[cp])
+	pl, dl, tl := bs(pt, 0, d[cp-1], 1, d[cp], parts[cp-1])
+	pr, dr, tr := bs(pt, 0, d[cp], 1, d[cp+1], parts[cp])
 
 	if dl < dr {
-		return pl
+		cp--
+		return pl, (float64(cp) + tl) * dtp
 	}
 
-	return pr
+	return pr, (float64(cp) + tr) * dtp
 }
 
 func dist2(a, b []float64) float64 {
@@ -775,11 +780,11 @@ func dist2(a, b []float64) float64 {
 	return dx*dx + dy*dy
 }
 
-// Returns closest point on part to pt and dist2
-func bs(pt []float64, ts, ds, te, de float64, part [][]float64) ([]float64, float64) {
+// Returns closest point on part to pt, dist2 and t [0-1]
+func bs(pt []float64, ts, ds, te, de float64, part [][]float64) ([]float64, float64, float64) {
 	td := te - ts
 	if td < 0.00001 {
-		return util.DeCasteljau(part, ts), ds
+		return util.DeCasteljau(part, ts), ds, ts
 	}
 	t := []float64{ts, ts + td/4, ts + td/2, ts + 3*td/4, te}
 	dl := dist2(pt, util.DeCasteljau(part, t[1]))
@@ -801,12 +806,12 @@ func bs(pt []float64, ts, ds, te, de float64, part [][]float64) ([]float64, floa
 		return bs(pt, t[3], d[3], t[4], d[4], part)
 	}
 	// Search t[ci-1] to t[ci] and t[ci] to t[ci+1]
-	pl, d1 := bs(pt, t[ci-1], d[ci-1], t[ci], d[ci], part)
-	pr, d2 := bs(pt, t[ci], d[ci], t[ci+1], d[ci+1], part)
+	pl, d1, tl := bs(pt, t[ci-1], d[ci-1], t[ci], d[ci], part)
+	pr, d2, tr := bs(pt, t[ci], d[ci], t[ci+1], d[ci+1], part)
 	if d1 < d2 {
-		return pl, d1
+		return pl, d1, tl
 	}
-	return pr, d2
+	return pr, d2, tr
 }
 
 // PointInPath returns if a point is contained within a closed path according to the
