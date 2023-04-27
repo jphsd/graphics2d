@@ -90,7 +90,7 @@ func main() {
 	house.Render(img, xfm)
 
 	// Save image
-	image.SaveImage(img, "house2")
+	image.SaveImage(img, "house")
 }
 
 func MakeHouse() *g2d.Renderable {

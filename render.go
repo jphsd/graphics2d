@@ -52,7 +52,7 @@ func RenderShapeExt(dst draw.Image, shape *Shape, filler image.Image, foffs imag
 	minx, miny := float32(srect.Min.X), float32(srect.Min.Y)
 
 	for _, path := range shape.paths {
-		prect := path.Bounds()
+		prect := path.Bounds() // shape.Bounds() will have caused these to be generated already
 		prect = srect.Intersect(prect)
 		if prect.Empty() {
 			// path doesn't overlap dst
