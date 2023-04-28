@@ -163,6 +163,42 @@ func ArcFromPoint(pt, c []float64, ang float64, s ArcStyle) *Path {
 	return Arc(c, r, offs, ang, s)
 }
 
+// ArcFromPoints returns a path describing an arc passing through a, b and c such that the
+// arc starts at a, passes through b and ends at c.
+func ArcFromPoints(a, b, c []float64, s ArcStyle) *Path {
+	cp := util.Circumcircle(a, b, c)
+	if math.IsInf(cp[2], 0) {
+		return Line(a, c)
+	}
+	aa, ca := util.LineAngle(cp, a), util.LineAngle(cp, c)
+	ang := ca - aa // [-2pi,2pi]
+
+	var oang float64 // [-2pi,2pi] - the opposite of ang such that |ang| + |oang| = 2pi
+	if ang < 0 {
+		oang = TwoPi + ang
+	} else {
+		oang = ang - TwoPi
+	}
+	agto := math.Abs(ang) > math.Abs(oang)
+
+	// if cp in tri, |ang| > pi, else |ang| < pi
+	if util.PointInTriangle(cp, a, b, c) {
+		// Choose larger of |ang|, |oang|
+		if agto {
+			return Arc(cp, cp[2], aa, ang, s)
+		} else {
+			return Arc(cp, cp[2], aa, oang, s)
+		}
+	} else {
+		// Choose smaller of |ang|, |oang|
+		if agto {
+			return Arc(cp, cp[2], aa, oang, s)
+		} else {
+			return Arc(cp, cp[2], aa, ang, s)
+		}
+	}
+}
+
 // PolyArcFromPoint returns a path concatenating the arcs.
 func PolyArcFromPoint(pt []float64, cs [][]float64, angs []float64) *Path {
 	n, na := len(cs), len(angs)
@@ -219,13 +255,16 @@ func ReentrantPolygon(c []float64, r float64, n int, t, ang float64) *Path {
 	da := TwoPi / float64(n)
 	cosDa, sinDa := math.Cos(da), math.Sin(da)
 	ri := r * math.Cos(da/2) * t
+	skip := util.Equals(t, 1)
 	dxe, dye := r*math.Cos(ang), r*math.Sin(ang)
 	dxi, dyi := ri*math.Cos(ang+da/2), ri*math.Sin(ang+da/2)
 	np := NewPath([]float64{c[0] + dxe, c[1] + dye})
 	dxe, dye = dxe*cosDa-dye*sinDa, dxe*sinDa+dye*cosDa
 	for i := 0; i < n; i++ {
-		np.AddStep([]float64{c[0] + dxi, c[1] + dyi})
-		dxi, dyi = dxi*cosDa-dyi*sinDa, dxi*sinDa+dyi*cosDa
+		if !skip {
+			np.AddStep([]float64{c[0] + dxi, c[1] + dyi})
+			dxi, dyi = dxi*cosDa-dyi*sinDa, dxi*sinDa+dyi*cosDa
+		}
 		np.AddStep([]float64{c[0] + dxe, c[1] + dye})
 		dxe, dye = dxe*cosDa-dye*sinDa, dxe*sinDa+dye*cosDa
 	}
