@@ -22,14 +22,14 @@ func (tp *TraceProc) Process(p *Path) []*Path {
 	if path == nil {
 		return []*Path{}
 	}
-	if p.Closed() {
-		path.Close()
-	}
 
 	if tp.Width < 0 {
 		path = path.Reverse()
 	}
 
+	if p.Closed() {
+		path.Close()
+	}
 	return []*Path{path}
 }
 

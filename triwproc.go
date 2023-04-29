@@ -55,5 +55,10 @@ func (tp *TriangleWaveProc) Process(p *Path) []*Path {
 	}
 	fpath.AddStep(path.steps[n-1][0])
 
+
+	if p.Closed() {
+		fpath.Close()
+	}
+
 	return []*Path{fpath}
 }

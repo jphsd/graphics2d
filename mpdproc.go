@@ -11,7 +11,7 @@ import (
 type MPDProc struct {
 	Perc  float64 // Percentage of step length used as initial displacement
 	Itrs  int     // Number of iterations to perform
-	Scale float64 // Multiplier used on displacement per iteration
+	Scale float64 // Multiplier (Hurst) used on displacement per iteration
 }
 
 // Process implements the PathProcessor interface.
@@ -35,8 +35,12 @@ func (m *MPDProc) Process(p *Path) []*Path {
 			cp = np
 		}
 	}
+	npath := PartsToPath(nparts...)
+	if p.Closed() {
+		npath.Close()
+	}
 
-	return []*Path{PartsToPath(nparts...)}
+	return []*Path{npath}
 }
 
 // MPD takes two points and adds points between them using the mid-point displacement algorithm
@@ -47,6 +51,9 @@ func (m *MPDProc) MPD(a, b []float64) [][]float64 {
 	}
 	v := util.Vec(a, b)
 	d := util.VecMag(v)
+	if util.Equals(d, 0) {
+		return [][]float64{a, b}
+	}
 	n := []float64{-v[1] / d, v[0] / d}
 	return m.mpdhelper(a, b, n, m.Itrs, d*m.Perc)
 }

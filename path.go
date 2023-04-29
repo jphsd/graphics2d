@@ -170,6 +170,9 @@ func (p *Path) Parts() [][][]float64 {
 
 // Close marks the path as closed.
 func (p *Path) Close() {
+	if p.closed {
+		return
+	}
 	p.AddStep(p.steps[0][0])
 	p.closed = true
 }

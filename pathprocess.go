@@ -40,6 +40,10 @@ func (cp *CompoundProc) Process(p *Path) []*Path {
 		}
 	}
 
+	if cp.Concatenate && p.Closed() {
+		paths[0].Close()
+	}
+
 	return paths
 }
 
@@ -54,6 +58,9 @@ type FlattenProc struct {
 // Process implements the PathProcessor interface.
 func (fp *FlattenProc) Process(p *Path) []*Path {
 	path := p.Flatten(fp.Flatten)
+	if p.Closed() {
+		path.Close()
+	}
 	return []*Path{path}
 }
 
@@ -63,6 +70,9 @@ type LineProc struct{}
 // Process implements the PathProcessor interface.
 func (lp *LineProc) Process(p *Path) []*Path {
 	path := p.Line()
+	if p.Closed() {
+		path.Close()
+	}
 	return []*Path{path}
 }
 
@@ -74,6 +84,9 @@ type LinesProc struct {
 // Process implements the PathProcessor interface.
 func (lp *LinesProc) Process(p *Path) []*Path {
 	path := p.Lines(lp.IncludeCP)
+	if p.Closed() {
+		path.Close()
+	}
 	return []*Path{path}
 }
 
@@ -92,6 +105,9 @@ type ReverseProc struct{}
 // Process implements the PathProcessor interface.
 func (rp *ReverseProc) Process(p *Path) []*Path {
 	path := p.Reverse()
+	if p.Closed() {
+		path.Close()
+	}
 	return []*Path{path}
 }
 
@@ -101,6 +117,9 @@ type SimplifyProc struct{}
 // Process implements the PathProcessor interface.
 func (sp *SimplifyProc) Process(p *Path) []*Path {
 	path := p.Simplify()
+	if p.Closed() {
+		path.Close()
+	}
 	return []*Path{path}
 }
 
@@ -128,5 +147,8 @@ type TransformProc struct {
 // Process implements the PathProcessor interface.
 func (tp *TransformProc) Process(p *Path) []*Path {
 	path := p.Transform(tp.Transform)
+	if p.Closed() {
+		path.Close()
+	}
 	return []*Path{path}
 }

@@ -24,6 +24,9 @@ func (clp *CurvesToLinesProc) Process(p *Path) []*Path {
 		}
 	}
 	path := PartsToPath(nparts...)
+	if p.Closed() {
+		path.Close()
+	}
 	return []*Path{path}
 }
 
