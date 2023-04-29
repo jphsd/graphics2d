@@ -14,6 +14,15 @@ type MPDProc struct {
 	Scale float64 // Multiplier (Hurst) used on displacement per iteration
 }
 
+// NewMPDProc creates an MPDProc with sensible parameters for iterations and Hurst.
+func NewMPDProc(l float64) *MPDProc {
+	if l < 0 {
+		l = -l
+	}
+
+	return &MPDProc{l, 3, 0.5}
+}
+
 // Process implements the PathProcessor interface.
 func (m *MPDProc) Process(p *Path) []*Path {
 	parts := p.Parts()
@@ -69,4 +78,22 @@ func (m *MPDProc) mpdhelper(a, b, n []float64, itr int, disp float64) [][]float6
 	lhs := m.mpdhelper(a, c, n, itr-1, ndisp)
 	rhs := m.mpdhelper(c, b, n, itr-1, ndisp)
 	return append(lhs, rhs[1:]...)
+}
+
+// HandDrawnProc contains the compound path processor used to create a hand drawn look.
+type HandDrawnProc struct {
+	Comp *CompoundProc
+}
+
+// NewHandDrawnProc takes the segment length to apply the MPD path processor to and returns a new
+// HandDrawnProc path processor.
+func NewHandDrawnProc(l float64) *HandDrawnProc {
+	comp := NewCompoundProc(NewSnipProc(2, []float64{l, l}, 0), &MPDProc{0.1, 3, 0.5})
+	comp.Concatenate = true
+	return &HandDrawnProc{comp}
+}
+
+// Process implements the PathProcessor interface.
+func (h *HandDrawnProc) Process(p *Path) []*Path {
+	return h.Comp.Process(p)
 }

@@ -283,9 +283,9 @@ func (d *DashProc) Process(p *Path) []*Path {
 	return res2
 }
 
-// MunchProc contains the length.
+// MunchProc contains the munching compound path processor.
 type MunchProc struct {
-	Munch *CompoundProc
+	Comp *CompoundProc
 }
 
 // NewMunchProc creates a munching path processor. It calculates points along a path spaced l apart
@@ -300,5 +300,5 @@ func NewMunchProc(l float64) *MunchProc {
 
 // Process implements the PathProcessor interface.
 func (mp *MunchProc) Process(p *Path) []*Path {
-	return p.Process(mp.Munch)
+	return p.Process(mp.Comp)
 }
