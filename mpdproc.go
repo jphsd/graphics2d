@@ -12,6 +12,7 @@ type MPDProc struct {
 	Perc  float64 // Percentage of step length used as initial displacement
 	Itrs  int     // Number of iterations to perform
 	Scale float64 // Multiplier (Hurst) used on displacement per iteration
+	Rel   bool    // if set, normal is the relative one and not the original
 }
 
 // NewMPDProc creates an MPDProc with sensible parameters for iterations and Hurst.
@@ -20,7 +21,7 @@ func NewMPDProc(l float64) *MPDProc {
 		l = -l
 	}
 
-	return &MPDProc{l, 3, 0.5}
+	return &MPDProc{l, 3, 0.5, false}
 }
 
 // Process implements the PathProcessor interface.
@@ -53,7 +54,7 @@ func (m *MPDProc) Process(p *Path) []*Path {
 }
 
 // MPD takes two points and adds points between them using the mid-point displacement algorithm
-// drive by the parameters stored in the MPDProc structure.
+// driven by the parameters stored in the MPDProc structure.
 func (m *MPDProc) MPD(a, b []float64) [][]float64 {
 	if m.Itrs == 0 {
 		return [][]float64{a, b}
@@ -69,8 +70,14 @@ func (m *MPDProc) MPD(a, b []float64) [][]float64 {
 
 func (m *MPDProc) mpdhelper(a, b, n []float64, itr int, disp float64) [][]float64 {
 	mpx, mpy := (a[0]+b[0])/2, (a[1]+b[1])/2
+	ln := n
+	if m.Rel {
+		lv := util.Vec(a, b)
+		ld := 1 / util.VecMag(lv)
+		ln = []float64{-lv[1] * ld, lv[0] * ld}
+	}
 	d := (rand.Float64()*2 - 1) * disp
-	c := []float64{mpx + d*n[0], mpy + d*n[1]}
+	c := []float64{mpx + d*ln[0], mpy + d*ln[1]}
 	if itr == 1 {
 		return [][]float64{a, c, b}
 	}
@@ -88,7 +95,7 @@ type HandDrawnProc struct {
 // NewHandDrawnProc takes the segment length to apply the MPD path processor to and returns a new
 // HandDrawnProc path processor.
 func NewHandDrawnProc(l float64) *HandDrawnProc {
-	comp := NewCompoundProc(NewSnipProc(2, []float64{l, l}, 0), &MPDProc{0.1, 3, 0.5})
+	comp := NewCompoundProc(NewSnipProc(2, []float64{l, l}, 0), &MPDProc{0.1, 3, 0.5, false})
 	comp.Concatenate = true
 	return &HandDrawnProc{comp}
 }
