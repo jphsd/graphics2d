@@ -170,8 +170,12 @@ func ArcFromPoints(a, b, c []float64, s ArcStyle) *Path {
 	if math.IsInf(cp[2], 0) {
 		return Line(a, c)
 	}
-	aa, ca := util.LineAngle(cp, a), util.LineAngle(cp, c)
+	aa, ba, ca := util.LineAngle(cp, a), util.LineAngle(cp, b), util.LineAngle(cp, c)
 	ang := ca - aa // [-2pi,2pi]
+
+	if util.AngleInRange(aa, ang, ba) {
+		return Arc(cp, cp[2], aa, ang, s)
+	}
 
 	var oang float64 // [-2pi,2pi] - the opposite of ang such that |ang| + |oang| = 2pi
 	if ang < 0 {
@@ -179,24 +183,7 @@ func ArcFromPoints(a, b, c []float64, s ArcStyle) *Path {
 	} else {
 		oang = ang - TwoPi
 	}
-	agto := math.Abs(ang) > math.Abs(oang)
-
-	// if cp in tri, |ang| > pi, else |ang| < pi
-	if util.PointInTriangle(cp, a, b, c) {
-		// Choose larger of |ang|, |oang|
-		if agto {
-			return Arc(cp, cp[2], aa, ang, s)
-		} else {
-			return Arc(cp, cp[2], aa, oang, s)
-		}
-	} else {
-		// Choose smaller of |ang|, |oang|
-		if agto {
-			return Arc(cp, cp[2], aa, oang, s)
-		} else {
-			return Arc(cp, cp[2], aa, ang, s)
-		}
-	}
+	return Arc(cp, cp[2], aa, oang, s)
 }
 
 // PolyArcFromPoint returns a path concatenating the arcs.

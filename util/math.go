@@ -5,6 +5,10 @@ import (
 	"math"
 )
 
+const (
+	TwoPi = math.Pi * 2
+)
+
 // IntersectionTValsP obtains values of t for each line for where they intersect. Actual intersection =>
 // both are in [0,1]
 func IntersectionTValsP(p1, p2, p3, p4 []float64) ([]float64, error) {
@@ -212,9 +216,9 @@ func AngleBetweenLines(p1, p2, p3, p4 []float64) float64 {
 	a2 := LineAngle(p3, p4)
 	da := a2 - a1
 	if da < -math.Pi {
-		da += 2 * math.Pi
+		da += TwoPi
 	} else if da > math.Pi {
-		da -= 2 * math.Pi
+		da -= TwoPi
 	}
 	return da
 }
@@ -243,4 +247,32 @@ func Circumcircle(p1, p2, p3 []float64) []float64 {
 	u := []float64{(c[1]*b2 - b[1]*c2) * d, (b[0]*c2 - c[0]*b2) * d}
 	r2 := u[0]*u[0] + u[1]*u[1]
 	return []float64{u[0] + p1[0], u[1] + p1[1], math.Sqrt(r2)}
+}
+
+// AngleInRange returns true if angle b is within [a,a+r].
+func AngleInRange(a, r, b float64) bool {
+	// Ensure a, b in [-pi,pi], r in [-2pi,2pi]
+	a, b = mapAngle(a), mapAngle(b)
+	for r < -TwoPi {
+		r += TwoPi
+	}
+	for r > TwoPi {
+		r -= TwoPi
+	}
+
+	ob := b - a
+	if r < 0 {
+		return !(ob < r || ob > 0)
+	}
+	return !(ob < 0 || ob > r)
+}
+
+func mapAngle(a float64) float64 {
+	for a < -math.Pi {
+		a += TwoPi
+	}
+	for a > math.Pi {
+		a -= TwoPi
+	}
+	return a
 }
