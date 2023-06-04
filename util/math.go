@@ -42,13 +42,14 @@ const (
 	Epsilon float64 = 0.000001 // 1:1,000,000
 )
 
-// EqualsP returns true if two points are equal.
+// EqualsP returns true if two points are equal (upto the extent of shared dimensions).
 func EqualsP(v1, v2 []float64) bool {
-	v1l := len(v1)
-	if v1l != len(v2) {
-		return false
+	lv1, lv2 := len(v1), len(v2)
+	min := lv1
+	if lv2 < min {
+		min = lv2
 	}
-	for i := 0; i < v1l; i++ {
+	for i := 0; i < min; i++ {
 		if !Equals(v1[i], v2[i]) {
 			return false
 		}

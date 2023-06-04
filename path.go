@@ -724,9 +724,9 @@ func (p *Path) Length(flat float64) float64 {
 	return sum
 }
 
-// ProjectPoint returns the point, it's t on the path closest to pt.
+// ProjectPoint returns the point, it's t on the path closest to pt and the distance^2.
 // Note t can be very non-linear.
-func (p *Path) ProjectPoint(pt []float64) ([]float64, float64) {
+func (p *Path) ProjectPoint(pt []float64) ([]float64, float64, float64) {
 	sp := p.Simplify()
 	parts := sp.Parts()
 	n := len(parts)
@@ -756,7 +756,7 @@ func (p *Path) ProjectPoint(pt []float64) ([]float64, float64) {
 		}
 	}
 
-	return ppt, (float64(c) + bt) * dtp
+	return ppt, (float64(c) + bt) * dtp, bd
 }
 
 func dist2(a, b []float64) float64 {

@@ -43,6 +43,10 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 	ns := len(pp.Points)
 	cp := 0
 	for _, part := range parts {
+		if partLen(part) < 0.0001 {
+			// Skip 0 length parts which cause tangent issues
+			continue
+		}
 		if pp.Points[cp] != nil {
 			var xfm *Aff3
 			switch pp.Rotate {
@@ -52,7 +56,8 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 				xfm = CreateTransform(part[0][0], part[0][1], 1, 0)
 			case RotRelative:
 				t0 := util.DeCasteljau(part, 0)
-				xfm = CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
+				ang := math.Atan2(t0[3], t0[2])
+				xfm = CreateTransform(t0[0], t0[1], 1, ang)
 			case RotRandom:
 				t0 := util.DeCasteljau(part, 0)
 				xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*TwoPi)
@@ -101,7 +106,10 @@ func NewShapesProc(shapes []*Shape, spacing float64, rot PointRot) *ShapesProc {
 	nshapes := make([]*Shape, nn)
 	for i := 0; i < n; i++ {
 		nshapes[i*d] = shapes[i]
+		// remaining d-1 slots are left nil
 	}
+	// Assumption - this is taking place in image space so pixel level sampling should
+	// be sufficient.
 	comp := NewCompoundProc(NewMunchProc(1), spaces)
 	comp.Concatenate = true
 	return &ShapesProc{comp, NewPointsProc(nshapes, rot)}
@@ -112,4 +120,11 @@ func (sp *ShapesProc) Process(p *Path) []*Path {
 	path := p.Process(sp.Comp)[0]
 
 	return path.Process(sp.Shapes)
+}
+
+func partLen(part [][]float64) float64 {
+	p1 := part[0]
+	p2 := part[len(part)-1]
+	dx, dy := p2[0]-p1[0], p2[1]-p1[1]
+	return math.Hypot(dx, dy)
 }
