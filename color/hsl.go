@@ -350,3 +350,19 @@ func LightPair(col color.Color, d float64) []HSL {
 func RandomHue() HSL {
 	return HSL{rand.Float64(), 1, 0.5, 1}
 }
+
+// HuePalette creates a palette n long of equally spaced hues starting from hoffs, using the
+// supplied saturation and lightness.
+func HuePalette(hoffs, s, l float64, n int) []HSL {
+	dh := 1.0 / float64(n)
+	h := hoffs
+	res := make([]HSL, n)
+	for i := 0; i < n; i++ {
+		res[i] = HSL{h, s, l, 1}
+		h += dh
+		if h > 1 {
+			h -= 1
+		}
+	}
+	return res
+}
