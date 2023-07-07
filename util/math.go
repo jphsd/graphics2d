@@ -212,6 +212,7 @@ func LineAngle(p1, p2 []float64) float64 {
 
 // AngleBetweenLines using Atan2 vs calculating the dot product (2xSqrt+Acos).
 // Retains the directionality of the rotation from l1 to l2, unlike dot product.
+// The result is in the range [-Pi,Pi].
 func AngleBetweenLines(p1, p2, p3, p4 []float64) float64 {
 	a1 := LineAngle(p1, p2)
 	a2 := LineAngle(p3, p4)
@@ -222,6 +223,15 @@ func AngleBetweenLines(p1, p2, p3, p4 []float64) float64 {
 		da -= TwoPi
 	}
 	return da
+}
+
+// DotProductAngle returns the angle between two lines using the dot product method. The
+// result is in the range [0,Pi].
+func DotProductAngle(p1, p2, p3, p4 []float64) float64 {
+	v1 := VecNormalize(Vec(p1, p2))
+	v2 := VecNormalize(Vec(p3, p4))
+	dp := v1[0]*v2[0] + v1[1]*v2[1]
+	return math.Acos(dp)
 }
 
 // MinD calculates the minimum dimensionality of point set
