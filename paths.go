@@ -430,3 +430,74 @@ func Equilateral(c []float64, s float64) *Path {
 	}
 	return Polygon(points...)
 }
+
+// ExtendLine returns the line that passes through the bounds (or nil) defined by the line equation of
+// pt1 and pt2.
+func ExtendLine(pt1, pt2 []float64, bounds [][]float64) *Path {
+	//IntersectionTValsP(p1, p2, p3, p4 []float64) ([]float64, error)
+	rp1 := []float64{}
+	set := false
+
+	// Top
+	b1, b2 := bounds[0], []float64{bounds[0][0], bounds[1][1]}
+	tvals, err := util.IntersectionTValsP(b1, b2, pt1, pt2)
+	if err != nil {
+		return nil
+	}
+	t := tvals[0]
+	if t > 0 && t < 1 {
+		ont := 1 - t
+		rp1 = []float64{ont*b1[0] + t*b2[0], ont*b1[1] + t*b2[1]}
+		set = true
+	}
+
+	// LHS
+	b2 = []float64{bounds[1][0], bounds[0][1]}
+	tvals, err = util.IntersectionTValsP(b1, b2, pt1, pt2)
+	if err != nil {
+		return nil
+	}
+	tmp := []float64{}
+	t = tvals[0]
+	if t > 0 && t < 1 {
+		ont := 1 - t
+		tmp = []float64{ont*b1[0] + t*b2[0], ont*b1[1] + t*b2[1]}
+		if set {
+			return Line(rp1, tmp)
+		}
+		rp1 = tmp
+		set = true
+	}
+
+	// RHS
+	b1, b2 = bounds[1], []float64{bounds[1][0], bounds[0][1]}
+	tvals, err = util.IntersectionTValsP(b1, b2, pt1, pt2)
+	if err != nil {
+		return nil
+	}
+	t = tvals[0]
+	if t > 0 && t < 1 {
+		ont := 1 - t
+		tmp = []float64{ont*b1[0] + t*b2[0], ont*b1[1] + t*b2[1]}
+		if set {
+			return Line(rp1, tmp)
+		}
+		rp1 = tmp
+		set = true
+	}
+
+	// Bottom
+	b2 = []float64{bounds[0][0], bounds[1][1]}
+	tvals, err = util.IntersectionTValsP(b1, b2, pt1, pt2)
+	if err != nil {
+		return nil
+	}
+	t = tvals[0]
+	if t > 0 && t < 1 {
+		ont := 1 - t
+		tmp = []float64{ont*b1[0] + t*b2[0], ont*b1[1] + t*b2[1]}
+		return Line(rp1, tmp)
+	}
+
+	return nil
+}
