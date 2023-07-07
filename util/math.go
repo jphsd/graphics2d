@@ -231,6 +231,12 @@ func DotProductAngle(p1, p2, p3, p4 []float64) float64 {
 	v1 := VecNormalize(Vec(p1, p2))
 	v2 := VecNormalize(Vec(p3, p4))
 	dp := v1[0]*v2[0] + v1[1]*v2[1]
+	// Clamp rounding errors
+	if dp < -1 {
+		dp = -1
+	} else if dp > 1 {
+		dp = 1
+	}
 	return math.Acos(dp)
 }
 
