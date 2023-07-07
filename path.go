@@ -582,14 +582,14 @@ func ReverseParts(parts [][][]float64) [][][]float64 {
 	n := len(parts)
 	res := make([][][]float64, n)
 	for i, j := 0, n-1; i < n; i++ {
-		res[i] = reversePoints(parts[j])
+		res[i] = ReversePoints(parts[j])
 		j--
 	}
 	return res
 }
 
 // [pts][x/y]
-func reversePoints(cp [][]float64) [][]float64 {
+func ReversePoints(cp [][]float64) [][]float64 {
 	n := len(cp)
 	res := make([][]float64, n)
 	for i, j := 0, n-1; i < n; i++ {
