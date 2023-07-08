@@ -40,7 +40,7 @@ func main() {
 		{NewNLLogistic(100, 0.8), "Logistic 9"},
 		{&NLP3{}, "P3"},
 		{&NLP5{}, "P5"},
-		{NewNLStopped([][]float64 {
+		{NewNLStopped([][]float64{
 			{0.24, 0.1},
 			{0.25, 0.3},
 			{0.49, 0.4},
