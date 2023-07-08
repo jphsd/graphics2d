@@ -15,6 +15,8 @@ import (
 // colornames.bestof.csv comes from the color-names project (https://github.com/meodai/color-names)
 // and is licensed under an MIT license.
 
+// There's no associated color model since this isn't a color space.
+
 //go:embed colornames.bestof.csv
 var b []byte
 
@@ -71,6 +73,16 @@ func ByName(name string) (*NamedRGB, error) {
 	}
 
 	return nil, fmt.Errorf("Color '%s' not found", name)
+}
+
+// NamedRGBPalette performs a concrete to interface conversion
+func NamedRGBPalette() []color.Color {
+	nc := len(NamedRGBs)
+	res := make([]color.Color, nc)
+	for i, c := range NamedRGBs {
+		res[i] = c.Color // Remove a level of indirection
+	}
+	return res
 }
 
 // RandomNamedRGB returns a random color from the list of named colors.
