@@ -457,11 +457,10 @@ func ExtendLine(pt1, pt2 []float64, bounds [][]float64) *Path {
 	if err != nil {
 		return nil
 	}
-	tmp := []float64{}
 	t = tvals[0]
 	if t > 0 && t < 1 {
 		ont := 1 - t
-		tmp = []float64{ont*b1[0] + t*b2[0], ont*b1[1] + t*b2[1]}
+		tmp := []float64{ont*b1[0] + t*b2[0], ont*b1[1] + t*b2[1]}
 		if set {
 			return Line(rp1, tmp)
 		}
@@ -478,12 +477,11 @@ func ExtendLine(pt1, pt2 []float64, bounds [][]float64) *Path {
 	t = tvals[0]
 	if t > 0 && t < 1 {
 		ont := 1 - t
-		tmp = []float64{ont*b1[0] + t*b2[0], ont*b1[1] + t*b2[1]}
+		tmp := []float64{ont*b1[0] + t*b2[0], ont*b1[1] + t*b2[1]}
 		if set {
 			return Line(rp1, tmp)
 		}
 		rp1 = tmp
-		set = true
 	}
 
 	// Bottom
@@ -495,7 +493,7 @@ func ExtendLine(pt1, pt2 []float64, bounds [][]float64) *Path {
 	t = tvals[0]
 	if t > 0 && t < 1 {
 		ont := 1 - t
-		tmp = []float64{ont*b1[0] + t*b2[0], ont*b1[1] + t*b2[1]}
+		tmp := []float64{ont*b1[0] + t*b2[0], ont*b1[1] + t*b2[1]}
 		return Line(rp1, tmp)
 	}
 
