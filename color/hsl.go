@@ -353,10 +353,10 @@ func RandomHue() HSL {
 
 // HuePalette creates a palette n long of equally spaced hues starting from hoffs, using the
 // supplied saturation and lightness.
-func HuePalette(hoffs, s, l float64, n int) []HSL {
+func HuePalette(hoffs, s, l float64, n int) []color.Color {
 	dh := 1.0 / float64(n)
 	h := hoffs
-	res := make([]HSL, n)
+	res := make([]color.Color, n)
 	for i := 0; i < n; i++ {
 		res[i] = HSL{h, s, l, 1}
 		h += dh
