@@ -1,6 +1,7 @@
 package graphics2d
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/jphsd/graphics2d/util"
@@ -239,3 +240,266 @@ func RightEgg(c []float64, h, d, xang float64) *Path {
 // Martyn Cundy and AP Rollett, Mathematical Models, 1951
 // Alexander Thom, Megalithic Sites in Britain, 1967
 // Note - above are for polycentric curves, not true ellipses.
+
+// Nellipse takes a slice of ordered foci, assumed to be on the hull of a convex polygon, and a length, and uses them
+// to construct a Gardener's ellipse (an approximation that ignores foci within the hull). The closed path will be
+// made up of twice as many arcs as there are foci. If the length isn't sufficient to wrap the foci, then nil is
+// returned.
+func Nellipse(l float64, foci ...[]float64) *Path {
+	np := len(foci)
+
+	// Trivial cases
+	switch np {
+	case 0:
+		return nil
+	case 1:
+		// Circle
+		return Circle(foci[0], l/2)
+	case 2:
+		// Single ellipse
+		ml := util.DistanceE(foci[0], foci[1]) * 2
+		if l < ml {
+			return nil
+		}
+		fe := &fflEllipse{foci[0], foci[1], 0, 1, l, nil, nil, -1, -1, nil}
+		c, rx, ry, th := fe.toEllipseArgs()
+		return Ellipse(c, rx, ry, th)
+	}
+
+	// Check l wraps the foci
+	ml := 0.0
+	for i := 0; i < np-1; i++ {
+		ml += util.DistanceE(foci[i], foci[i+1])
+	}
+	ml += util.DistanceE(foci[np-1], foci[0])
+	if l < ml {
+		return nil
+	}
+
+	// First set of ellipses - two (R & L) for each face tangent
+	ellipsesR, ellipsesL := calcEllipses(foci, l, false)
+
+	// Create a map of them
+	em := make(map[string]*fflEllipse)
+	for i, ellip := range ellipsesR {
+		addEllipse(em, ellip)
+		ellipsesR[i] = addEllipse(em, ellip)
+	}
+	for i, ellip := range ellipsesL {
+		ellipsesL[i] = addEllipse(em, ellip)
+	}
+
+	// Reverse points and calc the second set (ie reversed face tangents)
+	rellipsesR, rellipsesL := calcEllipses(ReversePoints(foci), l, true)
+
+	// Fix point reversal in ellipses and swap intercepts
+	for i, ellip := range rellipsesR {
+		ellip.f1i = np - 1 - ellip.f1i
+		ellip.f2i = np - 1 - ellip.f2i
+		ellip.i1, ellip.i2 = ellip.i2, ellip.i1
+		ellip.i1i, ellip.i2i = ellip.i2i, ellip.i1i
+		ellip.i2i += np
+		rellipsesR[i] = addEllipse(em, ellip)
+	}
+	for i, ellip := range rellipsesL {
+		ellip.f1i = np - 1 - ellip.f1i
+		ellip.f2i = np - 1 - ellip.f2i
+		ellip.i1, ellip.i2 = ellip.i2, ellip.i1
+		ellip.i1i, ellip.i2i = ellip.i2i, ellip.i1i
+		ellip.i1i += np
+		rellipsesL[i] = addEllipse(em, ellip)
+	}
+
+	// Ellipse intercepts are complete, construct arcs
+	i2e := make([]*fflEllipse, len(em))
+	for _, v := range em {
+		i2e[v.i1i] = v
+		c, rx, ry, offs, ang, th := v.toEllipseArcArgs()
+		v.path = EllipticalArc(c, rx, ry, offs, ang, th, ArcOpen)
+	}
+
+	// Construct final path from individual arcs
+	ce := ellipsesR[0]
+	ni := ce.i2i
+	path := ce.path
+	for i := 1; i < 2*np; i++ {
+		ce = i2e[ni]
+		path.Concatenate(ce.path)
+		ni = ce.i2i
+	}
+	path.Close()
+
+	return path
+}
+
+func calcEllipses(points [][]float64, l float64, flip bool) ([]*fflEllipse, []*fflEllipse) {
+	np := len(points)
+	resR := make([]*fflEllipse, np)
+	resL := make([]*fflEllipse, np)
+	q := points[:]
+	for i := 0; i < np; i++ {
+		ellipseR, ellipseL := ellipseCalc(q, l, i, flip)
+		// Adjust indices to handle rotation
+		ellipseR.f1i += i
+		if ellipseR.f1i >= np {
+			ellipseR.f1i -= np
+		}
+		ellipseR.f2i += i
+		if ellipseR.f2i >= np {
+			ellipseR.f2i -= np
+		}
+		resR[i] = ellipseR
+		ellipseL.f1i += i
+		if ellipseL.f1i >= np {
+			ellipseL.f1i -= np
+		}
+		ellipseL.f2i += i
+		if ellipseL.f2i >= np {
+			ellipseL.f2i -= np
+		}
+		resL[i] = ellipseL
+		// Rotate points
+		p := q[0]
+		q = q[1:]
+		q = append(q, p)
+	}
+	return resR, resL
+}
+
+// Calculate the ellipse for p0 and l. Returns f1 (= foci[0]), f2 and lr for the R ellipse
+// and f0 (= foci[1]), f2 and ll for the L ellipse. Flip controls the side of line calculation
+func ellipseCalc(foci [][]float64, l float64, id int, flip bool) (*fflEllipse, *fflEllipse) {
+	f0 := foci[1] // f0 and f1 defines the face tangent
+	f1 := foci[0]
+	fi := findFurthest(foci)
+
+	// Skip foci < fi
+	for i := 0; i < fi-1; i++ {
+		l -= util.DistanceE(foci[i], foci[i+1])
+	}
+
+	// Test points fi thru n until we find one that has no poly points on the RHS of it
+	np := len(foci)
+	for i := fi; i < np; i++ {
+		cp := foci[i]
+		l -= util.DistanceE(foci[i-1], cp)
+
+		pt, d := findEllipseIntersection(f0, f1, cp, l)
+		if i == np-1 {
+			// No need to test
+			return &fflEllipse{f1, cp, 0, i, l + d, pt, nil, id, -1, nil},
+				&fflEllipse{f0, cp, 1, i, l + util.DistanceE(f0, f1) + util.DistanceE(f0, cp), nil, pt, -1, id, nil}
+		} else {
+			sol := util.SideOfLine(cp, pt, foci[i+1])
+			if (flip && sol > 0) || (!flip && sol < 0) {
+				return &fflEllipse{f1, cp, 0, i, l + d, pt, nil, id, -1, nil},
+					&fflEllipse{f0, cp, 1, i, l + util.DistanceE(f0, f1) + util.DistanceE(f0, cp), nil, pt, -1, id, nil}
+			}
+		}
+	}
+
+	// Should never get here!
+	panic("ellipseCalc failed")
+}
+
+// Assumes points are in adjacency order and for the first point returns the index of the point furthest away from it
+// Assumes #points > 2
+func findFurthest(points [][]float64) int {
+	np := len(points)
+	max := -1.0
+	cur := -1
+	for i := 2; i < np; i++ {
+		d := util.DistanceE(points[0], points[i])
+		if d > max {
+			max = d
+			cur = i
+		}
+	}
+	return cur
+}
+
+// Find p on line f0->f1, such that d(p,fi)+d(p,f1) = l
+func findEllipseIntersection(f0, f1, fi []float64, l float64) ([]float64, float64) {
+	a := util.DistanceE(f1, fi)
+	th := util.AngleBetweenLines(f1, f0, f1, fi)
+	if th < 0 {
+		th = -th
+	}
+	th = math.Pi - th
+
+	// Use the Cosine rule to find b given a, th and l=b+c
+	b := (l*l - a*a) / (2 * (l - a*math.Cos(th)))
+
+	// Get unit vector for f0->f1 and scale it by b
+	vec := util.VecNormalize(util.Vec(f0, f1))
+	vec[0] *= b
+	vec[1] *= b
+
+	pt := []float64{f1[0] + vec[0], f1[1] + vec[1]}
+	return pt, a
+}
+
+func addEllipse(em map[string]*fflEllipse, ellip *fflEllipse) *fflEllipse {
+	h := ellip.hash()
+	me := em[h]
+	if me == nil {
+		em[h] = ellip
+	} else {
+		// Merge the intercepts
+		if me.i1i == -1 {
+			me.i1, me.i1i = ellip.i1, ellip.i1i
+		} else {
+			me.i2, me.i2i = ellip.i2, ellip.i2i
+		}
+	}
+	return me
+}
+
+// fflEllipse is an ellipse defined by it's two foci and the length of sides of the triangle formed
+// by f1, f2 and a point on the circumference.
+type fflEllipse struct {
+	f1, f2   []float64 // foci
+	f1i, f2i int       // index of foci
+	l        float64   // length
+	i1, i2   []float64 // face tangent intercepts
+	i1i, i2i int       // index of face tangent intercepts
+	path     *Path     // the arc path
+}
+
+// f1, f2, l => c, rx, ry, th
+func (fe *fflEllipse) toEllipseArgs() ([]float64, float64, float64, float64) {
+	c := []float64{(fe.f1[0] + fe.f2[0]) / 2, (fe.f1[1] + fe.f2[1]) / 2}
+	dx, dy := fe.f2[0]-fe.f1[0], fe.f2[1]-fe.f1[1]
+	df := math.Hypot(dx, dy)
+	if fe.l < 2*df {
+		return nil, 0, 0, 0
+	}
+	rx := (fe.l - df) / 2
+	ry := math.Sqrt(rx*rx - df*df/4)
+	theta := math.Atan2(dy, dx)
+	return c, rx, ry, theta
+}
+
+// f1, f2, l, i1, i2 => c, rx, ry, offs, ang, th
+func (fe *fflEllipse) toEllipseArcArgs() ([]float64, float64, float64, float64, float64, float64) {
+	c := []float64{(fe.f1[0] + fe.f2[0]) / 2, (fe.f1[1] + fe.f2[1]) / 2}
+	dx, dy := fe.f2[0]-fe.f1[0], fe.f2[1]-fe.f1[1]
+	df := math.Hypot(dx, dy)
+	if fe.l < 2*df {
+		return nil, 0, 0, 0, 0, 0
+	}
+	rx := (fe.l - df) / 2
+	ry := math.Sqrt(rx*rx - df*df/4)
+	theta := math.Atan2(dy, dx)
+	offs := util.LineAngle(c, fe.i1)
+	ang := util.AngleBetweenLines(c, fe.i1, c, fe.i2)
+	return c, rx, ry, offs, ang, theta
+}
+
+func (fe *fflEllipse) hash() string {
+	a, b := fe.f1i, fe.f2i
+	if a > b {
+		a, b = b, a
+	}
+	return fmt.Sprintf("%d %d %f", a, b, fe.l)
+}
