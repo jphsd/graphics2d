@@ -99,6 +99,13 @@ func DistanceE(p1, p2 []float64) float64 {
 	return math.Hypot(dx, dy)
 }
 
+// LineNormalToPoint returns the point on the line that's normal to the specified point, in
+// absolute terms and as a t value. The distance from the point to the line is returned too.
+func LineNormalToPoint(lp1, lp2, p []float64) ([]float64, float64, float64) {
+	d2, pt, t := DistanceToLineSquared(lp1, lp2, p)
+	return pt, t, math.Sqrt(d2)
+}
+
 // DistanceToLineSquared calculates the squared Euclidean length of the normal from a point to
 // the line. Returns the distance squared, the line intercept and the t value.
 func DistanceToLineSquared(lp1, lp2, p []float64) (float64, []float64, float64) {
