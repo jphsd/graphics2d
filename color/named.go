@@ -13,14 +13,14 @@ import (
 )
 
 // colornames.bestof.csv comes from the color-names project (https://github.com/meodai/color-names)
-// and is licensed under an MIT license.
+// and is licensed under an MIT license. Includes the CSS/HTML standard colors.
 
 // There's no associated color model since this isn't a color space.
 
 //go:embed colornames.bestof.csv
 var b []byte
 
-// ColorFile retruns a []byte of the color csv file,
+// ColorFile returns a []byte of the color csv file,
 func ColorFile() []byte {
 	return b
 }
