@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"math"
+	"strings"
 
 	"github.com/jphsd/graphics2d/util"
 )
@@ -356,12 +357,14 @@ func (p *Path) Process(proc PathProcessor) []*Path {
 }
 
 // String converts a path into a string.
+// P %f,%f [S %d [%f,%f ]] [C]
 func (p *Path) String() string {
 	step := p.steps[0]
 	str := fmt.Sprintf("P %f,%f ", step[0][0], step[0][1])
 	for i := 1; i < len(p.steps); i++ {
 		step = p.steps[i]
 		str += "S "
+		str += fmt.Sprintf("%d ", len(step))
 		for _, pts := range step {
 			str += fmt.Sprintf("%f,%f ", pts[0], pts[1])
 		}
@@ -370,6 +373,54 @@ func (p *Path) String() string {
 		str += "C"
 	}
 	return str
+}
+
+// StringToPath converts a string created using path.String() back into a path.
+// Returns nil if the string isn't parsable into a path.
+func StringToPath(str string) *Path {
+	parts := strings.Split(str, " ")
+	np := len(parts)
+
+	if np < 2 || parts[0] != "P" {
+		return nil
+	}
+	var x, y float64
+	n, err := fmt.Sscanf(parts[1], "%f,%f", &x, &y)
+	if n != 2 || err != nil {
+		return nil
+	}
+	path := NewPath([]float64{x, y})
+	if np < 3 {
+		return path
+	}
+
+	// Handle steps
+	i := 2
+	for i+1 < np && parts[i] == "S" {
+		i++
+		var s int
+		n, err = fmt.Sscanf(parts[i], "%d", &s)
+		if n != 1 || err != nil {
+			return nil
+		}
+		step := make([][]float64, s)
+		i++
+		for j := 0; i < np && j < s; j++ {
+			n, err := fmt.Sscanf(parts[i], "%f,%f", &x, &y)
+			if n != 2 || err != nil {
+				return nil
+			}
+			step[j] = []float64{x, y}
+			i++
+		}
+		path.AddStep(step...)
+	}
+
+	if i < np && parts[i] == "C" {
+		path.Close()
+	}
+
+	return path
 }
 
 // Transform applies an affine transform to the points in a path to create a new one.
