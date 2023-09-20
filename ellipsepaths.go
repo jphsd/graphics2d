@@ -172,6 +172,67 @@ func EllipticalArcFromPoints(p1, p2, c []float64, s ArcStyle) *Path {
 	return EllipticalArc(c, rx, ry, offs, ang, xang, s)
 }
 
+// EllipticalArcFromPoints2 provides a specification similar to that found in the SVG11 standard
+// where the center is calculated from the given rx and ry values and flag specifications.
+// See https://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
+func EllipticalArcFromPoints2(p1, p2 []float64, rx, ry, xang float64, arc, swp bool, s ArcStyle) *Path {
+	if util.Equals(rx, 0) || util.Equals(ry, 0) || util.EqualsP(p1, p2) {
+		return Line(p1, p2)
+	}
+
+	// F6.5 Step1
+	x1 := math.Cos(xang)*(p1[0]-p2[0])/2 + math.Sin(xang)*(p1[1]-p2[1])/2
+	y1 := -math.Sin(xang)*(p1[0]-p2[0])/2 + math.Cos(xang)*(p1[1]-p2[1])/2
+
+	// Fix rx and ry if necs (see F6.6)
+	if rx < 0 {
+		rx = -rx
+	}
+	if ry < 0 {
+		ry = -ry
+	}
+	x12, y12, rx2, ry2 := x1*x1, y1*y1, rx*rx, ry*ry
+	l := x12/rx2 + y12/ry2
+	if l > 1 {
+		// radii are too small
+		sqrl := math.Sqrt(l)
+		rx, ry = sqrl*rx, sqrl*ry
+		rx2, ry2 = rx*rx, ry*ry
+	}
+
+	// F6.5 Step2
+	val := (rx2*ry2 - rx2*y12 - ry2*x12) / (rx2*y12 + ry2*x12)
+	if util.Equals(val, 0) {
+		// Fix -0 before sqrt
+		val = 0
+	}
+	tmp := math.Sqrt(val)
+	if tmp != tmp {
+		panic("constant is NaN")
+	}
+	if arc == swp {
+		tmp = -tmp
+	}
+	cx, cy := tmp*rx*y1/ry, -tmp*ry*x1/rx
+
+	// F6.5 Step3
+	cx1 := math.Cos(xang)*cx - math.Sin(xang)*cy + (p1[0]+p2[0])/2
+	cy1 := math.Sin(xang)*cx + math.Cos(xang)*cy + (p1[1]+p2[1])/2
+
+	// F6.5 Step4 (differs from spec)
+	c := []float64{cx1, cy1}
+	offs := util.LineAngle(c, p1)
+	ang := util.AngleBetweenLines(c, p1, c, p2)
+
+	if !swp && ang > 0 {
+		ang -= TwoPi
+	} else if swp && ang < 0 {
+		ang += TwoPi
+	}
+
+	return EllipticalArc([]float64{cx1, cy1}, rx, ry, offs, ang, xang, s)
+}
+
 // IrregularEllipse uses different rx and ry values for each quadrant of an ellipse. disp (-1,1)
 // determines how far along either rx1 (+ve) or rx2 (-ve), ry2 extends from (ry1 extends from c).
 func IrregularEllipse(c []float64, rx1, rx2, ry1, ry2, disp, xang float64) *Path {
