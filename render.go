@@ -80,14 +80,16 @@ func RenderShapeExt(dst draw.Image, shape *Shape, filler image.Image, foffs imag
 	rasterizer.Draw(dst, srect, filler, foffs)
 }
 
-// RenderShapeAlpha creates and returns the shape's alpha mask. The mask size is determined by the shape's
-// bounds and the mask is located at {0, 0}.
+// RenderShapeAlpha creates and returns the shape's alpha mask. The mask size and location are
+// determined by the shape's bounds.
 func RenderShapeAlpha(shape *Shape) *image.Alpha {
 	srect := shape.Bounds()
 	size := srect.Size()
-	rect := image.Rectangle{image.Point{}, image.Point{size.X, size.Y}}
 
-	rasterizer := vector.NewRasterizer(size.X, size.Y) // Rasterizer has implicit r.Min of {0, 0}
+	// Make rasterizer rect, note rasterizer has implicit r.Min of {0, 0}
+	rrect := image.Rectangle{image.Point{}, size}
+
+	rasterizer := vector.NewRasterizer(size.X, size.Y)
 	rasterizer.DrawOp = draw.Src
 
 	// Process paths translated by -srect.Min
@@ -103,7 +105,10 @@ func RenderShapeAlpha(shape *Shape) *image.Alpha {
 		rasterizer.ClosePath()
 	}
 
-	mask := image.NewAlpha(rect)
-	rasterizer.Draw(mask, rect, image.Opaque, image.Point{})
+	mask := image.NewAlpha(rrect)
+	rasterizer.Draw(mask, rrect, image.Opaque, image.Point{})
+
+	// Reset image rectangle back to srect
+	mask.Rect = srect
 	return mask
 }
