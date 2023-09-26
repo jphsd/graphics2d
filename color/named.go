@@ -18,11 +18,19 @@ import (
 // There's no associated color model since this isn't a color space.
 
 //go:embed colornames.bestof.csv
-var b []byte
+var b0 []byte
 
 // ColorFile returns a []byte of the color csv file,
-func ColorFile() []byte {
-	return b
+func ColorFile0() []byte {
+	return b0
+}
+
+//go:embed colornames.css.csv
+var b1 []byte
+
+// ColorFile returns a []byte of the color csv file,
+func ColorFile1() []byte {
+	return b1
 }
 
 // NamedRGB contains the name of the color and its RGB color representation.
@@ -32,15 +40,22 @@ type NamedRGB struct {
 }
 
 // NamedRGBs is the slice of colors loaded from the color names file.
-var NamedRGBs []*NamedRGB
-var namedRGBs = make(map[string]*NamedRGB)
-var colorToName = make(map[string]string)
+var BestNamedRGBs []*NamedRGB
+var CSSNamedRGBs []*NamedRGB
+var bestMap = make(map[string]*NamedRGB)
+var cssMap = make(map[string]*NamedRGB)
 
 func init() {
-	reader := csv.NewReader(bytes.NewReader(ColorFile()))
+	reader := csv.NewReader(bytes.NewReader(ColorFile0()))
+	BestNamedRGBs = parse(reader, bestMap)
+	reader = csv.NewReader(bytes.NewReader(ColorFile1()))
+	CSSNamedRGBs = parse(reader, cssMap)
+}
+
+func parse(reader *csv.Reader, nmap map[string]*NamedRGB) []*NamedRGB {
 	if records, err := reader.ReadAll(); err == nil {
 		n := len(records)
-		NamedRGBs = make([]*NamedRGB, n-1)
+		res := make([]*NamedRGB, n-1)
 		// Skip header
 		for i := 1; i < n; i++ {
 			entry := records[i]
@@ -58,17 +73,28 @@ func init() {
 			col := color.RGBA{r, g, b, 0xff}
 			lcn := strings.ToLower(entry[0])
 			nc := &NamedRGB{entry[0], col}
-			namedRGBs[lcn] = nc
-			colorToName[entry[1][1:]] = entry[0]
-			NamedRGBs[i-1] = nc
+			nmap[lcn] = nc
+			res[i-1] = nc
 		}
+		return res
 	}
+	return nil
 }
 
 // ByName returns the color given by the name. If there's no match, error will be set.
 func ByName(name string) (*NamedRGB, error) {
 	name = strings.ToLower(name)
-	if col, prs := namedRGBs[name]; prs {
+	if col, prs := bestMap[name]; prs {
+		return col, nil
+	}
+
+	return nil, fmt.Errorf("Color '%s' not found", name)
+}
+
+// ByName returns the color given by the name. If there's no match, error will be set.
+func ByCSSName(name string) (*NamedRGB, error) {
+	name = strings.ToLower(name)
+	if col, prs := cssMap[name]; prs {
 		return col, nil
 	}
 
@@ -77,9 +103,9 @@ func ByName(name string) (*NamedRGB, error) {
 
 // NamedRGBPalette performs a concrete to interface conversion
 func NamedRGBPalette() []color.Color {
-	nc := len(NamedRGBs)
+	nc := len(BestNamedRGBs)
 	res := make([]color.Color, nc)
-	for i, c := range NamedRGBs {
+	for i, c := range BestNamedRGBs {
 		res[i] = c.Color // Remove a level of indirection
 	}
 	return res
@@ -87,22 +113,12 @@ func NamedRGBPalette() []color.Color {
 
 // RandomNamedRGB returns a random color from the list of named colors.
 func RandomNamedRGB() *NamedRGB {
-	return NamedRGBs[rand.Intn(len(NamedRGBs))]
+	return BestNamedRGBs[rand.Intn(len(BestNamedRGBs))]
 }
 
 // String returns a string represntation of NamedRGB.
 func (nc *NamedRGB) String() string {
 	return fmt.Sprintf("%s #%02x%02x%02xff", nc.Name, nc.Color.R, nc.Color.G, nc.Color.B)
-}
-
-// NameForColor attempts to find the name matching the RGB values of the supplied color.
-func NameForColor(col color.Color) (string, error) {
-	rgb := color.RGBA(color.RGBAModel.Convert(col).(color.RGBA))
-	nc := colorToName[fmt.Sprintf("%02x%02x%02x", rgb.R, rgb.G, rgb.B)]
-	if len(nc) == 0 {
-		return "", fmt.Errorf("No name for color found")
-	}
-	return nc, nil
 }
 
 // RGBA implements the color.Color interface.
