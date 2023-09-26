@@ -6,7 +6,6 @@ import (
 	"image/color"
 	"image/draw"
 
-	g2dimg "github.com/jphsd/graphics2d/image"
 	"github.com/jphsd/graphics2d/util"
 	"golang.org/x/image/vector"
 )
@@ -33,18 +32,21 @@ var RenderFlatten = DefaultRenderFlatten
 // RenderShapeExt renders the supplied shape with the fill and clip images into
 // the destination image using op.
 func RenderShapeExt(dst draw.Image, shape *Shape, filler image.Image, foffs image.Point, clip *image.Alpha, coffs image.Point, op draw.Op) {
-	rect := dst.Bounds()
+	drect := dst.Bounds()
 
 	// To avoid unnecessary work, reduce the rasterizer size to the shape width and height
 	// clipped by the destination image bounds
 	srect := shape.Bounds()
-	srect = rect.Intersect(srect)
+	srect = drect.Intersect(srect)
 	if srect.Empty() {
 		// shape doesn't overlap dst
 		return
 	}
+
 	size := srect.Size()
-	rasterizer := vector.NewRasterizer(size.X, size.Y) // Rasterizer has implicit r.Min of {0, 0}
+
+	// Make rasterizer, note rasterizer has implicit r.Min of {0, 0}
+	rasterizer := vector.NewRasterizer(size.X, size.Y)
 	rasterizer.DrawOp = op
 
 	// Process paths translated by -srect.Min and add srect.Min fo filler offest
@@ -67,17 +69,16 @@ func RenderShapeExt(dst draw.Image, shape *Shape, filler image.Image, foffs imag
 		}
 		rasterizer.ClosePath()
 	}
-
-	if clip != nil {
-		// Obtain rasterizer mask and intersect it against the clip mask
-		mask := image.NewAlpha(srect)
-		rasterizer.Draw(mask, srect, image.Opaque, image.Point{})
-		mask = g2dimg.AlphaAnd(mask, clip, coffs)
-		draw.DrawMask(dst, srect, filler, foffs, mask, srect.Min, op)
+	if clip == nil {
+		rasterizer.Draw(dst, srect, filler, foffs)
 		return
 	}
 
-	rasterizer.Draw(dst, srect, filler, foffs)
+	// Obtain rasterizer mask and intersect it against the clip mask
+	mask := image.NewAlpha(srect)
+	coffs = image.Point{coffs.X + srect.Min.X, coffs.Y + srect.Min.Y}
+	rasterizer.Draw(mask, srect, clip, coffs)
+	draw.DrawMask(dst, drect, filler, foffs, mask, image.Point{}, op)
 }
 
 // RenderShapeAlpha creates and returns the shape's alpha mask. The mask size and location are
@@ -86,9 +87,7 @@ func RenderShapeAlpha(shape *Shape) *image.Alpha {
 	srect := shape.Bounds()
 	size := srect.Size()
 
-	// Make rasterizer rect, note rasterizer has implicit r.Min of {0, 0}
-	rrect := image.Rectangle{image.Point{}, size}
-
+	// Make rasterizer, note rasterizer has implicit r.Min of {0, 0}
 	rasterizer := vector.NewRasterizer(size.X, size.Y)
 	rasterizer.DrawOp = draw.Src
 
@@ -105,10 +104,7 @@ func RenderShapeAlpha(shape *Shape) *image.Alpha {
 		rasterizer.ClosePath()
 	}
 
-	mask := image.NewAlpha(rrect)
-	rasterizer.Draw(mask, rrect, image.Opaque, image.Point{})
-
-	// Reset image rectangle back to srect
-	mask.Rect = srect
+	mask := image.NewAlpha(srect)
+	rasterizer.Draw(mask, srect, image.Opaque, image.Point{})
 	return mask
 }
