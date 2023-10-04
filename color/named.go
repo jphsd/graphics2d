@@ -91,7 +91,7 @@ func ByName(name string) (*NamedRGB, error) {
 	return nil, fmt.Errorf("Color '%s' not found", name)
 }
 
-// ByName returns the color given by the name. If there's no match, error will be set.
+// ByCSSName returns the color given by the name. If there's no match, error will be set.
 func ByCSSName(name string) (*NamedRGB, error) {
 	name = strings.ToLower(name)
 	if col, prs := cssMap[name]; prs {
