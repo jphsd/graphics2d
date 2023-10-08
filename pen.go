@@ -94,3 +94,51 @@ func NewRandomHuePen(width float64) *Pen {
 func NewFilledPen(grad image.Image, width float64) *Pen {
 	return &Pen{grad, NewStrokeProc(width), nil}
 }
+
+// Width returns the width of this pen.
+// Note this only works for pens with a StrokeProc path processor.
+func (p *Pen) Width() float64 {
+	sp, ok := p.Stroke.(*StrokeProc)
+	if !ok {
+		return -1
+	}
+	return sp.RTraceProc.Width - sp.LTraceProc.Width
+}
+
+// ChangeWidth returns a new pen the width while preserving the other aspects of the pen's stroke.
+// Note this only works for pens with a StrokeProc path processor.
+func (p *Pen) ChangeWidth(width float64) *Pen {
+	sp, ok := p.Stroke.(*StrokeProc)
+	if !ok {
+		return nil
+	}
+
+	tsp := NewStrokeProc(width)
+	tsp.CapFunc = sp.CapFunc
+	tsp.PointFunc = sp.PointFunc
+	tsp.CapStartFunc = sp.CapStartFunc
+	tsp.CapEndFunc = sp.CapEndFunc
+	tsp.RTraceProc.JoinFunc = sp.RTraceProc.JoinFunc
+	tsp.LTraceProc.JoinFunc = sp.LTraceProc.JoinFunc
+
+	return &Pen{p.Filler, tsp, p.Xfm.Copy()}
+}
+
+// ScaleWidth returns a new pen the scaled width while preserving the other aspects of the pen's stroke.
+// Note this only works for pens with a StrokeProc path processor.
+func (p *Pen) ScaleWidth(scale float64) *Pen {
+	sp, ok := p.Stroke.(*StrokeProc)
+	if !ok {
+		return nil
+	}
+
+	tsp := NewStrokeProc(p.Width() * scale)
+	tsp.CapFunc = sp.CapFunc
+	tsp.PointFunc = sp.PointFunc
+	tsp.CapStartFunc = sp.CapStartFunc
+	tsp.CapEndFunc = sp.CapEndFunc
+	tsp.RTraceProc.JoinFunc = sp.RTraceProc.JoinFunc
+	tsp.LTraceProc.JoinFunc = sp.LTraceProc.JoinFunc
+
+	return &Pen{p.Filler, tsp, p.Xfm.Copy()}
+}
