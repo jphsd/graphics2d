@@ -121,6 +121,9 @@ func (p *Pen) ChangeWidth(width float64) *Pen {
 	tsp.RTraceProc.JoinFunc = sp.RTraceProc.JoinFunc
 	tsp.LTraceProc.JoinFunc = sp.LTraceProc.JoinFunc
 
+	if p.Xfm == nil {
+		return &Pen{p.Filler, tsp, nil}
+	}
 	return &Pen{p.Filler, tsp, p.Xfm.Copy()}
 }
 
@@ -140,5 +143,8 @@ func (p *Pen) ScaleWidth(scale float64) *Pen {
 	tsp.RTraceProc.JoinFunc = sp.RTraceProc.JoinFunc
 	tsp.LTraceProc.JoinFunc = sp.LTraceProc.JoinFunc
 
+	if p.Xfm == nil {
+		return &Pen{p.Filler, tsp, nil}
+	}
 	return &Pen{p.Filler, tsp, p.Xfm.Copy()}
 }
