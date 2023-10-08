@@ -23,6 +23,12 @@ func RenderShape(dst draw.Image, shape *Shape, filler image.Image, fx, fy int) {
 	RenderShapeExt(dst, shape, filler, image.Point{fx, fy}, nil, image.Point{}, draw.Over)
 }
 
+// RenderClippedShape renders the supplied shape with the offset fill image into
+// the destination image as masked by the clip shape.
+func RenderClippedShape(dst draw.Image, shape, clip *Shape, filler image.Image, fx, fy int) {
+	RenderShapeExt(dst, shape, filler, image.Point{fx, fy}, clip.Mask(), image.Point{}, draw.Over)
+}
+
 // DefaultRenderFlatten is the standard curve flattening value.
 const DefaultRenderFlatten = 0.6
 
