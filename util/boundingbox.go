@@ -1,6 +1,9 @@
 package util
 
-import "math"
+import (
+	"image"
+	"math"
+)
 
 // BoundingBox returns the minimum and maximum dimensional values in
 // a set of points. Bounds are inclusive. The dimensionality of the
@@ -80,4 +83,11 @@ func BBOutline(bb [][]float64) [][]float64 {
 	x1, x2 := bb[0][0], bb[1][0]
 	y1, y2 := bb[0][1], bb[1][1]
 	return [][]float64{{x1, y1}, {x2, y1}, {x2, y2}, {x1, y2}}
+}
+
+// RectToBB converts an image.Rectangle to a bounding box
+func RectToBB(rect image.Rectangle) [][]float64 {
+	return [][]float64{
+		{float64(rect.Min.X), float64(rect.Min.Y)},
+		{float64(rect.Max.X), float64(rect.Max.Y)}}
 }
