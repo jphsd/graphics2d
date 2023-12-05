@@ -7,9 +7,10 @@ import (
 	"github.com/jphsd/graphics2d/util"
 )
 
-// Mathematical constant.
+// Mathematical constants.
 const (
-	TwoPi = 2 * math.Pi
+	TwoPi  = 2 * math.Pi
+	HalfPi = math.Pi / 2
 )
 
 // A collection of part and path creation functions.
@@ -33,7 +34,7 @@ func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 	// are apparent for angles > Pi/2
 	n := 1
 	for true {
-		if a < math.Pi/2 {
+		if a < HalfPi {
 			break
 		}
 		a /= 2
@@ -238,7 +239,7 @@ func RegularPolygon(pt1, pt2 []float64, n int) *Path {
 
 // ReentrantPolygon returns a closed path describing an n pointed star.
 func ReentrantPolygon(c []float64, r float64, n int, t, ang float64) *Path {
-	ang -= math.Pi / 2 // So ang = 0 has the start of the polygon pointing up
+	ang -= HalfPi // So ang = 0 has the start of the polygon pointing up
 	da := TwoPi / float64(n)
 	cosDa, sinDa := math.Cos(da), math.Sin(da)
 	ri := r * math.Cos(da/2) * t

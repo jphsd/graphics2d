@@ -114,7 +114,6 @@ func (p *Pen) ChangeWidth(width float64) *Pen {
 	}
 
 	tsp := NewStrokeProc(width)
-	tsp.CapFunc = sp.CapFunc
 	tsp.PointFunc = sp.PointFunc
 	tsp.CapStartFunc = sp.CapStartFunc
 	tsp.CapEndFunc = sp.CapEndFunc
@@ -136,7 +135,6 @@ func (p *Pen) ScaleWidth(scale float64) *Pen {
 	}
 
 	tsp := NewStrokeProc(p.Width() * scale)
-	tsp.CapFunc = sp.CapFunc
 	tsp.PointFunc = sp.PointFunc
 	tsp.CapStartFunc = sp.CapStartFunc
 	tsp.CapEndFunc = sp.CapEndFunc

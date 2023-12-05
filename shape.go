@@ -45,8 +45,8 @@ func (s *Shape) Bounds() image.Rectangle {
 	return image.Rectangle{image.Point{fx, fy}, image.Point{cx, cy}}
 }
 
-// Mask returns an Alpha image, the size of the shape bounds, containing the result
-// of rendering the shape, located at {0, 0}.
+// Mask returns an Alpha image defined by the shape's bounds, containing the result
+// of rendering the shape.
 func (s *Shape) Mask() *image.Alpha {
 	if s.mask != nil {
 		return s.mask

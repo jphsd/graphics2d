@@ -47,7 +47,7 @@ func (cp *CompoundProc) Process(p *Path) []*Path {
 	return paths
 }
 
-// PathProcessor wrappers for Flatten, Simplify and Line path functions
+// PathProcessor wrappers for Flatten, Simplify, Line and Parts path functions
 
 // FlattenProc is a wrapper around Path.Flatten() and contains the minimum required
 // distance to the control points.

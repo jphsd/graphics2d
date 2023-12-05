@@ -133,6 +133,22 @@ func CapRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
 	return MakeArcParts(p[0], p[1], r, offs, math.Pi)
 }
 
+// CapInvRound extends e1 and s1 and draws a semicircle that passes through p.
+func CapInvRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1, s1 := p1[len(p1)-1], p2[0]
+	dx, dy := e1[0]-p[0], e1[1]-p[1]
+	e2 := []float64{e1[0] - dy, e1[1] + dx}
+	s2 := []float64{s1[0] - dy, s1[1] + dx}
+	offs := math.Atan2(dy, dx)
+	r := math.Sqrt(dx*dx + dy*dy)
+	tp := MakeArcParts(p[0]-dy, p[1]+dx, r, offs, -math.Pi)
+	res := make([][][]float64, 1, len(tp)+2)
+	res[0] = [][]float64{e1, e2}
+	res = append(res, tp...)
+	res = append(res, [][]float64{s2, s1})
+	return res
+}
+
 // CapSquare draws an extended square (stroke width/2) from e1 and s1.
 func CapSquare(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
 	e1, s1 := p1[len(p1)-1], p2[0]
@@ -159,18 +175,69 @@ func CapTail(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
 	return [][][]float64{{e1, e2}, {e2, p}, {p, s2}, {s2, s1}}
 }
 
-// CapInvRound extends e1 and s1 and draws a semicircle that passes through p.
-func CapInvRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+// OvalCap contains the ratio of rx to ry for the oval and a center line offset
+type OvalCap struct {
+	Rxy  float64 // Ratio of Rx to Ry
+	Offs float64 // Offset from center line [-1,1] -1 = LHS, 0 = centerline, 1 = RHS
+}
+
+// CapOval creates a half oval with ry = w/2 and rx = Rxy * ry
+func (oc *OvalCap) CapOval(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1 := p1[len(p1)-1]
+	dx, dy := e1[0]-p[0], e1[1]-p[1]
+	offs := math.Atan2(dy, dx)
+	ry := math.Sqrt(dx*dx + dy*dy)
+	rx := ry * oc.Rxy
+
+	if util.Equals(oc.Offs, 0) {
+		return EllipticalArc(p, rx, ry, offs, math.Pi, offs-HalfPi, ArcOpen).Parts()
+	}
+
+	// Construct two quarter arcs with new rys and cp
+	s1 := p2[0]
+	t := (oc.Offs + 1) / 2
+	omt := 1 - t
+	cp := []float64{e1[0]*omt + s1[0]*t, e1[1]*omt + s1[1]*t}
+	d := 2 * ry
+	ry1, ry2 := d*t, d*omt
+	res := EllipticalArc(cp, rx, ry1, offs, HalfPi, offs-HalfPi, ArcOpen).Parts()
+	return append(res, EllipticalArc(cp, rx, ry2, offs+HalfPi, HalfPi, offs-HalfPi, ArcOpen).Parts()...)
+}
+
+// CapInvOval creates an inverted half oval with rx = w/2 and ry = rxy * rx
+// Offs is ignored
+func (oc *OvalCap) CapInvOval(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
 	e1, s1 := p1[len(p1)-1], p2[0]
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
 	e2 := []float64{e1[0] - dy, e1[1] + dx}
 	s2 := []float64{s1[0] - dy, s1[1] + dx}
 	offs := math.Atan2(dy, dx)
-	r := math.Sqrt(dx*dx + dy*dy)
-	tp := MakeArcParts(p[0]-dy, p[1]+dx, r, offs, -math.Pi)
+	xoffs := offs - HalfPi
+	ry := math.Sqrt(dx*dx + dy*dy)
+	rx := ry * oc.Rxy
+	tp := EllipticalArc([]float64{p[0] - dy*oc.Rxy, p[1] + dx*oc.Rxy}, rx, ry, offs, -math.Pi, xoffs, ArcOpen).Parts()
 	res := make([][][]float64, 1, len(tp)+2)
 	res[0] = [][]float64{e1, e2}
 	res = append(res, tp...)
 	res = append(res, [][]float64{s2, s1})
 	return res
+}
+
+// RSCap contains the percentage [0,1] of the corner taken up by an arc. Perc = 1 is equivalent to CapRound
+// Perc = 0, to CapSquare.
+type RSCap struct {
+	Perc float64
+}
+
+// CapRoundedSquare creates a square cap with rounded corners
+func (rc *RSCap) CapRoundedSquare(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
+	e1, s1 := p1[len(p1)-1], p2[0]
+	dx, dy := e1[0]-p[0], e1[1]-p[1]
+	r := math.Sqrt(dx*dx+dy*dy) * rc.Perc
+	e2 := []float64{e1[0] - dy, e1[1] + dx}
+	s2 := []float64{s1[0] - dy, s1[1] + dx}
+	parts := [][][]float64{{e1, e2}, {e2, s2}, {s2, s1}}
+	path := PartsToPath(parts...)
+	rp := &RoundedProc{r}
+	return path.Process(rp)[0].Parts()
 }

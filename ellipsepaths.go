@@ -252,7 +252,7 @@ func IrregularEllipse(c []float64, rx1, rx2, ry1, ry2, disp, xang float64) *Path
 	rxx1 := rx1 - dx
 	rxx2 := rx2 + dx
 
-	ang := math.Pi / 2
+	ang := HalfPi
 	var offs float64
 
 	parts := [][][]float64{}
