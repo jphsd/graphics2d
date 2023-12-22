@@ -119,7 +119,7 @@ func (s *Shape) Copy() *Shape {
 
 // Transform applies an affine transform to all the paths in the shape
 // and returns a new shape.
-func (s *Shape) Transform(xfm *Aff3) *Shape {
+func (s *Shape) Transform(xfm Transform) *Shape {
 	np := make([]*Path, len(s.paths))
 	for i, path := range s.paths {
 		np[i] = path.Transform(xfm)

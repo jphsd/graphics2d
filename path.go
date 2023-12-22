@@ -424,7 +424,7 @@ func StringToPath(str string) *Path {
 }
 
 // Transform applies an affine transform to the points in a path to create a new one.
-func (p *Path) Transform(xfm *Aff3) *Path {
+func (p *Path) Transform(xfm Transform) *Path {
 	steps := make([][][]float64, len(p.steps))
 	for i, step := range p.steps {
 		steps[i] = xfm.Apply(step...)
