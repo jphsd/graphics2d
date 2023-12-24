@@ -684,7 +684,7 @@ func (p *Path) Line() *Path {
 	return path
 }
 
-// Lines reduces a path to a line for every step.
+// Lines reduces a path to a line for every step. If inccp is set then the control points are included.
 func (p *Path) Lines(inccp bool) *Path {
 	first := p.steps[0][0]
 	path := NewPath(first)
