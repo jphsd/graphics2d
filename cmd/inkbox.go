@@ -28,8 +28,6 @@ func main() {
 		g2d.RenderColoredShape(img, g2d.NewShape(path), color.GopherBlue)
 	}
 	path := InkStroke(points[len(points)-1], points[0], 20, 0, 1)
-	pts.AddPaths(g2d.Circle(points[len(points)-1], 2))
-
 	g2d.RenderColoredShape(img, g2d.NewShape(path), color.GopherBlue)
 
 	image.SaveImage(img, "inkbox")
