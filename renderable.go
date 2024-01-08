@@ -77,7 +77,7 @@ func (r *Renderable) AddClippedPennedShape(shape, clip *Shape, pen *Pen, xfm *Af
 // AddRenderable allows another renderable to be concatenated (post transform) to the current one.
 func (r *Renderable) AddRenderable(rend *Renderable, xfm *Aff3) *Renderable {
 	for i, shape := range rend.Shapes {
-		r.AddClippedShape(shape, r.Clips[i], rend.Fillers[i], xfm)
+		r.AddClippedShape(shape, rend.Clips[i], rend.Fillers[i], xfm)
 	}
 	return r
 }
@@ -88,14 +88,14 @@ func (r *Renderable) Render(img draw.Image, xfm *Aff3) {
 		clip := r.Clips[i]
 		if xfm != nil {
 			if clip == nil {
-				RenderShape(img, shape.Transform(xfm), r.Fillers[i], 0, 0)
+				RenderShape(img, shape.Transform(xfm), r.Fillers[i])
 			} else {
-				RenderClippedShape(img, shape.Transform(xfm), clip.Transform(xfm), r.Fillers[i], 0, 0)
+				RenderClippedShape(img, shape.Transform(xfm), clip.Transform(xfm), r.Fillers[i])
 			}
 		} else if clip == nil {
-			RenderShape(img, shape, r.Fillers[i], 0, 0)
+			RenderShape(img, shape, r.Fillers[i])
 		} else {
-			RenderClippedShape(img, shape, clip, r.Fillers[i], 0, 0)
+			RenderClippedShape(img, shape, clip, r.Fillers[i])
 		}
 	}
 }

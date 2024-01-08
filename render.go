@@ -10,23 +10,22 @@ import (
 	"golang.org/x/image/vector"
 )
 
-// RenderColoredShape renders the supplied shape with the fill color
-// into the destination image.
+// RenderColoredShape renders the supplied shape with the fill color into the destination image.
 func RenderColoredShape(dst draw.Image, shape *Shape, fill color.Color) {
-	filler := image.NewUniform(fill)
-	RenderShapeExt(dst, shape, filler, image.Point{}, nil, image.Point{}, draw.Over)
+	RenderShape(dst, shape, image.NewUniform(fill))
 }
 
-// RenderShape renders the supplied shape with the offset fill image into
-// the destination image.
-func RenderShape(dst draw.Image, shape *Shape, filler image.Image, fx, fy int) {
-	RenderShapeExt(dst, shape, filler, image.Point{fx, fy}, nil, image.Point{}, draw.Over)
+// RenderShape renders the supplied shape with the fill image into the destination image.
+func RenderShape(dst draw.Image, shape *Shape, filler image.Image) {
+	r := dst.Bounds()
+	RenderShapeExt(dst, r, shape, filler, r.Min, nil, image.Point{}, draw.Over)
 }
 
-// RenderClippedShape renders the supplied shape with the offset fill image into
-// the destination image as masked by the clip shape.
-func RenderClippedShape(dst draw.Image, shape, clip *Shape, filler image.Image, fx, fy int) {
-	RenderShapeExt(dst, shape, filler, image.Point{fx, fy}, clip.Mask(), image.Point{}, draw.Over)
+// RenderClippedShape renders the supplied shape with the fill image into the destination image
+// as masked by the clip shape.
+func RenderClippedShape(dst draw.Image, shape, clip *Shape, filler image.Image) {
+	r := dst.Bounds()
+	RenderShapeExt(dst, r, shape, filler, r.Min, clip.Mask(), r.Min, draw.Over)
 }
 
 // DefaultRenderFlatten is the standard curve flattening value.
@@ -36,37 +35,41 @@ const DefaultRenderFlatten = 0.6
 var RenderFlatten = DefaultRenderFlatten
 
 // RenderShapeExt renders the supplied shape with the fill and clip images into
-// the destination image using op.
-func RenderShapeExt(dst draw.Image, shape *Shape, filler image.Image, foffs image.Point, clip *image.Alpha, coffs image.Point, op draw.Op) {
-	drect := dst.Bounds()
+// the destination image region using op.
+func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler image.Image, fp image.Point, clip *image.Alpha, cp image.Point, op draw.Op) {
+	orig := drect.Min
 
 	// To avoid unnecessary work, reduce the rasterizer size to the shape width and height
-	// clipped by the destination image bounds
+	// clipped by the destination image bounds, the filler image and the clip image
 	srect := shape.Bounds()
-	srect = drect.Intersect(srect)
-	if srect.Empty() {
-		// shape doesn't overlap dst
+	drect = drect.Intersect(srect)
+	// the filler bounds
+	drect = drect.Intersect(filler.Bounds().Add(orig.Sub(fp)))
+	// and the clip bounds (if present)
+	if clip != nil {
+		drect = drect.Intersect(clip.Bounds().Add(orig.Sub(cp)))
+	}
+	if drect.Empty() {
 		return
 	}
 
-	size := srect.Size()
+	size := drect.Size()
+	dx, dy := drect.Min.X-orig.X, drect.Min.Y-orig.Y
 
 	// Make rasterizer, note rasterizer has implicit r.Min of {0, 0}
 	rasterizer := vector.NewRasterizer(size.X, size.Y)
 	rasterizer.DrawOp = op
 
-	// Process paths translated by -srect.Min and add srect.Min fo filler offest
-	foffs = image.Point{foffs.X + srect.Min.X, foffs.Y + srect.Min.Y}
-	minx, miny := float32(srect.Min.X), float32(srect.Min.Y)
+	// Process paths translated by -drect.Min since mp is {0, 0} in the vectorizer
+	minx, miny := float32(drect.Min.X), float32(drect.Min.Y)
 
 	for _, path := range shape.paths {
 		prect := path.Bounds() // shape.Bounds() will have caused these to be generated already
-		prect = srect.Intersect(prect)
+		prect = drect.Intersect(prect)
 		if prect.Empty() {
-			// path doesn't overlap dst
 			continue
 		}
-		fp := path.Flatten(RenderFlatten) // tolerance 0.6
+		fp := path.Flatten(RenderFlatten) // default tolerance 0.6
 		step := util.ToF32(fp.steps[0][0]...)
 		rasterizer.MoveTo(step[0]-minx, step[1]-miny)
 		for i, lp := 1, len(fp.steps); i < lp; i++ {
@@ -75,16 +78,21 @@ func RenderShapeExt(dst draw.Image, shape *Shape, filler image.Image, foffs imag
 		}
 		rasterizer.ClosePath()
 	}
+
+	fp.X += dx
+	fp.Y += dy
+
 	if clip == nil {
-		rasterizer.Draw(dst, srect, filler, foffs)
+		rasterizer.Draw(dst, drect, filler, fp)
 		return
 	}
 
-	// Obtain rasterizer mask and intersect it against the clip mask
-	mask := image.NewAlpha(srect)
-	coffs = image.Point{coffs.X + srect.Min.X, coffs.Y + srect.Min.Y}
-	rasterizer.Draw(mask, srect, clip, coffs)
-	draw.DrawMask(dst, drect, filler, foffs, mask, image.Point{}, op)
+	// Process clip mask - obtain rasterizer mask and intersect it against the clip mask
+	mask := image.NewAlpha(drect)
+	cp.X += dx
+	cp.Y += dy
+	rasterizer.Draw(mask, drect, clip, cp)
+	draw.DrawMask(dst, drect, filler, fp, mask, drect.Min, op)
 }
 
 // RenderShapeAlpha creates and returns the shape's alpha mask. The mask size and location are
