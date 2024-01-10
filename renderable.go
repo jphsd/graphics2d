@@ -100,6 +100,21 @@ func (r *Renderable) Render(img draw.Image, xfm *Aff3) {
 	}
 }
 
+// Image renders the shapes in the renderable with their respective fillers.
+func (r *Renderable) Image() *image.RGBA {
+	rect := r.Bounds()
+	img := image.NewRGBA(rect)
+	for i, shape := range r.Shapes {
+		clip := r.Clips[i]
+		if clip == nil {
+			RenderShape(img, shape, r.Fillers[i])
+		} else {
+			RenderClippedShape(img, shape, clip, r.Fillers[i])
+		}
+	}
+	return img
+}
+
 // Bounds returns the extent of the renderable.
 func (r *Renderable) Bounds() image.Rectangle {
 	rect := image.Rectangle{}
