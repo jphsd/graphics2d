@@ -16,6 +16,8 @@ func init() {
 		{&NLCube{}, "Cube"},
 		{&NLCircle1{}, "Circle1"},
 		{&NLCircle2{}, "Circle2"},
+		{NewNLLame(2, 2), "Lame 1"},
+		{NewNLLame(0.5, 0.5), "Lame 2"},
 		{&NLSin{}, "Sin"},
 		{&NLSin1{}, "Sin1"},
 		{&NLSin2{}, "Sin2"},

@@ -182,11 +182,17 @@ func (nl *NLSin2) InvTransform(v float64) float64 {
 type NLCircle1 struct{}
 
 func (nl *NLCircle1) Transform(t float64) float64 {
-	return 1 - math.Sqrt(1-t*t)
+	if t < 1 {
+		return 1 - math.Sqrt(1-t*t)
+	}
+	return 1
 }
 
 func (nl *NLCircle1) InvTransform(v float64) float64 {
-	return math.Sqrt(1 - (v-1)*(v-1))
+	if v < 1 {
+		return math.Sqrt(1 - (v-1)*(v-1))
+	}
+	return 1
 }
 
 // NLCircle2 v = sqrt(2t-t^2)
@@ -198,6 +204,35 @@ func (nl *NLCircle2) Transform(t float64) float64 {
 
 func (nl *NLCircle2) InvTransform(v float64) float64 {
 	return 1 - math.Sqrt(1-v*v)
+}
+
+// NLLame (aka superellipse) v = 1 - (1-t^n)^1/m
+type NLLame struct {
+	N   float64
+	M   float64
+	Odn float64
+	Odm float64
+}
+
+func NewNLLame(n, m float64) *NLLame {
+	return &NLLame{n, m, 1 / n, 1 / m}
+}
+
+func (nl *NLLame) Transform(t float64) float64 {
+	if t < 1 {
+		vm := 1 - math.Pow(t, nl.N)
+		return 1 - math.Pow(vm, nl.Odm)
+	}
+	return 1
+}
+
+func (nl *NLLame) InvTransform(v float64) float64 {
+	if v < 1 {
+		v = 1 - v
+		tn := 1 - math.Pow(v, nl.M)
+		return math.Pow(tn, nl.Odn)
+	}
+	return 1
 }
 
 // NLCatenary v = cosh(t)
