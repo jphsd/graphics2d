@@ -364,11 +364,19 @@ func NewNLOmt(f NonLinear) *NLOmt {
 }
 
 func (nl *NLOmt) Transform(t float64) float64 {
-	return 1 - nl.F.Transform(1-t)
+	t = 1 - t
+	if t > 0 {
+		return 1 - nl.F.Transform(t)
+	}
+	return 1
 }
 
 func (nl *NLOmt) InvTransform(v float64) float64 {
-	return 1 - nl.F.InvTransform(1-v)
+	v = 1 - v
+	if v > 0 {
+		return 1 - nl.F.InvTransform(1-v)
+	}
+	return 1
 }
 
 // NLRand uses random incremental steps from a normal distribution, smoothed with a cubic.
