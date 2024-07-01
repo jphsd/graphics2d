@@ -79,6 +79,7 @@ func graph(nl util.NonLinear, n int, s string) {
 	xfm := g2d.Translate(100, 900)
 	xfm.Scale(800, -800)
 
+	nl = util.NewNLOmt(nl)
 	path := g2d.NewPath([]float64{0, 0})
 	dt := 1.0 / 100
 	t := dt
