@@ -1,6 +1,6 @@
 module github.com/jphsd/graphics2d
 
-go 1.21
+go 1.21.0
 
 require (
 	github.com/jphsd/datastruct v0.0.0-20230819004359-fdb942b23eca
