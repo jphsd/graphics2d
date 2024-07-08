@@ -37,11 +37,7 @@ func (r *Renderable) AddClippedShape(shape, clip *Shape, filler image.Image, xfm
 		}
 	} else {
 		r.Shapes = append(r.Shapes, shape)
-		if clip != nil {
-			r.Clips = append(r.Clips, clip)
-		} else {
-			r.Clips = append(r.Clips, nil)
-		}
+		r.Clips = append(r.Clips, clip)
 	}
 	r.Fillers = append(r.Fillers, filler)
 	return r

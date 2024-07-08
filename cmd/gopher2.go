@@ -15,7 +15,7 @@ var (
 	black  = g2d.NewPen(color.Black, 4)
 )
 
-// The gopher (FKA Gordon)
+// The gopher (FKA Gordon) dancing
 // From Renee French's original design http://reneefrench.blogspot.com/
 func main() {
 	// Create image to write into
