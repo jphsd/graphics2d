@@ -60,6 +60,9 @@ func hslModel(col color.Color) color.Color {
 
 // NewHSL returns the color as an HSL triplet.
 func NewHSL(col color.Color) HSL {
+	if hsl, ok := col.(HSL); ok {
+		return HSL{hsl.H, hsl.S, hsl.L, hsl.A}
+	}
 	ir, ig, ib, ia := col.RGBA()
 	if ia == 0 {
 		return HSL{0, 0, 0, 0}
