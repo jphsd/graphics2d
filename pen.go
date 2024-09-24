@@ -1,9 +1,8 @@
 package graphics2d
 
 import (
-	g2dc "github.com/jphsd/graphics2d/color"
+	"github.com/jphsd/graphics2d/color"
 	"image"
-	"image/color"
 )
 
 // Pen describes the color/image, stroke and shape to image transform to
@@ -18,19 +17,19 @@ type Pen struct {
 
 // Predefined pens.
 var (
-	BlackPen     = NewPen(g2dc.Black, 1)
-	DarkGrayPen  = NewPen(g2dc.DarkGray, 1)
-	GrayPen      = NewPen(g2dc.Gray, 1)
-	LightGrayPen = NewPen(g2dc.LightGray, 1)
-	WhitePen     = NewPen(g2dc.White, 1)
-	RedPen       = NewPen(g2dc.Red, 1)
-	GreenPen     = NewPen(g2dc.Green, 1)
-	BluePen      = NewPen(g2dc.Blue, 1)
-	YellowPen    = NewPen(g2dc.Yellow, 1)
-	MagentaPen   = NewPen(g2dc.Magenta, 1)
-	CyanPen      = NewPen(g2dc.Cyan, 1)
-	OrangePen    = NewPen(g2dc.Orange, 1)
-	BrownPen     = NewPen(g2dc.Brown, 1)
+	BlackPen     = NewPen(color.Black, 1)
+	DarkGrayPen  = NewPen(color.DarkGray, 1)
+	GrayPen      = NewPen(color.MidGray, 1)
+	LightGrayPen = NewPen(color.LightGray, 1)
+	WhitePen     = NewPen(color.White, 1)
+	RedPen       = NewPen(color.Red, 1)
+	GreenPen     = NewPen(color.Green, 1)
+	BluePen      = NewPen(color.Blue, 1)
+	YellowPen    = NewPen(color.Yellow, 1)
+	MagentaPen   = NewPen(color.Magenta, 1)
+	CyanPen      = NewPen(color.Cyan, 1)
+	OrangePen    = NewPen(color.Orange, 1)
+	BrownPen     = NewPen(color.Brown, 1)
 )
 
 // NewPen returns a pen that will render a shape with the given pen
@@ -70,9 +69,9 @@ func NewProcessorPen(color color.Color, width float64, proc PathProcessor) *Pen 
 // NewNamedPen returns a pen that will render a shape with the given width and named color
 // into an image. If the name is not matched then a black pen will be returned.
 func NewNamedPen(name string, width float64) *Pen {
-	col, err := g2dc.ByName(name)
+	col, err := color.ByName(name)
 	if err != nil {
-		return &Pen{image.NewUniform(g2dc.Black), NewStrokeProc(width), nil}
+		return &Pen{image.NewUniform(color.Black), NewStrokeProc(width), nil}
 	}
 	return &Pen{image.NewUniform(col), NewStrokeProc(width), nil}
 }
@@ -80,13 +79,13 @@ func NewNamedPen(name string, width float64) *Pen {
 // NewRandomPen returns a pen that will render a shape with the given pen
 // width and a random color into an image.
 func NewRandomPen(width float64) *Pen {
-	return &Pen{image.NewUniform(g2dc.Random()), NewStrokeProc(width), nil}
+	return &Pen{image.NewUniform(color.Random()), NewStrokeProc(width), nil}
 }
 
 // NewRandomHuePen returns a pen that will render a shape with the given pen
 // width and a random hued color into an image.
 func NewRandomHuePen(width float64) *Pen {
-	return &Pen{image.NewUniform(g2dc.RandomHue()), NewStrokeProc(width), nil}
+	return &Pen{image.NewUniform(color.RandomHue()), NewStrokeProc(width), nil}
 }
 
 // NewFilledPen returns a pen that will render a shape with the given pen
