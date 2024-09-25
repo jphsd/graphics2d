@@ -125,9 +125,13 @@ func EllipticalArcFromPoint(pt, c []float64, rxy, ang, xang float64, s ArcStyle)
 // If p1, p2 and c are colinear and not equidistant then nil is returned.
 func EllipticalArcFromPoints(p1, p2, c []float64, s ArcStyle) *Path {
 	d1, d2 := util.DistanceESquared(p1, c), util.DistanceESquared(p2, c)
-	if util.Collinear(p1, p2, c) && !util.Equals(d1, d2) {
-		// No solution
-		return nil
+	if util.Collinear(p1, p2, c) {
+		if !util.Equals(d1, d2) {
+			// No solution
+			return nil
+		}
+		// Infinite solutions - choose circular
+		return ArcFromPoint(p1, c, math.Pi, s)
 	}
 
 	p1a := util.LineAngle(c, p1)
