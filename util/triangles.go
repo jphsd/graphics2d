@@ -15,10 +15,33 @@ func TriArea(p1, p2, p3 []float64) float64 {
 	return det / 2
 }
 
+var (
+	SideOfLine = TriArea
+)
+
+// Left returns true if p is to the left of the line
+func Left(lp1, lp2, p []float64) bool {
+	return TriArea(lp1, lp2, p) > 0
+}
+
+// Left returns true if p is to the left of or on the line
+func LeftOn(lp1, lp2, p []float64) bool {
+	return TriArea(lp1, lp2, p) >= 0
+}
+
+// Right returns true if p is to the right of the line
+func Right(lp1, lp2, p []float64) bool {
+	return TriArea(lp1, lp2, p) < 0
+}
+
+// RightOn returns true if p is to the right of or on the line
+func RightOn(lp1, lp2, p []float64) bool {
+	return TriArea(lp1, lp2, p) <= 0
+}
+
 // Collinear returns true if three points are on a line (i.e. if the area of the resultant triangle is 0)
-func Collinear(p1, p2, p3 []float64) bool {
-	a := TriArea(p1, p2, p3)
-	return Equals(0, a)
+func Collinear(lp1, lp2, p []float64) bool {
+	return Equals(TriArea(lp1, lp2, p), 0)
 }
 
 // PointInTriangle returns true if p is in the triangle formed by tp1, tp2 and tp3.

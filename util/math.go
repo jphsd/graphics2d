@@ -128,11 +128,33 @@ func DistanceToLineSquared(lp1, lp2, p []float64) (float64, []float64, float64) 
 	return dx*dx + dy*dy, ip, ts[0]
 }
 
-// SideOfLine calculates which side of a line a point is one by calculating the cross product of the
-// vector from the line start to the point with the line's normal. If +ve then one side, -ve the other,
-// 0 - on the line.
-func SideOfLine(lp1, lp2, p []float64) float64 {
-	return CrossProduct(lp1, lp2, p)
+// PointOnLine returns if p is on the line and t for p if it is.
+func PointOnLine(lp1, lp2, p []float64) (bool, float64) {
+	cp := CrossProduct(lp1, lp2, p)
+	if !Equals(cp, 0) {
+		return false, -1
+	}
+	dx := lp2[0] - lp1[0]
+	if Equals(dx, 0) {
+		// Vertical
+		return true, (p[1] - lp1[1]) / (lp2[1] - lp2[0])
+	}
+	return true, (p[0] - lp1[0]) / dx
+}
+
+// True if lines are parallel
+func Parallel(lp1, lp2, lp3, lp4 []float64) bool {
+	_, err := IntersectionTValsP(lp1, lp2, lp3, lp4)
+	return err != nil
+}
+
+// True if lines are on the same infinite line
+func Coincident(lp1, lp2, lp3, lp4 []float64) bool {
+	if !Parallel(lp1, lp2, lp3, lp4) {
+		return false
+	}
+	cp := CrossProduct(lp1, lp2, lp3)
+	return Equals(cp, 0)
 }
 
 // ToF64 casts a slice of float32 to float64.
@@ -159,7 +181,7 @@ func ToF32(pts ...float64) []float32 {
 	return res
 }
 
-// Centroid returns the centroid of a set of points.
+// Centroid returns the vertex centroid of a set of points.
 func Centroid(pts ...[]float64) []float64 {
 	n := len(pts)
 	if n == 0 {

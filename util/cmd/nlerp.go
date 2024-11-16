@@ -22,6 +22,8 @@ var (
 		{&util.NLCircle1{}, "Circle1"},
 		{&util.NLCircle2{}, "Circle2"},
 		{&util.NLSin{}, "Sin"},
+		{&util.NLSin1{}, "Sin1"},
+		{&util.NLSin2{}, "Sin2"},
 		{util.NewNLLame(2, 2), "Lame 1"},
 		{util.NewNLLame(4, 4), "Lame 2"},
 		{util.NewNLLame(8, 8), "Lame 3"},
@@ -79,13 +81,12 @@ func graph(nl util.NonLinear, n int, s string) {
 	xfm := g2d.Translate(100, 900)
 	xfm.Scale(800, -800)
 
-	nl = util.NewNLOmt(nl)
 	path := g2d.NewPath([]float64{0, 0})
 	dt := 1.0 / 100
 	t := dt
 	for i := 0; i < 100; i++ {
 		v := nl.Transform(t)
-		path.AddSteps([][]float64{{v, t}})
+		path.AddSteps([][]float64{{t, v}})
 		//fmt.Printf("%f => %f\n", t, v)
 		t += dt
 	}

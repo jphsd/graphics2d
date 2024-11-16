@@ -41,11 +41,8 @@ func BoundingBox(pts ...[]float64) [][]float64 {
 
 // BBOverlap returns true if bb1 and bb2 overlap at the smallest dimensionality.
 func BBOverlap(bb1, bb2 [][]float64) bool {
-	min := len(bb1[0])
-	if min > len(bb2[0]) {
-		min = len(bb2[0])
-	}
-	for i := 0; i < min; i++ {
+	md := min(len(bb1[0]), len(bb2[0]))
+	for i := 0; i < md; i++ {
 		if bb1[0][i] > bb2[1][i] || bb2[0][i] > bb1[1][i] {
 			return false
 		}
@@ -53,13 +50,25 @@ func BBOverlap(bb1, bb2 [][]float64) bool {
 	return true
 }
 
+// BBIntersection returns the bb formed by the overlap or nil.
+func BBIntersection(bb1, bb2 [][]float64) [][]float64 {
+	md := min(len(bb1[0]), len(bb2[0]))
+	res := [][]float64{make([]float64, md), make([]float64, md)}
+	for i := 0; i < md; i++ {
+		if bb1[0][i] > bb2[1][i] || bb2[0][i] > bb1[1][i] {
+			return nil
+		}
+		res[0][i] = max(bb1[0][i], bb2[0][i])
+		res[1][i] = min(bb1[1][i], bb2[1][i])
+	}
+
+	return res
+}
+
 // BBContains returns true if p is in bb at the smallest dimensionality.
 func BBContains(p []float64, bb [][]float64) bool {
-	min := len(bb[0])
-	if min > len(p) {
-		min = len(p)
-	}
-	for i := 0; i < min; i++ {
+	md := min(len(bb[0]), len(p))
+	for i := 0; i < md; i++ {
 		if p[i] < bb[0][i] || p[i] > bb[1][i] {
 			return false
 		}
