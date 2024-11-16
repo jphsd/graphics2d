@@ -154,24 +154,6 @@ func Equal(img1, img2 image.Image, offs image.Point) bool {
 	return true
 }
 
-// Copy creates a grayscale copy of img
-func Copy(img image.Image) *image.Gray {
-	r := img.Bounds()
-	res := image.NewGray(r)
-	draw.Draw(res, r, img, r.Min, draw.Src)
-	return res
-}
-
-// AlphaToGray does a shallow copy (vs going through the ColorModel).
-func AlphaToGray(a *image.Alpha) *image.Gray {
-	return &image.Gray{a.Pix, a.Stride, a.Rect}
-}
-
-// GrayToAlpha does a shallow copy (vs going through the ColorModel).
-func GrayToAlpha(a *image.Gray) *image.Alpha {
-	return &image.Alpha{a.Pix, a.Stride, a.Rect}
-}
-
 // AlphaAnd returns img1 & img2 (intersection).
 // For a pair of pixels, p1 & p2 returns min(p1, p2).
 func AlphaAnd(img1, img2 *image.Alpha, offs image.Point) *image.Alpha {
@@ -210,12 +192,6 @@ func AlphaNot(img *image.Alpha) *image.Alpha {
 func AlphaEqual(img1, img2 *image.Alpha, offs image.Point) bool {
 	g1, g2 := AlphaToGray(img1), AlphaToGray(img2)
 	return Equal(g1, g2, offs)
-}
-
-// AlphaCopy returns a deep copy of img.
-func AlphaCopy(img *image.Alpha) *image.Alpha {
-	g1 := AlphaToGray(img)
-	return GrayToAlpha(Copy(g1))
 }
 
 // vs inline?

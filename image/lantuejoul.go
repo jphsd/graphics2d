@@ -26,7 +26,7 @@ func LJSkeleton(img image.Image, b [][]bool, n int) []*image.Gray {
 
 	// First round (n = 0) is just regular tophat
 	res[0] = TopHat(gray, b)
-	res[n] = Copy(res[0])
+	res[n] = CopyGray(res[0])
 	for i := 1; i < n; i++ {
 		// Dilate current support by b
 		simg = growImg(simg, dw, dh)
@@ -47,7 +47,7 @@ func LJReconstitute(skels []*image.Gray, b [][]bool) *image.Gray {
 	simg := SupportToGray(Z0)
 
 	// First round (n = 0) is just the skeleton
-	res := Copy(skels[0])
+	res := CopyGray(skels[0])
 
 	for i := 1; i < len(skels); i++ {
 		// Dilate current support by b
