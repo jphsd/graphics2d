@@ -390,6 +390,17 @@ func Lune(c []float64, r0, r1, r2, th float64) *Path {
 	return p1
 }
 
+// Lune2 returns a closed path made up of two arcs with the supplied end points.
+// The arcs are calculated from the circumcircles of the two triangles defined by the end points,
+// and their midpoint displaced by r1 or r2.
+func Lune2(p1, p2 []float64, r1, r2 float64) *Path {
+	dx, dy := p2[0]-p1[0], p2[1]-p1[1]
+	th := math.Atan2(dy, dx)
+	d := math.Hypot(dx, dy)
+
+	return Lune([]float64{p1[0] + dx/2, p1[1] + dy/2}, d/2, r1, r2, th)
+}
+
 // Square returns a closed path describing a square with side s, centered on c.
 func Square(c []float64, s float64) *Path {
 	hs := s / 2
