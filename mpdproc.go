@@ -95,7 +95,7 @@ type HandDrawnProc struct {
 // NewHandDrawnProc takes the segment length to apply the MPD path processor to and returns a new
 // HandDrawnProc path processor.
 func NewHandDrawnProc(l float64) *HandDrawnProc {
-	comp := NewCompoundProc(NewSnipProc(2, []float64{l, l}, 0), &MPDProc{0.1, 3, 0.5, false})
+	comp := NewCompoundProc(NewFSnipProc(2, []float64{l, l}, 0), &MPDProc{0.1, 3, 0.5, false})
 	comp.Concatenate = true
 	return &HandDrawnProc{comp}
 }
