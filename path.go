@@ -154,12 +154,16 @@ func (p *Path) Steps() [][][]float64 {
 // Parts returns the steps of a path, each prepended with its start.
 func (p *Path) Parts() [][][]float64 {
 	n := len(p.steps)
+	if n == 0 {
+		return nil
+	}
+	cp := p.steps[0][0]
 	if n == 1 {
 		// This is a point
-		return [][][]float64{{p.steps[0][0]}}
+		// Deep copy
+		return [][][]float64{{{cp[0], cp[1]}}}
 	}
 	parts := make([][][]float64, n-1, n)
-	cp := p.steps[0][0]
 	for i := 1; i < n; i++ {
 		part := toPart(cp, p.steps[i])
 		parts[i-1] = part
@@ -242,10 +246,13 @@ func (p *Path) Flatten(d float64) *Path {
 	return path
 }
 
+// Deep copy
 func toPart(cp []float64, pts [][]float64) [][]float64 {
 	res := make([][]float64, len(pts)+1)
-	res[0] = cp
-	copy(res[1:], pts)
+	res[0] = []float64{cp[0], cp[1]}
+	for i, pt := range pts {
+		res[i+1] = []float64{pt[0], pt[1]}
+	}
 	return res
 }
 
