@@ -50,7 +50,22 @@ func PointInTriangle(p, tp1, tp2, tp3 []float64) bool {
 	return !(w1 < 0 || w1 > 1 || w2 < 0 || w2 > 1 || w3 < 0 || w3 > 1)
 }
 
-// Barycentric converts a point on the plane into Barycentric weights given three non-coincident points, tp1, tp2 and tp3.
+// PointInTriangleStrict returns true if p is strictly in the triangle formed by tp1, tp2 and tp3.
+func PointInTriangleStrict(p, tp1, tp2, tp3 []float64) bool {
+	w1, w2, w3 := Barycentric(p, tp1, tp2, tp3)
+	return !(Equals(w1, 0) || Equals(w2, 0) || Equals(w3, 0)) &&
+		!(w1 < 0 || w1 > 1 || w2 < 0 || w2 > 1 || w3 < 0 || w3 > 1)
+}
+
+// PointOnTriangle returns true if p is on an edge of the triangle formed by tp1, tp2 and tp3.
+func PointOnTriangle(p, tp1, tp2, tp3 []float64) bool {
+	w1, w2, w3 := Barycentric(p, tp1, tp2, tp3)
+	return (Equals(w1, 0) || Equals(w2, 0) || Equals(w3, 0)) &&
+		!(w1 < 0 || w1 > 1 || w2 < 0 || w2 > 1 || w3 < 0 || w3 > 1)
+}
+
+// Barycentric converts a point on the plane into Barycentric weights given three non-coincident points,
+// tp1, tp2 and tp3.
 func Barycentric(p, tp1, tp2, tp3 []float64) (float64, float64, float64) {
 	// Barycentric form (see https://en.wikipedia.org/wiki/Barycentric_coordinate_system)
 	// p = d1 * t1 + d2 * t2 + d3 * t3. If p is within tri then d1 + d2 + d3 = 1
