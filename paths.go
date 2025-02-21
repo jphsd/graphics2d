@@ -395,7 +395,7 @@ func Lune(c []float64, r0, r1, r2, th float64) *Path {
 // and their midpoint displaced by r1 or r2.
 func Lune2(p1, p2 []float64, r1, r2 float64) *Path {
 	dx, dy := p2[0]-p1[0], p2[1]-p1[1]
-	th := math.Atan2(dy, dx) + HalfPi 
+	th := math.Atan2(dy, dx) + HalfPi
 	d := math.Hypot(dx, dy)
 
 	return Lune([]float64{p1[0] + dx/2, p1[1] + dy/2}, d/2, r1, r2, th)
