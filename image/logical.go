@@ -69,6 +69,24 @@ func Sub(img1, img2 image.Image, offs image.Point) *image.Gray {
 	return res
 }
 
+// Add returns the result of addin img1 to img1, offset by offs. The images are converted to
+// image.Gray if not already so. For a pair of pixels, p1 & p2 returns min(0xff, p1+p2).
+func Add(img1, img2 image.Image, offs image.Point) *image.Gray {
+	r := img1.Bounds()
+	res := image.NewGray(r)
+
+	rect := r.Intersect(img2.Bounds().Add(r.Min.Sub(offs)))
+	if rect.Empty() {
+		// Implicit: Sub with 0 => img1
+		draw.Draw(res, r, img1, r.Min, draw.Src)
+		return res
+	}
+
+	process(img1, img2, res, offs, add)
+
+	return res
+}
+
 // utility function to perform grayscale conversion and apply f.
 func process(img1, img2 image.Image, res *image.Gray, offs image.Point, f func(uint8, uint8) uint8) {
 	r := img1.Bounds()
@@ -218,4 +236,11 @@ func sub(a, b uint8) uint8 {
 
 func xor(a, b uint8) uint8 {
 	return min(max(a, b), sub(0xff, min(a, b)))
+}
+
+func add(a, b uint8) uint8 {
+	if b > 0xff-a {
+		return 0xff
+	}
+	return a + b
 }
