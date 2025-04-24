@@ -60,5 +60,5 @@ func NewStrokedPen(color color.Color, width float64,
 	if cap == nil {
 		cap = CapButt
 	}
-	return &Pen{image.NewUniform(color), NewStrokeProcExt(width, -width, JoinBevel, 0.5, CapButt), nil}
+	return &Pen{image.NewUniform(color), NewStrokeProcExt(width, -width, join, 0.5, cap), nil}
 }
