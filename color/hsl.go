@@ -109,6 +109,16 @@ func NewHSL(col color.Color) HSL {
 	return HSL{h, s, l, a}
 }
 
+// NewHSLFromHSV is a convenience function that maps HSV to HSL (all in [0,1])
+func NewHSLFromHSV(h, sv, v float64) HSL {
+	l := v * (1 - sv/2)
+	var sl float64
+	if l > 0 && l < 1 {
+		sl = (v - l) / min(l, 1-l)
+	}
+	return HSL{h, sl, l, 1}
+}
+
 // Complement returns the color's complement.
 func Complement(col color.Color) HSL {
 	hsl := NewHSL(col)
