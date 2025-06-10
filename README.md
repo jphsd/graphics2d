@@ -17,6 +17,3 @@ The top level Path and Shape types are complete, and the majority of PathProcess
 > dashedstroke := NewCompoundProc(NewDashProc(pattern, offs), NewStrokeProc(1))
 
 Wiki entries [here](https://github.com/jphsd/graphics2d/wiki)
-
-## Code Structure
-![Visualization of the codebase](./diagram.svg)
