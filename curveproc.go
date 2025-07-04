@@ -41,7 +41,7 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 
 	res := []*Path{}
 
-	// Bezier
+	// Bezier - curve passes through mid points. If path is open, then passes through start and end too.
 
 	if cp.Style == Bezier {
 		// Calc mid points
@@ -78,7 +78,7 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 		return res
 	}
 
-	// Quad
+	// Quad - curve passes through mid points. If path is open, then passes through start and end too.
 
 	if cp.Style == Quad {
 		// Calc mid points
@@ -109,7 +109,7 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 		return res
 	}
 
-	// Catmull-Rom
+	// Catmull-Rom - curve passes through all points
 
 	// Calc opposite tangents
 	ops := make([][]float64, ns)
@@ -117,8 +117,8 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 		ops[i] = []float64{(points[i+1][0] - points[i-1][0]) / 2, (points[i+1][1] - points[i-1][1]) / 2}
 	}
 	if p.closed {
-		ops[0] = []float64{points[1][0] - points[ns-1][0], points[1][1] - points[ns-1][1]}
-		ops[ns-1] = []float64{points[0][0] - points[ns-2][0], points[0][1] - points[ns-2][1]}
+		ops[0] = []float64{(points[1][0] - points[ns-1][0]) / 2, (points[1][1] - points[ns-1][1]) / 2}
+		ops[ns-1] = []float64{(points[0][0] - points[ns-2][0]) / 2, (points[0][1] - points[ns-2][1]) / 2}
 	} else {
 		ops[0] = []float64{0, 0}
 		ops[ns-1] = ops[0]

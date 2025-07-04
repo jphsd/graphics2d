@@ -1,10 +1,5 @@
 package graphics2d
 
-import (
-	"math"
-	"math/rand"
-)
-
 // CircularJitterProc takes a path and jitters its internal step points by a random amount within the defined radius.
 type CircularJitterProc struct {
 	Radius float64
@@ -25,13 +20,9 @@ func (sp *CircularJitterProc) Process(p *Path) []*Path {
 	}
 
 	for i := 0; i < np-1; i++ {
-		th := rand.Float64() * TwoPi
-		nx := math.Cos(th) * sp.Radius * rand.Float64()
-		ny := math.Sin(th) * sp.Radius * rand.Float64()
 		part := parts[i]
 		end := len(part) - 1
-		part[end][0] += nx
-		part[end][1] += ny
+		part[end] = jitter(part[end], sp.Radius)
 		res.AddStep(part[1:]...)
 	}
 	res.AddStep(parts[np-1][1:]...)

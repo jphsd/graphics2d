@@ -6,7 +6,7 @@ import (
 )
 
 // HandyProc applies a modified form of line rendering as outlined in Wood12.
-// Note the lines are not smoothed and closed paths ae not preserved.
+// Note the lines are not smoothed and closed paths are not preserved.
 type HandyProc struct {
 	N int     // Repetitions
 	R float64 // Jitter radius
