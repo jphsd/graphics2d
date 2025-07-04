@@ -16,13 +16,13 @@ func main() {
 	cp := []float64{250, 260}
 	path := g2d.ReentrantPolygon(cp, 250, 5, 0.5, 0)
 
+	// Create path processor
+	// Wood12 uses Catmull splines
+	cpp := &g2d.CurveProc{0.375, g2d.CatmullRom}
 	hpp := &g2d.HandyProc{N: 3, R: 4}
-	paths := path.Process(hpp)
-	shape := g2d.NewShape(paths...)
+	bpp := g2d.NewCompoundProc(hpp, cpp)
 
-	// Wood12 uses Catmull splines...
-	rpp := &g2d.RoundedProc{10000}
-	shape = shape.ProcessPaths(rpp)
+	shape := g2d.NewShape(path.Process(bpp)...)
 
 	g2d.DrawShape(img, shape, g2d.BlackPen)
 
