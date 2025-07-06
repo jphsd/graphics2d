@@ -47,6 +47,19 @@ func (cp *CompoundProc) Process(p *Path) []*Path {
 	return paths
 }
 
+// DecomposeProc decompses each step of a path into its own path.
+type DecomposeProc struct{}
+
+// Process implements the PathProcessor interface.
+func (dp *DecomposeProc) Process(p *Path) []*Path {
+	paths := []*Path{}
+	for _, part := range p.Parts() {
+		paths = append(paths, PartsToPath(part))
+	}
+
+	return paths
+}
+
 // PathProcessor wrappers for Flatten, Simplify, Line and Parts path functions
 
 // FlattenProc is a wrapper around Path.Flatten() and contains the minimum required

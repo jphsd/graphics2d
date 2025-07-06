@@ -24,12 +24,24 @@ func (hp *HandyProc) Process(p *Path) []*Path {
 	}
 
 	for i := 1; i < ns; i++ {
-		op2 := steps[i][len(steps[i])-1]
-		opa, opb := Lerp(0.5, op1, op2), Lerp(0.75, op1, op2)
-		for _, path := range paths {
-			path.AddStep(jitter(opa, hp.R))
-			path.AddStep(jitter(opb, hp.R))
-			path.AddStep(jitter(op2, hp.R))
+		nc := len(steps[i]) - 1
+		op2 := steps[i][nc]
+		if nc == 0 {
+			// This is a linear step, add extra points
+			opa, opb := Lerp(0.5, op1, op2), Lerp(0.75, op1, op2)
+			for _, path := range paths {
+				path.AddStep(jitter(opa, hp.R))
+				path.AddStep(jitter(opb, hp.R))
+				path.AddStep(jitter(op2, hp.R))
+			}
+		} else {
+			// This is a non-linear step, just jitter the end point
+			for _, path := range paths {
+				sps := make([][]float64, nc+1)
+				copy(sps, steps[i][:nc])
+				sps[nc] = jitter(op2, hp.R)
+				path.AddStep(sps...)
+			}
 		}
 		op1 = op2
 	}
