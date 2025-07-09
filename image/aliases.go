@@ -1,13 +1,20 @@
 package image
 
-import stdimg "image"
+import (
+	"image"
+	"image/color"
+)
 
-type Image = stdimg.Image
-type RGBA = stdimg.RGBA
-type RGBA64 = stdimg.RGBA64
-type NRGBA = stdimg.NRGBA
-type NRGBA64 = stdimg.NRGBA64
-type Gray = stdimg.Gray
-type Gray16 = stdimg.Gray16
-type Point = stdimg.Point
-type Rectangle = stdimg.Rectangle
+type Image = image.Image
+type RGBA = image.RGBA
+type RGBA64 = image.RGBA64
+type NRGBA = image.NRGBA
+type NRGBA64 = image.NRGBA64
+type Gray = image.Gray
+type Gray16 = image.Gray16
+type Uniform = image.Uniform
+type Point = image.Point
+type Rectangle = image.Rectangle
+
+var Rect func(int, int, int, int) Rectangle = image.Rect
+var NewUniform func(color.Color) *Uniform = image.NewUniform

@@ -1,13 +1,5 @@
 package color
 
-import (
-	"image/color"
-	"math"
-	"math/rand"
-
-	"github.com/jphsd/graphics2d/util"
-)
-
 // HSL describes a color in Hue Saturation Lightness space. All values are in range [0,1].
 type HSL struct {
 	H, S, L, A float64
@@ -48,9 +40,9 @@ func hueConv(m1, m2, h float64) float64 {
 }
 
 // HSLModel standard HSL color type with all values in range [0,1]
-var HSLModel color.Model = color.ModelFunc(hslModel)
+var HSLModel Model = ModelFunc(hslModel)
 
-func hslModel(col color.Color) color.Color {
+func hslModel(col Color) Color {
 	hsl, ok := col.(HSL)
 	if !ok {
 		hsl = NewHSL(col)
@@ -59,7 +51,7 @@ func hslModel(col color.Color) color.Color {
 }
 
 // NewHSL returns the color as an HSL triplet.
-func NewHSL(col color.Color) HSL {
+func NewHSL(col Color) HSL {
 	if hsl, ok := col.(HSL); ok {
 		return HSL{hsl.H, hsl.S, hsl.L, hsl.A}
 	}
@@ -74,13 +66,13 @@ func NewHSL(col color.Color) HSL {
 	g /= a
 	b /= a
 
-	min := math.Min(math.Min(r, g), b)
-	max := math.Max(math.Max(r, g), b)
+	min := min(min(r, g), b)
+	max := max(max(r, g), b)
 
 	l := (max + min) / 2
 
 	var s, h float64
-	if util.Equals(min, max) {
+	if equals(min, max) {
 		s = 0
 		h = 0
 	} else {
@@ -120,7 +112,7 @@ func NewHSLFromHSV(h, sv, v float64) HSL {
 }
 
 // Complement returns the color's complement.
-func Complement(col color.Color) HSL {
+func Complement(col Color) HSL {
 	hsl := NewHSL(col)
 	hsl.H += 0.5
 	if hsl.H > 1 {
@@ -132,7 +124,7 @@ func Complement(col color.Color) HSL {
 // Monochrome returns the color's monochrome palette (excluding black and white).
 // Note the palette may not contain the original color since the values are equally
 // spaced over L.
-func Monochrome(col color.Color, n int) []HSL {
+func Monochrome(col Color, n int) []HSL {
 	if n < 2 {
 		return []HSL{NewHSL(col)}
 	}
@@ -149,7 +141,7 @@ func Monochrome(col color.Color, n int) []HSL {
 }
 
 // Analogous returns the color's analogous colors.
-func Analogous(col color.Color) []HSL {
+func Analogous(col Color) []HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	d := 1 / float64(12)
 	a1.H += d
@@ -164,7 +156,7 @@ func Analogous(col color.Color) []HSL {
 }
 
 // Triad returns the color's other two triadics.
-func Triad(col color.Color) []HSL {
+func Triad(col Color) []HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	d := 1 / float64(3)
 	a1.H += d
@@ -179,7 +171,7 @@ func Triad(col color.Color) []HSL {
 }
 
 // Tetrad returns the color's other three tetradics.
-func Tetrad(col color.Color) []HSL {
+func Tetrad(col Color) []HSL {
 	a1, a2, a3 := NewHSL(col), NewHSL(col), NewHSL(col)
 	d := 0.25
 	a1.H += d
@@ -198,9 +190,9 @@ func Tetrad(col color.Color) []HSL {
 }
 
 // Warmer returns the color shifted towards red.
-func Warmer(col color.Color) HSL {
+func Warmer(col Color) HSL {
 	hsl := NewHSL(col)
-	if util.Equals(hsl.H, 0) {
+	if equals(hsl.H, 0) {
 		return hsl
 	}
 	if hsl.H < 0.5 {
@@ -220,9 +212,9 @@ func Warmer(col color.Color) HSL {
 }
 
 // Cooler returns the color shifted toward cyan.
-func Cooler(col color.Color) HSL {
+func Cooler(col Color) HSL {
 	hsl := NewHSL(col)
-	if util.Equals(hsl.H, 0.5) {
+	if equals(hsl.H, 0.5) {
 		return hsl
 	}
 	if hsl.H < 0.5 {
@@ -242,9 +234,9 @@ func Cooler(col color.Color) HSL {
 }
 
 // Tint returns the color shifted towards white.
-func Tint(col color.Color) HSL {
+func Tint(col Color) HSL {
 	hsl := NewHSL(col)
-	if util.Equals(hsl.L, 1) {
+	if equals(hsl.L, 1) {
 		return hsl
 	}
 	if hsl.L > 0.9 {
@@ -256,9 +248,9 @@ func Tint(col color.Color) HSL {
 }
 
 // Shade returns the color shifted towards black.
-func Shade(col color.Color) HSL {
+func Shade(col Color) HSL {
 	hsl := NewHSL(col)
-	if util.Equals(hsl.L, 0) {
+	if equals(hsl.L, 0) {
 		return hsl
 	}
 	if hsl.L < 0.1 {
@@ -270,9 +262,9 @@ func Shade(col color.Color) HSL {
 }
 
 // Boost returns the color shifted away from gray.
-func Boost(col color.Color) HSL {
+func Boost(col Color) HSL {
 	hsl := NewHSL(col)
-	if util.Equals(hsl.S, 1) {
+	if equals(hsl.S, 1) {
 		return hsl
 	}
 	if hsl.S > 0.9 {
@@ -284,9 +276,9 @@ func Boost(col color.Color) HSL {
 }
 
 // Tone returns the color shifted towards gray.
-func Tone(col color.Color) HSL {
+func Tone(col Color) HSL {
 	hsl := NewHSL(col)
-	if util.Equals(hsl.S, 0) {
+	if equals(hsl.S, 0) {
 		return hsl
 	}
 	if hsl.S < 0.1 {
@@ -298,12 +290,12 @@ func Tone(col color.Color) HSL {
 }
 
 // Compound returns the colors analogous to the color's complement.
-func Compound(col color.Color) []HSL {
+func Compound(col Color) []HSL {
 	return Analogous(Complement(col))
 }
 
 // HuePair returns a pair of colors d away on either side of the color. d is in range [0,1]
-func HuePair(col color.Color, d float64) []HSL {
+func HuePair(col Color, d float64) []HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	if d < 0 {
 		d = 0
@@ -322,7 +314,7 @@ func HuePair(col color.Color, d float64) []HSL {
 }
 
 // SatPair returns a pair of colors d away on either side of the color. d is in range [0,1]
-func SatPair(col color.Color, d float64) []HSL {
+func SatPair(col Color, d float64) []HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	if d < 0 {
 		d = 0
@@ -341,7 +333,7 @@ func SatPair(col color.Color, d float64) []HSL {
 }
 
 // LightPair returns a pair of colors d away on either side of the color. d is in range [0,1]
-func LightPair(col color.Color, d float64) []HSL {
+func LightPair(col Color, d float64) []HSL {
 	a1, a2 := NewHSL(col), NewHSL(col)
 	if d < 0 {
 		d = 0
@@ -359,23 +351,11 @@ func LightPair(col color.Color, d float64) []HSL {
 	return []HSL{a1, a2}
 }
 
-// RandomHue returns an HSL color with a random hue, fully saturated and 50% lightness.
-func RandomHue() HSL {
-	return HSL{rand.Float64(), 1, 0.5, 1}
-}
-
-// HuePalette creates a palette n long of equally spaced hues starting from hoffs, using the
-// supplied saturation and lightness.
-func HuePalette(hoffs, s, l float64, n int) []color.Color {
-	dh := 1.0 / float64(n)
-	h := hoffs
-	res := make([]color.Color, n)
-	for i := 0; i < n; i++ {
-		res[i] = HSL{h, s, l, 1}
-		h += dh
-		if h > 1 {
-			h -= 1
-		}
+func equals(v1, v2 float64) bool {
+	d := v1 - v2
+	if d < 0 {
+		d = -d
 	}
-	return res
+
+	return d < 0.000001
 }
