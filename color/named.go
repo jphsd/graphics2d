@@ -37,11 +37,16 @@ type NamedRGB struct {
 	Color RGBA
 }
 
-// NamedRGBs is the slice of colors loaded from the color names file.
-var BestNamedRGBs []*NamedRGB
-var CSSNamedRGBs []*NamedRGB
-var bestMap = make(map[string]*NamedRGB)
-var cssMap = make(map[string]*NamedRGB)
+var (
+	// NamedRGBs is the slice of colors loaded from the best color names file.
+	BestNamedRGBs []*NamedRGB
+
+	// CSSNamedRGBs is the slice of colors loaded from the W3 CSS color names file.
+	CSSNamedRGBs []*NamedRGB
+
+	bestMap = make(map[string]*NamedRGB)
+	cssMap  = make(map[string]*NamedRGB)
+)
 
 func init() {
 	reader := csv.NewReader(bytes.NewReader(ColorFile0()))
