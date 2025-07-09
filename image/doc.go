@@ -1,5 +1,5 @@
 /*
-Package image contains utility functions for reading, writing and converting images. 
+Package image contains utility functions for reading, writing and converting images.
 
 Image types:
 

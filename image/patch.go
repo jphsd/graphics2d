@@ -2,8 +2,7 @@ package image
 
 import (
 	"fmt"
-	"image"
-	"image/color"
+	"github.com/jphsd/graphics2d/color"
 )
 
 // Patch is an infinite image covered with a patch of colors.
@@ -38,8 +37,8 @@ func (p *Patch) ColorModel() color.Model {
 }
 
 // Bounds implements the Bounds function in the Image interface.
-func (p *Patch) Bounds() image.Rectangle {
-	return image.Rectangle{image.Point{-1e9, -1e9}, image.Point{1e9, 1e9}}
+func (p *Patch) Bounds() Rectangle {
+	return Rectangle{Point{-1e9, -1e9}, Point{1e9, 1e9}}
 }
 
 // At implements the At function in the Image interface.

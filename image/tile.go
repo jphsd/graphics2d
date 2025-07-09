@@ -2,13 +2,14 @@ package image
 
 import (
 	"image"
-	"image/color"
+	//"image/color"
+	"github.com/jphsd/graphics2d/color"
 	"image/draw"
 )
 
 // Tile is an infinite image covered with a tile.
 type Tile struct {
-	TileImg *image.RGBA
+	TileImg *RGBA
 	Width   int
 	Height  int
 	OffsX   int
@@ -18,7 +19,7 @@ type Tile struct {
 }
 
 // NewTile creates a new image with the supplied image tile.
-func NewTile(img image.Image) *Tile {
+func NewTile(img Image) *Tile {
 	rect := img.Bounds()
 	w, h := rect.Dx(), rect.Dy()
 	tile := image.NewRGBA(image.Rectangle{image.Point{}, rect.Size()})
@@ -32,8 +33,8 @@ func (t *Tile) ColorModel() color.Model {
 }
 
 // Bounds implements the Bounds function in the Image interface.
-func (t *Tile) Bounds() image.Rectangle {
-	return image.Rectangle{image.Point{-1e9, -1e9}, image.Point{1e9, 1e9}}
+func (t *Tile) Bounds() Rectangle {
+	return Rectangle{Point{-1e9, -1e9}, Point{1e9, 1e9}}
 }
 
 // At implements the At function in the Image interface.
