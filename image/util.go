@@ -181,6 +181,7 @@ func SaveImage(img Image, name string) error {
 }
 
 // ReadImage is a utility function to read an image from a file.
+// The following formats are supported - bmp, jpeg, png, tiff, webp.
 func ReadImage(name string) (Image, error) {
 	f, err := os.Open(name)
 	if err != nil {
