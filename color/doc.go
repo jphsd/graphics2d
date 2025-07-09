@@ -16,11 +16,11 @@ A new color type and model for [HSL] along with functions:
 	[HSL.Tone] - adds 10% of gray to a color
 	[HSL.Compound] - returns the analogous colors of the color's complement
 
-An embedded list of [CSS] color names and their colors, [CSSNamedRGBs]
+An embedded list of [CSS] color names and their colors, [CSSNamedRGBs].
 
-An embedded list of [popular] color names and their colors, [BestNamedRGBs]
+An embedded list of [popular] color names and their colors, [BestNamedRGBs].
 
-Lerping functions for RGB and HSL
+Lerping functions for RGB and HSL.
 
 [CSS]: https://www.w3.org/wiki/CSS/Properties/color/keywords
 [popular]: https://github.com/meodai/color-names

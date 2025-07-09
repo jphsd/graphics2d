@@ -6,6 +6,8 @@ import (
 )
 
 type Image = image.Image
+type Alpha = image.Alpha
+type Alpha16 = image.Alpha16
 type RGBA = image.RGBA
 type RGBA64 = image.RGBA64
 type NRGBA = image.NRGBA
