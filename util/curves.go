@@ -1,8 +1,6 @@
 package util
 
-import (
-	"math"
-)
+import "math"
 
 // CalcPointsForArc takes an arc angle (less than or equal to Pi), and calculates the
 // points for a Bezier cubic to describe it on a circle centered

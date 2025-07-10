@@ -322,3 +322,8 @@ func mapAngle(a float64) float64 {
 	}
 	return a
 }
+
+// Lerp returns the value (1-t)*start + t*end.
+func Lerp(t, start, end float64) float64 {
+	return (1-t)*start + t*end
+}
