@@ -44,7 +44,7 @@ of other possibilities:
 
 	CapsProc - adds shapes at the start and end of a path
 	CompoundProc - allows multiple path processors to be run in sequence
-	CurvesToLinesProc - replaces curved steps with lines between the points
+	StepsToLinesProc - replaces curved steps with lines between the points
 	DashProc - wraps SnipProc to produce a dashed path
 	FlattenProc - wraps Path.Flatten
 	JitterProc - randomly move segment endpoints by some percentage of the segment's length
