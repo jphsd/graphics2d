@@ -156,7 +156,7 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 	npp := len(chind)
 	if npp == 0 {
 		// All of path is in the snip
-		return []*Path{p.Open()}
+		return []*Path{p.Copy()}
 	}
 
 	// Build snipped paths based on part indices and t values as split points.

@@ -203,7 +203,7 @@ func NewMunchProc(l float64) *MunchProc {
 		l = -l
 	}
 
-	return &MunchProc{NewCompoundProc(NewFSnipProc(2, []float64{l, l}, 0), &LineProc{})}
+	return &MunchProc{NewCompoundProc(NewFSnipProc(2, []float64{l, l}, 0), &LinesProc{false})}
 }
 
 // Process implements the PathProcessor interface.

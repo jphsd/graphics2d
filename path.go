@@ -53,6 +53,7 @@ func NewPath(start []float64) *Path {
 
 // AddStep takes an array of points and treats n-1 of them as control points and the
 // last as a point on the curve.
+// Adding a step to a closed path will cause an error as will adding an invalid point.
 func (p *Path) AddStep(points ...[]float64) error {
 	n := len(points)
 	if n == 0 {
@@ -91,17 +92,6 @@ func (p *Path) AddStep(points ...[]float64) error {
 	return nil
 }
 
-// AddSteps adds multiple steps to the path.
-func (p *Path) AddSteps(steps ...[][]float64) error {
-	for _, step := range steps {
-		err := p.AddStep(step...)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // Concatenate adds the paths to this path. If any path is closed then an error
 // is returned. If the paths aren't coincident, then they are joined with a line.
 func (p *Path) Concatenate(paths ...*Path) error {
@@ -120,10 +110,14 @@ func (p *Path) Concatenate(paths ...*Path) error {
 		steps := path.Steps()
 		if util.EqualsP(last, steps[0][0]) {
 			// End of p is coincident with sep[0][0] of path
-			p.AddSteps(steps[1:]...)
+			for _, step := range steps[1:] {
+				p.AddStep(step...)
+			}
 		} else {
 			// Line to steps[0][0]
-			p.AddSteps(steps...)
+			for _, step := range steps {
+				p.AddStep(step...)
+			}
 		}
 		lstep = steps[len(steps)-1]
 		last = lstep[len(lstep)-1]
@@ -340,13 +334,6 @@ func (p *Path) Copy() *Path {
 	return path
 }
 
-// Open performs a deepish copy like Copy() but leaves the path open.
-func (p *Path) Open() *Path {
-	path := p.Copy()
-	path.closed = false
-	return path
-}
-
 // Parent returns the path's parent
 func (p *Path) Parent() *Path {
 	return p.parent
@@ -364,7 +351,7 @@ func (p *Path) Process(proc PathProcessor) []*Path {
 }
 
 // String converts a path into a string.
-// P %f,%f [S %d [%f,%f ]] [C]
+// P %f,%f [S %d [%f,%f ]][C]
 func (p *Path) String() string {
 	step := p.steps[0]
 	str := fmt.Sprintf("P %f,%f ", step[0][0], step[0][1])
@@ -670,6 +657,7 @@ func reverseTangents(tangents [][][]float64) [][][]float64 {
 	return res
 }
 
+/*
 // Line reduces a path to a line between its endpoints. For a closed path or one where the
 // start and endpoints are coincident, a single point is returned.
 func (p *Path) Line() *Path {
@@ -690,6 +678,7 @@ func (p *Path) Line() *Path {
 	path.AddStep(last)
 	return path
 }
+*/
 
 // Lines reduces a path to a line for every step. If inccp is set then the control points are included.
 func (p *Path) Lines(inccp bool) *Path {
@@ -865,21 +854,26 @@ func bs(pt []float64, ts, ds, te, de float64, part [][]float64) ([]float64, floa
 // PointInPath returns if a point is contained within a closed path according to the
 // setting of util.WindingRule. If the path is not closed then false is returned, regardless.
 func (p *Path) PointInPath(pt []float64) bool {
-	return util.PointInPoly(pt, p.Poly()...)
+	if !p.closed {
+		return false
+	}
+	ppts, _ := p.PolyLine()
+	return util.PointInPoly(pt, ppts...)
 }
 
-// Poly converts a path into a flat sided polygon. Returns an empty slice if the path isn't closed.
-func (p *Path) Poly() [][]float64 {
-	if !p.closed {
-		return [][]float64{}
-	}
+// PolyLine converts a path into a polygon line. If the second result is true, the result is a polygon.
+func (p *Path) PolyLine() ([][]float64, bool) {
 	fp := p.Flatten(RenderFlatten)
 	parts := fp.Parts()
-	poly := make([][]float64, len(parts))
+	np := len(parts)
+	poly := make([][]float64, np)
 	for i, part := range parts {
 		poly[i] = part[0]
+		if i == np-1 && !p.closed {
+			poly = append(poly, part[len(part)-1])
+		}
 	}
-	return poly
+	return poly, p.closed
 }
 
 type pathJSON struct {

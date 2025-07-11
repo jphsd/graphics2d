@@ -77,18 +77,6 @@ func (fp *FlattenProc) Process(p *Path) []*Path {
 	return []*Path{path}
 }
 
-// LineProc replaces a path with a single line.
-type LineProc struct{}
-
-// Process implements the PathProcessor interface.
-func (lp *LineProc) Process(p *Path) []*Path {
-	path := p.Line()
-	if p.Closed() {
-		path.Close()
-	}
-	return []*Path{path}
-}
-
 // LinesProc replaces a path step with a line.
 type LinesProc struct {
 	IncludeCP bool
@@ -100,15 +88,6 @@ func (lp *LinesProc) Process(p *Path) []*Path {
 	if p.Closed() {
 		path.Close()
 	}
-	return []*Path{path}
-}
-
-// OpenProc replaces a path with its open version.
-type OpenProc struct{}
-
-// Process implements the PathProcessor interface.
-func (op *OpenProc) Process(p *Path) []*Path {
-	path := p.Open()
 	return []*Path{path}
 }
 
