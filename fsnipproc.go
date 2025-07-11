@@ -97,7 +97,7 @@ func (sp *FSnipProc) Process(p *Path) []*Path {
 	}
 
 	// Flatten the path and get the parts as lines
-	path := p.Flatten(sp.Flatten).Lines(false)
+	path := p.Flatten(sp.Flatten).Process(&StepsToLinesProc{false})[0]
 	parts := path.Parts()
 
 	// Pattern state variables
@@ -203,7 +203,7 @@ func NewMunchProc(l float64) *MunchProc {
 		l = -l
 	}
 
-	return &MunchProc{NewCompoundProc(NewFSnipProc(2, []float64{l, l}, 0), &LinesProc{false})}
+	return &MunchProc{NewCompoundProc(NewFSnipProc(2, []float64{l, l}, 0), &StepsToLinesProc{false})}
 }
 
 // Process implements the PathProcessor interface.

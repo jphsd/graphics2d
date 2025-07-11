@@ -1,18 +1,18 @@
 package graphics2d
 
-// CurvesToLinesProc takes a path and converts all of the points to lines.
-type CurvesToLinesProc struct {
-	SkipCP bool
+// StepsToLinesProc takes a path and converts all of the points to lines.
+type StepsToLinesProc struct {
+	IncCP bool
 }
 
 // Process implements the PathProcessor interface.
-func (clp *CurvesToLinesProc) Process(p *Path) []*Path {
+func (clp *StepsToLinesProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	nparts := [][][]float64{}
 
 	cp := parts[0][0]
 	for _, part := range parts {
-		if clp.SkipCP {
+		if !clp.IncCP {
 			lp := part[len(part)-1]
 			nparts = append(nparts, [][]float64{cp, lp})
 			cp = lp

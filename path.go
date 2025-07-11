@@ -657,51 +657,6 @@ func reverseTangents(tangents [][][]float64) [][][]float64 {
 	return res
 }
 
-/*
-// Line reduces a path to a line between its endpoints. For a closed path or one where the
-// start and endpoints are coincident, a single point is returned.
-func (p *Path) Line() *Path {
-	n := len(p.steps)
-
-	if n == 1 || p.closed {
-		return p.Copy()
-	}
-
-	first := p.steps[0][0]
-	lastStep := p.steps[n-1]
-	last := lastStep[len(lastStep)-1]
-
-	path := NewPath(first)
-	if util.EqualsP(first, last) {
-		return path
-	}
-	path.AddStep(last)
-	return path
-}
-*/
-
-// Lines reduces a path to a line for every step. If inccp is set then the control points are included.
-func (p *Path) Lines(inccp bool) *Path {
-	first := p.steps[0][0]
-	path := NewPath(first)
-
-	for _, step := range p.steps {
-		ls := len(step)
-		if inccp {
-			for i := 0; i < ls-1; i++ {
-				path.AddStep(step[i])
-			}
-		}
-		path.AddStep(step[ls-1])
-	}
-
-	if p.closed {
-		path.Close()
-	}
-
-	return path
-}
-
 // Tangents returns the normalized start and end tangents of every part in the path.
 // [part][start/end][normalized x/y]
 func (p *Path) Tangents() [][][]float64 {

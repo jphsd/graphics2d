@@ -77,6 +77,7 @@ func (fp *FlattenProc) Process(p *Path) []*Path {
 	return []*Path{path}
 }
 
+/*
 // LinesProc replaces a path step with a line.
 type LinesProc struct {
 	IncludeCP bool
@@ -90,6 +91,7 @@ func (lp *LinesProc) Process(p *Path) []*Path {
 	}
 	return []*Path{path}
 }
+*/
 
 // ReverseProc replaces a path with its reverse.
 type ReverseProc struct{}
