@@ -218,11 +218,12 @@ func (p *Path) Flatten(d float64) *Path {
 	p.tolerance = d
 	d2 := d * d
 	res := make([][][]float64, 1)
-	res[0] = p.steps[0]
+	sp := p.Simplify()
+	res[0] = sp.steps[0]
 	cp := res[0][0]
 	// For all remaining steps in path
-	for i := 1; i < len(p.steps); i++ {
-		fp := flattenPart(d2, toPart(cp, p.steps[i]))
+	for i := 1; i < len(sp.steps); i++ {
+		fp := flattenPart(d2, toPart(cp, sp.steps[i]))
 		for _, ns := range fp {
 			// ns length is always 2
 			res = append(res, [][]float64{ns[1]})
