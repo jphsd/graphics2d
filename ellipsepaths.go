@@ -20,7 +20,7 @@ func Ellipse(c []float64, rx, ry, xang float64) *Path {
 	xfm.Rotate(xang)
 	xfm.Scale(1, ry/rx)
 	xfm.Translate(-ax, -ay)
-	return np.Transform(xfm)
+	return np.Process(&TransformProc{xfm})[0]
 }
 
 // EllipseFromPoints returns a path describing the smallest ellipse containing points p1 and p2.
@@ -99,7 +99,7 @@ func EllipticalArc(c []float64, rx, ry, offs, ang, xang float64, s ArcStyle) *Pa
 	xfm.Rotate(xang)
 	xfm.Scale(1, ry/rx)
 
-	return np.Transform(xfm)
+	return np.Process(&TransformProc{xfm})[0]
 }
 
 // EllipticalArcFromPoint returns a path describing an ellipse arc from a point. The ratio of rx to ry
@@ -273,7 +273,7 @@ func IrregularEllipse(c []float64, rx1, rx2, ry1, ry2, disp, xang float64) *Path
 	xfm.Translate(c[0], c[1])
 	xfm.Rotate(xang)
 
-	path := PartsToPath(parts...).Transform(xfm)
+	path := PartsToPath(parts...).Process(&TransformProc{xfm})[0]
 	path.Close()
 	return path
 }

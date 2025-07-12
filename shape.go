@@ -117,12 +117,12 @@ func (s *Shape) Copy() *Shape {
 	return &Shape{np, nil, nil, s.parent}
 }
 
-// Transform applies an affine transform to all the paths in the shape
+// Transform applies a transform to all the paths in the shape
 // and returns a new shape.
 func (s *Shape) Transform(xfm Transform) *Shape {
 	np := make([]*Path, len(s.paths))
 	for i, path := range s.paths {
-		np[i] = path.Transform(xfm)
+		np[i] = path.Process(&TransformProc{xfm})[0]
 	}
 	return &Shape{np, nil, nil, s}
 }

@@ -34,7 +34,6 @@ type Path struct {
 	flattened  *Path
 	tolerance  float64
 	simplified *Path
-	reversed   *Path
 	tangents   [][][]float64
 	// Processed from
 	parent *Path
@@ -88,7 +87,6 @@ func (p *Path) AddStep(points ...[]float64) error {
 	p.flattened = nil
 	p.simplified = nil
 	p.tangents = nil
-	p.reversed = nil
 	return nil
 }
 
@@ -329,7 +327,6 @@ func (p *Path) Copy() *Path {
 	path := &Path{}
 	path.steps = steps
 	path.closed = p.closed
-	path.bbox = nil
 	path.parent = p.parent
 	return path
 }
@@ -414,54 +411,6 @@ func StringToPath(str string) *Path {
 		path.Close()
 	}
 
-	return path
-}
-
-// Transform applies an affine transform to the points in a path to create a new one.
-func (p *Path) Transform(xfm Transform) *Path {
-	steps := make([][][]float64, len(p.steps))
-	for i, step := range p.steps {
-		steps[i] = xfm.Apply(step...)
-	}
-
-	path := &Path{}
-	path.steps = steps
-	path.closed = p.closed
-	path.parent = p
-	if p.flattened != nil {
-		steps = make([][][]float64, len(p.flattened.steps))
-		for i, step := range p.flattened.steps {
-			steps[i] = xfm.Apply(step...)
-		}
-		tmp := &Path{}
-		tmp.steps = steps
-		tmp.closed = p.closed
-		tmp.parent = path
-		path.flattened = tmp
-		path.tolerance = p.tolerance
-	}
-	if p.reversed != nil {
-		steps = make([][][]float64, len(p.reversed.steps))
-		for i, step := range p.reversed.steps {
-			steps[i] = xfm.Apply(step...)
-		}
-		tmp := &Path{}
-		tmp.steps = steps
-		tmp.closed = p.closed
-		tmp.parent = path
-		path.reversed = tmp
-	}
-	if p.simplified != nil {
-		steps = make([][][]float64, len(p.simplified.steps))
-		for i, step := range p.simplified.steps {
-			steps[i] = xfm.Apply(step...)
-		}
-		tmp := &Path{}
-		tmp.steps = steps
-		tmp.closed = p.closed
-		tmp.parent = path
-		path.simplified = tmp
-	}
 	return path
 }
 
@@ -592,10 +541,6 @@ func CPSafe(part [][]float64) bool {
 
 // Reverse returns a new path describing the current path in reverse order (i.e start and end switched).
 func (p *Path) Reverse() *Path {
-	if p.reversed != nil {
-		return p.reversed
-	}
-
 	path := PartsToPath(ReverseParts(p.Parts())...)
 
 	// If other aspects have already been calculated - reverse them too
@@ -617,7 +562,6 @@ func (p *Path) Reverse() *Path {
 		path.closed = true
 	}
 	path.parent = p.parent
-	p.reversed = path
 
 	return path
 }
@@ -856,7 +800,6 @@ func (p *Path) UnmarshalJSON(b []byte) error {
 	p.flattened = nil
 	p.tolerance = 0
 	p.simplified = nil
-	p.reversed = nil
 	p.tangents = nil
 	p.parent = nil
 

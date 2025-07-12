@@ -47,20 +47,7 @@ func (cp *CompoundProc) Process(p *Path) []*Path {
 	return paths
 }
 
-// DecomposeProc decompses each step of a path into its own path.
-type DecomposeProc struct{}
-
-// Process implements the PathProcessor interface.
-func (dp *DecomposeProc) Process(p *Path) []*Path {
-	paths := []*Path{}
-	for _, part := range p.Parts() {
-		paths = append(paths, PartsToPath(part))
-	}
-
-	return paths
-}
-
-// PathProcessor wrappers for Flatten, Simplify, Line and Parts path functions
+// PathProcessor wrappers for Flatten, Simplify, and Reverse path functions
 
 // FlattenProc is a wrapper around Path.Flatten() and contains the minimum required
 // distance to the control points.
@@ -70,39 +57,15 @@ type FlattenProc struct {
 
 // Process implements the PathProcessor interface.
 func (fp *FlattenProc) Process(p *Path) []*Path {
-	path := p.Flatten(fp.Flatten)
-	if p.Closed() {
-		path.Close()
-	}
-	return []*Path{path}
+	return []*Path{p.Flatten(fp.Flatten)}
 }
-
-/*
-// LinesProc replaces a path step with a line.
-type LinesProc struct {
-	IncludeCP bool
-}
-
-// Process implements the PathProcessor interface.
-func (lp *LinesProc) Process(p *Path) []*Path {
-	path := p.Lines(lp.IncludeCP)
-	if p.Closed() {
-		path.Close()
-	}
-	return []*Path{path}
-}
-*/
 
 // ReverseProc replaces a path with its reverse.
 type ReverseProc struct{}
 
 // Process implements the PathProcessor interface.
 func (rp *ReverseProc) Process(p *Path) []*Path {
-	path := p.Reverse()
-	if p.Closed() {
-		path.Close()
-	}
-	return []*Path{path}
+	return []*Path{p.Reverse()}
 }
 
 // SimplifyProc is a wrpper around Path.Simplify().
@@ -110,11 +73,7 @@ type SimplifyProc struct{}
 
 // Process implements the PathProcessor interface.
 func (sp *SimplifyProc) Process(p *Path) []*Path {
-	path := p.Simplify()
-	if p.Closed() {
-		path.Close()
-	}
-	return []*Path{path}
+	return []*Path{p.Simplify()}
 }
 
 // StepsProc converts each path step into its own path.
@@ -130,19 +89,4 @@ func (sp *StepsProc) Process(p *Path) []*Path {
 	}
 
 	return paths
-}
-
-// TransformProc is a wrapper around Path.Transform() and contains the Aff3
-// transform to be applied.
-type TransformProc struct {
-	Transform *Aff3
-}
-
-// Process implements the PathProcessor interface.
-func (tp *TransformProc) Process(p *Path) []*Path {
-	path := p.Transform(tp.Transform)
-	if p.Closed() {
-		path.Close()
-	}
-	return []*Path{path}
 }
