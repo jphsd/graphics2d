@@ -47,7 +47,7 @@ func (bp *BucketProc) Process(s *Shape) []*Shape {
 	b := 0
 	switch bp.Style {
 	case Chunk:
-		npb := min(np / bp.N, 1)
+		npb := min(np/bp.N, 1)
 		for i, path := range paths {
 			shapes[b].AddPaths(path)
 			if i > 0 && i%npb == 0 {
