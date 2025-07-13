@@ -457,7 +457,7 @@ func SimplifyExtremities(part [][]float64) [][][]float64 {
 	rtvals := make([]float64, nt)
 	lt := 0.0
 	ll := 1.0
-	for i := 0; i < nt; i++ {
+	for i := range nt {
 		if i == 0 {
 			// Reset
 			lt = tvals[i]
@@ -681,7 +681,7 @@ func (p *Path) ProjectPoint(pt []float64) ([]float64, float64, float64) {
 
 	// Construct start and end distances
 	d := make([]float64, n+1)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		d[i] = dist2(pt, parts[i][0])
 	}
 	if p.closed {

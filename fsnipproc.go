@@ -178,7 +178,7 @@ func (d *DashProc) Process(p *Path) []*Path {
 	dp := np / 2
 	res1 := make([]*Path, 0, dp+1)
 	res2 := make([]*Path, 0, dp+1)
-	for i := 0; i < np; i++ {
+	for i := range np {
 		if i%2 == 0 {
 			res1 = append(res1, paths[i])
 		} else {

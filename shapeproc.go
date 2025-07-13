@@ -7,7 +7,7 @@ type ShapeProc struct{}
 func (sp *ShapeProc) Process(s *Shape) []*Shape {
 	paths := s.Paths()
 	shapes := make([]*Shape, len(paths))
-	for i := 0; i < len(paths); i++ {
+	for i := range len(paths) {
 		shapes[i] = NewShape(paths[i])
 	}
 

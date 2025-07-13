@@ -402,7 +402,7 @@ func calcEllipses(points [][]float64, l float64, flip bool) ([]*fflEllipse, []*f
 	resR := make([]*fflEllipse, np)
 	resL := make([]*fflEllipse, np)
 	q := points[:]
-	for i := 0; i < np; i++ {
+	for i := range np {
 		ellipseR, ellipseL := ellipseCalc(q, l, i, flip)
 		// Adjust indices to handle rotation
 		ellipseR.f1i += i

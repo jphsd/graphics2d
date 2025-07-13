@@ -55,7 +55,7 @@ func (tp *TraceProc) ProcessParts(p *Path) [][][]float64 {
 
 	// Convert tangents to scaled RHS normals
 	norms := make([][][]float64, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		norms[i] = make([][]float64, 2)
 		norms[i][0] = []float64{w * tangs[i][0][1], -w * tangs[i][0][0]}
 		norms[i][1] = []float64{w * tangs[i][1][1], -w * tangs[i][1][0]}
@@ -63,7 +63,7 @@ func (tp *TraceProc) ProcessParts(p *Path) [][][]float64 {
 
 	// Calculate the path by LineTransforming the parts and handling the joins
 	rhs := make([][][]float64, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		part := parts[i]
 		ln := len(part) - 1
 		offs := norms[i]

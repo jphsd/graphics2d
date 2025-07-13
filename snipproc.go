@@ -125,7 +125,7 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 			continue
 		}
 		// walk individual line segs until we find the one with the state change in it
-		for j := 0; j < nsegs; j++ {
+		for j := range nsegs {
 			length := lpart[j][1]
 			if length < delta {
 				// skip this seg
@@ -167,7 +167,7 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 	pind := 0                 // current index into parts
 	pparts := [][][]float64{} // parts collected towards next path
 
-	for i := 0; i < npp; i++ {
+	for i := range npp {
 		p, t := chind[i], cht[i]
 		for p > pind {
 			pparts = append(pparts, rem)
@@ -232,7 +232,7 @@ func convTVals(chind []int, cht []float64) []float64 {
 	p := -1
 	lt := 0.0
 	ll := 1.0
-	for i := 0; i < n; i++ {
+	for i := range n {
 		if chind[i] != p {
 			// Reset
 			lt = cht[i]

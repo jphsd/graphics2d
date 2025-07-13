@@ -104,7 +104,7 @@ func NewShapesProc(shapes []*Shape, spacing float64, rot PointRot) *ShapesProc {
 	d := int(math.Floor(spacing + 0.5))
 	nn := d * n
 	nshapes := make([]*Shape, nn)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		nshapes[i*d] = shapes[i]
 		// remaining d-1 slots are left nil
 	}

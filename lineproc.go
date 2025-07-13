@@ -38,7 +38,7 @@ func (sp *SplitProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	n := len(parts)
 	res := make([]*Path, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		res[i] = PartsToPath(parts[i])
 	}
 	return res
