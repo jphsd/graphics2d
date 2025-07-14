@@ -90,6 +90,18 @@ func (p *Path) AddStep(points ...[]float64) error {
 	return nil
 }
 
+// LineTo is a chain wrapper around AddStep
+func (p *Path) LineTo(point []float64) *Path {
+	p.AddStep(point)
+	return p
+}
+
+// CurveTo is a chain wrapper around AddStep
+func (p *Path) CurveTo(points ...[]float64) *Path {
+	p.AddStep(points...)
+	return p
+}
+
 // Concatenate adds the paths to this path. If any path is closed then an error
 // is returned. If the paths aren't coincident, then they are joined with a line.
 func (p *Path) Concatenate(paths ...*Path) error {
