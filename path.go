@@ -180,12 +180,13 @@ func (p *Path) Parts() [][][]float64 {
 }
 
 // Close marks the path as closed.
-func (p *Path) Close() {
+func (p *Path) Close() *Path {
 	if p.closed {
-		return
+		return p
 	}
 	p.AddStep(p.steps[0][0])
 	p.closed = true
+	return p
 }
 
 // Closed returns true if the path is closed.
