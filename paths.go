@@ -56,6 +56,44 @@ func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 	return res
 }
 
+// MakeRoundedParts uses the tangents p1-p2 and p2-p3, and the radius r to figure an arc between them.
+func MakeRoundedParts(p1, p2, p3 []float64, r float64) [][][]float64 {
+	theta := util.AngleBetweenLines(p1, p2, p3, p2)
+	neg := theta < 0
+	if neg {
+		theta = -theta
+	}
+	t2 := theta / 2
+	tt2 := math.Tan(t2)
+
+	// Check r is < min(p12, p23) / 2
+	v1, v2 := util.Vec(p1, p2), util.Vec(p2, p3)
+	d1, d2 := util.VecMag(v1), util.VecMag(v2)
+	m1, m2 := d1, d2
+	md := min(m1, m2)
+	r = min(tt2*md, r)
+
+	// Find intersection of arc with p1-p2
+	u1 := []float64{v1[0] / d1, v1[1] / d1}
+	s := r / tt2
+	i12 := []float64{p2[0] - s*u1[0], p2[1] - s*u1[1]}
+
+	// Calc center
+	c := []float64{i12[0], i12[1]}
+	theta = math.Pi - theta
+	n1 := []float64{u1[1], -u1[0]}
+	if neg {
+		n1[0], n1[1] = -n1[0], -n1[1]
+	} else {
+		theta = -theta
+	}
+	c = []float64{c[0] + r*n1[0], c[1] + r*n1[1]}
+
+	// Calc offset
+	a12 := math.Atan2(-n1[1], -n1[0])
+	return MakeArcParts(c[0], c[1], r, a12, theta)
+}
+
 // Point returns a path containing the point.
 func Point(pt []float64) *Path {
 	return NewPath(pt)

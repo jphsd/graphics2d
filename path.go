@@ -90,15 +90,29 @@ func (p *Path) AddStep(points ...[]float64) error {
 	return nil
 }
 
-// LineTo is a chain wrapper around AddStep
+// LineTo is a chain wrapper around AddStep.
 func (p *Path) LineTo(point []float64) *Path {
 	p.AddStep(point)
 	return p
 }
 
-// CurveTo is a chain wrapper around AddStep
+// CurveTo is a chain wrapper around AddStep.
 func (p *Path) CurveTo(points ...[]float64) *Path {
 	p.AddStep(points...)
+	return p
+}
+
+// ArcTo is a chain wrapper around MakeRoundedParts.
+// If r is too large for the supplied tangents, then it is truncated.
+func (p *Path) ArcTo(p1, p2 []float64, r float64) *Path {
+	last := p.steps[len(p.steps)-1]
+	p0 := last[len(last)-1]
+	parts := MakeRoundedParts(p0, p1, p2, r)
+	p.AddStep(parts[0][0]) // in case arc doesn't start at p0
+	for _, part := range parts {
+		p.AddStep(part[1:]...)
+	}
+	p.AddStep(p2) // in case arc doesn't end at p2
 	return p
 }
 
