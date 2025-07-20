@@ -12,7 +12,7 @@ import (
 type Pen struct {
 	Filler image.Image
 	Stroke PathProcessor
-	Xfm    *Aff3
+	Xfm    Transform
 }
 
 // Predefined pens.
