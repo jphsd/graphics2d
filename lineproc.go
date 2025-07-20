@@ -29,17 +29,3 @@ func (clp *StepsToLinesProc) Process(p *Path) []*Path {
 	}
 	return []*Path{path}
 }
-
-// SplitProc breaks up a path into a collection of paths, one for each step in the original path.
-type SplitProc struct{}
-
-// Process implements the PathProcessor interface.
-func (sp *SplitProc) Process(p *Path) []*Path {
-	parts := p.Parts()
-	n := len(parts)
-	res := make([]*Path, n)
-	for i := range n {
-		res[i] = PartsToPath(parts[i])
-	}
-	return res
-}
