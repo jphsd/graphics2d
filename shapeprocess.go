@@ -16,8 +16,7 @@ type PathsProc struct{}
 // Process implements the ShapeProcessor interface.
 func (pp *PathsProc) Process(s *Shape) []*Shape {
 	paths := s.Paths()
-	np := len(paths)
-	shapes := make([]*Shape, np)
+	shapes := make([]*Shape, len(paths))
 	for i, path := range paths {
 		shapes[i] = NewShape(path)
 	}
