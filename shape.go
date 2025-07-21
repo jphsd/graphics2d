@@ -110,11 +110,14 @@ func (s *Shape) Paths() []*Path {
 	return s.paths[:]
 }
 
-// Copy creates a new instance of this shape with a shallow copy of its paths.
+// Copy creates a new instance of this shape with a copy of its paths.
 func (s *Shape) Copy() *Shape {
-	np := make([]*Path, len(s.paths))
-	copy(np, s.paths)
-	return &Shape{np, nil, nil, s.parent}
+	paths := make([]*Path, len(s.paths))
+	for i, path := range s.paths {
+		paths[i] = path.Copy()
+	}
+
+	return &Shape{paths, nil, nil, s.parent}
 }
 
 // Transform applies a transform to all the paths in the shape

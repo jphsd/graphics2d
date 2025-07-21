@@ -7,8 +7,9 @@ type TransformProc struct {
 
 // Process implements the PathProcessor interface.
 func (tp *TransformProc) Process(p *Path) []*Path {
-	steps := p.Steps()
-	for i, step := range steps {
+	psteps := p.Steps()
+	steps := make([][][]float64, len(psteps))
+	for i, step := range psteps {
 		steps[i] = tp.Transform.Apply(step...)
 	}
 

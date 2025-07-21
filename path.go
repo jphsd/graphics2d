@@ -347,16 +347,32 @@ func (p *Path) Bounds() image.Rectangle {
 	return image.Rectangle{image.Point{fx, fy}, image.Point{cx, cy}}
 }
 
-// Copy performs a deepish copy - points themselves aren't duplicated.
+// Copy performs a deep copy
 func (p *Path) Copy() *Path {
 	steps := make([][][]float64, len(p.steps))
 	copy(steps, p.steps)
 
 	path := &Path{}
-	path.steps = steps
+	path.steps = make([][][]float64, len(steps))
+	for i, step := range steps {
+		path.steps[i] = copyStep(step)
+	}
 	path.closed = p.closed
 	path.parent = p.parent
 	return path
+}
+
+func copyStep(step [][]float64) [][]float64 {
+	res := make([][]float64, len(step))
+	for i, pt := range step {
+		res[i] = copyPoint(pt)
+	}
+	return res
+}
+
+func copyPoint(point []float64) []float64 {
+	// Only preserve x and y
+	return []float64{point[0], point[1]}
 }
 
 // Parent returns the path's parent
