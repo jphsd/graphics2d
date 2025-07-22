@@ -50,9 +50,9 @@ func JoinRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
 	a1 := math.Atan2(dy, dx)
 	a2 := util.LineAngle(p, s2)
 	da := a2 - a1
-	if da < -math.Pi {
+	if da < -Pi {
 		da += TwoPi
-	} else if da > math.Pi {
+	} else if da > Pi {
 		da -= TwoPi
 	}
 	if da < 0 {
@@ -73,7 +73,7 @@ type MiterJoin struct {
 // NewMiterJoin creates a default MiterJoin with the limit set to 10 degrees and the alternative
 // function to JoinBevel.
 func NewMiterJoin() *MiterJoin {
-	return &MiterJoin{10 * math.Pi / 180, JoinBevel}
+	return &MiterJoin{10 * Pi / 180, JoinBevel}
 }
 
 // JoinMiter creates a miter join from e1 to s2 unless the moter limit is exceeded in which
@@ -85,16 +85,16 @@ func (mj *MiterJoin) JoinMiter(p1 [][]float64, p []float64, p2 [][]float64) [][]
 	dx2, dy2 := s2[0]-p[0], s2[1]-p[1]
 	a2 := math.Atan2(dy2, dx2)
 	da := a2 - a1
-	if da < -math.Pi {
+	if da < -Pi {
 		da += TwoPi
-	} else if da > math.Pi {
+	} else if da > Pi {
 		da -= TwoPi
 	}
 	if da < 0 {
 		// inside angle
 		return JoinBevel(p1, p, p2)
 	}
-	if da > math.Pi-mj.MiterLimit {
+	if da > Pi-mj.MiterLimit {
 		// miter limit exceeded
 		if mj.MiterAltFunc != nil {
 			return mj.MiterAltFunc(p1, p, p2)
@@ -130,7 +130,7 @@ func CapRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
 	offs := math.Atan2(dy, dx)
 	r := math.Sqrt(dx*dx + dy*dy)
-	return MakeArcParts(p[0], p[1], r, offs, math.Pi)
+	return MakeArcParts(p[0], p[1], r, offs, Pi)
 }
 
 // CapInvRound extends e1 and s1 and draws a semicircle that passes through p.
@@ -141,7 +141,7 @@ func CapInvRound(p1 [][]float64, p []float64, p2 [][]float64) [][][]float64 {
 	s2 := []float64{s1[0] - dy, s1[1] + dx}
 	offs := math.Atan2(dy, dx)
 	r := math.Sqrt(dx*dx + dy*dy)
-	tp := MakeArcParts(p[0]-dy, p[1]+dx, r, offs, -math.Pi)
+	tp := MakeArcParts(p[0]-dy, p[1]+dx, r, offs, -Pi)
 	res := make([][][]float64, 1, len(tp)+2)
 	res[0] = [][]float64{e1, e2}
 	res = append(res, tp...)
@@ -190,7 +190,7 @@ func (oc *OvalCap) CapOval(p1 [][]float64, p []float64, p2 [][]float64) [][][]fl
 	rx := ry * oc.Rxy
 
 	if util.Equals(oc.Offs, 0) {
-		return EllipticalArc(p, rx, ry, offs, math.Pi, offs-HalfPi, ArcOpen).Parts()
+		return EllipticalArc(p, rx, ry, offs, Pi, offs-HalfPi, ArcOpen).Parts()
 	}
 
 	// Construct two quarter arcs with new rys and cp
@@ -215,7 +215,7 @@ func (oc *OvalCap) CapInvOval(p1 [][]float64, p []float64, p2 [][]float64) [][][
 	xoffs := offs - HalfPi
 	ry := math.Sqrt(dx*dx + dy*dy)
 	rx := ry * oc.Rxy
-	tp := EllipticalArc([]float64{p[0] - dy*oc.Rxy, p[1] + dx*oc.Rxy}, rx, ry, offs, -math.Pi, xoffs, ArcOpen).Parts()
+	tp := EllipticalArc([]float64{p[0] - dy*oc.Rxy, p[1] + dx*oc.Rxy}, rx, ry, offs, -Pi, xoffs, ArcOpen).Parts()
 	res := make([][][]float64, 1, len(tp)+2)
 	res[0] = [][]float64{e1, e2}
 	res = append(res, tp...)

@@ -9,8 +9,9 @@ import (
 
 // Mathematical constants.
 const (
-	TwoPi  = 2 * math.Pi
-	HalfPi = math.Pi / 2
+	Pi     = math.Pi
+	TwoPi  = 2 * Pi
+	HalfPi = Pi / 2
 )
 
 // A collection of part and path creation functions.
@@ -80,7 +81,7 @@ func MakeRoundedParts(p1, p2, p3 []float64, r float64) [][][]float64 {
 
 	// Calc center
 	c := []float64{i12[0], i12[1]}
-	theta = math.Pi - theta
+	theta = Pi - theta
 	n1 := []float64{u1[1], -u1[0]}
 	if neg {
 		n1[0], n1[1] = -n1[0], -n1[1]

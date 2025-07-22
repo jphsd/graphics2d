@@ -131,7 +131,7 @@ func EllipticalArcFromPoints(p1, p2, c []float64, s ArcStyle) *Path {
 			return nil
 		}
 		// Infinite solutions - choose circular
-		return ArcFromPoint(p1, c, math.Pi, s)
+		return ArcFromPoint(p1, c, Pi, s)
 	}
 
 	p1a := util.LineAngle(c, p1)
@@ -490,7 +490,7 @@ func findEllipseIntersection(f0, f1, fi []float64, l float64) ([]float64, float6
 	if th < 0 {
 		th = -th
 	}
-	th = math.Pi - th
+	th = Pi - th
 
 	// Use the Cosine rule to find b given a, th and l=b+c
 	b := (l*l - a*a) / (2 * (l - a*math.Cos(th)))

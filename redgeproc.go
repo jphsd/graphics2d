@@ -29,7 +29,7 @@ func (rp *RoundedEdgeProc) Process(p *Path) []*Path {
 		var cpath *Path
 		if rp.Elip {
 			th := math.Atan2(dy, dx)
-			ang := math.Pi
+			ang := Pi
 			var ry float64
 			if d < 0 {
 				ry = -d
@@ -38,7 +38,7 @@ func (rp *RoundedEdgeProc) Process(p *Path) []*Path {
 				ang = -ang
 			}
 			cp := []float64{mpx, mpy}
-			cpath = EllipticalArc(cp, l/2, ry, math.Pi, ang, 0, ArcOpen)
+			cpath = EllipticalArc(cp, l/2, ry, Pi, ang, 0, ArcOpen)
 			xfm := RotateAbout(th, mpx, mpy)
 			cpath = cpath.Process(&TransformProc{xfm})[0]
 		} else {

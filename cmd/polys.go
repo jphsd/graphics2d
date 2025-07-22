@@ -23,7 +23,7 @@ func main() {
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			ns := i*n + j + 3
-			dw := mdw * math.Tan(math.Pi/float64(ns))
+			dw := mdw * math.Tan(g2d.Pi/float64(ns))
 			if dw > mdw {
 				dw = mdw
 			}

@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	TwoPi = math.Pi * 2
+	Pi = math.Pi
+	TwoPi = Pi * 2
 )
 
 // IntersectionTValsP obtains values of t for each line for where they intersect. Actual intersection =>
@@ -246,9 +247,9 @@ func AngleBetweenLines(p1, p2, p3, p4 []float64) float64 {
 	a1 := LineAngle(p1, p2)
 	a2 := LineAngle(p3, p4)
 	da := a2 - a1
-	if da < -math.Pi {
+	if da < -Pi {
 		da += TwoPi
-	} else if da > math.Pi {
+	} else if da > Pi {
 		da -= TwoPi
 	}
 	return da
@@ -314,10 +315,10 @@ func AngleInRange(a, r, b float64) bool {
 }
 
 func mapAngle(a float64) float64 {
-	for a < -math.Pi {
+	for a < -Pi {
 		a += TwoPi
 	}
-	for a > math.Pi {
+	for a > Pi {
 		a -= TwoPi
 	}
 	return a
