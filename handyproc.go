@@ -1,10 +1,5 @@
 package graphics2d
 
-import (
-	"math"
-	"math/rand"
-)
-
 // HandyProc applies a modified form of line rendering as outlined in Wood12.
 // Note the lines are not smoothed and closed paths are not preserved.
 type HandyProc struct {
@@ -47,10 +42,4 @@ func (hp *HandyProc) Process(p *Path) []*Path {
 	}
 
 	return paths
-}
-
-func jitter(pt []float64, r float64) []float64 {
-	th := rand.Float64() * TwoPi
-	dx, dy := math.Cos(th)*r, math.Sin(th)*r
-	return []float64{pt[0] + dx, pt[1] + dy}
 }
