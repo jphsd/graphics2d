@@ -100,3 +100,10 @@ func RectToBB(rect image.Rectangle) [][]float64 {
 		{float64(rect.Min.X), float64(rect.Min.Y)},
 		{float64(rect.Max.X), float64(rect.Max.Y)}}
 }
+
+// BBToRect converts a bounding box to an image.Rectangle
+func BBToRect(bb [][]float64) image.Rectangle {
+	return image.Rectangle{
+		image.Point{int(math.Floor(bb[0][0])), int(math.Floor(bb[0][1]))},
+		image.Point{int(math.Ceil(bb[1][0])), int(math.Ceil(bb[1][1]))}}
+}

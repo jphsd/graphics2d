@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	Pi = math.Pi
+	Pi    = math.Pi
 	TwoPi = Pi * 2
 )
 
