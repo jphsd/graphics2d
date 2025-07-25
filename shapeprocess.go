@@ -24,7 +24,7 @@ func (pp *PathsProc) Process(s *Shape) []*Shape {
 	return shapes
 }
 
-// BucketProc agregates paths into N shapes using the specificed style.
+// BucketProc aggregates paths into N shapes using the specificed style.
 type BucketProc struct {
 	N     int
 	Style BucketStyle
