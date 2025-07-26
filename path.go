@@ -341,10 +341,7 @@ func (p *Path) BoundingBox() [][]float64 {
 // be the minimal bounding rectangle for the path since the control points are also included.
 // If a tight bounding rectangle is required then use CalcExtremities().
 func (p *Path) Bounds() image.Rectangle {
-	bb := p.BoundingBox()
-	fx, fy := int(math.Floor(bb[0][0])), int(math.Floor(bb[0][1]))
-	cx, cy := int(math.Ceil(bb[1][0])), int(math.Ceil(bb[1][1]))
-	return image.Rectangle{image.Point{fx, fy}, image.Point{cx, cy}}
+	return util.BBToRect(p.BoundingBox())
 }
 
 // Copy performs a deep copy

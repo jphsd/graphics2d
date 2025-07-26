@@ -26,16 +26,32 @@ for i:=0; i<fonts.NumFonts(); i++ {
 f := fonts.Font(0)
 */
 
+var (
+	fontCache = make(map[*sfnt.Font]map[rune]*Shape)
+)
+
 // GlyphToShape returns a shape containing the paths for rune r as found in the font. The path is in
 // font units. Use font.UnitsPerEm() to calculate scale factors.
 func GlyphToShape(font *sfnt.Font, r rune) (*Shape, error) {
-	var buffer sfnt.Buffer
-	x, err := font.GlyphIndex(&buffer, r)
-	if err != nil {
-		return nil, err
+	rcache := fontCache[font]
+	if rcache == nil {
+		fontCache[font] = make(map[rune]*Shape)
 	}
-	// x == 0 means use the unfound glyph
-	return GlyphIndexToShape(font, x)
+	shape := rcache[r]
+	if shape == nil {
+		var buffer sfnt.Buffer
+		x, err := font.GlyphIndex(&buffer, r)
+		if err != nil {
+			return nil, err
+		}
+		// x == 0 means use the unfound glyph
+		shape, err = GlyphIndexToShape(font, x)
+		if err != nil {
+			return nil, err
+		}
+		rcache[r] = shape
+	}
+	return shape, nil
 }
 
 // GlyphIndexToShape returns a shape containing the paths for glyph index x as found in the font. The path is in
