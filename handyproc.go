@@ -30,11 +30,12 @@ func (hp *HandyProc) Process(p *Path) []*Path {
 				path.AddStep(jitter(op2, hp.R))
 			}
 		} else {
-			// This is a non-linear step, just jitter the end point
+			// Just jitter control and end points
 			for _, path := range paths {
 				sps := make([][]float64, nc+1)
-				copy(sps, steps[i][:nc])
-				sps[nc] = jitter(op2, hp.R)
+				for j := range nc+1 {
+					sps[j] = jitter(steps[i][j], hp.R)
+				}
 				path.AddStep(sps...)
 			}
 		}
