@@ -28,22 +28,26 @@ f := fonts.Font(0)
 
 var (
 	fontCache = make(map[*sfnt.Font]map[rune]*Shape)
+	giCache   = make(map[*sfnt.Font]map[rune]sfnt.GlyphIndex)
 )
 
 // GlyphToShape returns a shape containing the paths for rune r as found in the font. The path is in
 // font units. Use font.UnitsPerEm() to calculate scale factors.
 func GlyphToShape(font *sfnt.Font, r rune) (*Shape, error) {
-	rcache := fontCache[font]
-	if rcache == nil {
-		fontCache[font] = make(map[rune]*Shape)
+	rcache, ok := fontCache[font]
+	if !ok {
+		rcache = make(map[rune]*Shape)
+		fontCache[font] = rcache
+		giCache[font] = make(map[rune]sfnt.GlyphIndex)
 	}
-	shape := rcache[r]
-	if shape == nil {
+	shape, ok := rcache[r]
+	if !ok {
 		var buffer sfnt.Buffer
 		x, err := font.GlyphIndex(&buffer, r)
 		if err != nil {
 			return nil, err
 		}
+		giCache[font][r] = x
 		// x == 0 means use the unfound glyph
 		shape, err = GlyphIndexToShape(font, x)
 		if err != nil {
@@ -96,23 +100,29 @@ func GlyphIndexToShape(font *sfnt.Font, x sfnt.GlyphIndex) (*Shape, error) {
 // StringToShape returns the string rendered as both a single shape, and as individual shapes, correctly
 // offset. Glyphs with no paths are not returned (e.g. space etc.).
 func StringToShape(tfont *sfnt.Font, str string) (*Shape, []*Shape, error) {
-	r2gi := make(map[rune]sfnt.GlyphIndex)
-	gi2s := make(map[sfnt.GlyphIndex]*Shape)
-	gi2adv := make(map[sfnt.GlyphIndex]float64)
+	r2gi, ok := giCache[tfont]
+	if !ok {
+		r2gi = make(map[rune]sfnt.GlyphIndex)
+		giCache[tfont] = r2gi
+	}
+	r2s, ok := fontCache[tfont]
+	if !ok {
+		r2s = make(map[rune]*Shape)
+		fontCache[tfont] = r2s
+	}
+	r2adv := make(map[rune]float64)
 	upem := fixed.I(int(tfont.UnitsPerEm()))
 
 	var buffer sfnt.Buffer
-	var err error
 	x := 0.0
 
 	shape := &Shape{}
 	shapes := []*Shape{}
 	for i, r := range str {
-		gi, ok := r2gi[r]
-		var s *Shape
+		s, ok := r2s[r]
 		if !ok {
 			// Find the glyph index
-			gi, err = tfont.GlyphIndex(&buffer, r)
+			gi, err := tfont.GlyphIndex(&buffer, r)
 			if err != nil {
 				return nil, nil, fmt.Errorf("error at rune %d (%s)", i, err.Error())
 			}
@@ -122,15 +132,13 @@ func StringToShape(tfont *sfnt.Font, str string) (*Shape, []*Shape, error) {
 			if err != nil {
 				return nil, nil, err
 			}
-			gi2s[gi] = s
+			r2s[r] = s
 			// Lookup its advance and convert it to float64
 			adv, err := tfont.GlyphAdvance(&buffer, gi, upem, font.HintingNone)
 			if err != nil {
 				return nil, nil, err
 			}
-			gi2adv[gi] = I266ToF64(adv)
-		} else {
-			s = gi2s[gi]
+			r2adv[r] = I266ToF64(adv)
 		}
 		if len(s.Paths()) > 0 {
 			// Add to result shape
@@ -139,7 +147,7 @@ func StringToShape(tfont *sfnt.Font, str string) (*Shape, []*Shape, error) {
 			shapes = append(shapes, s)
 			shape.AddShapes(s)
 		}
-		x += gi2adv[gi]
+		x += r2adv[r]
 	}
 	return shape, shapes, nil
 }
