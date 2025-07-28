@@ -16,7 +16,7 @@ func main() {
 	// Create a path and decompse it into its constituent parts
 	cp := []float64{250, 260}
 	path := g2d.ReentrantPolygon(cp, 250, 5, 0.5, 0) // Five pointed star
-	paths := path.Process(&g2d.DecomposeProc{})
+	paths := path.Process(&g2d.StepsProc{})
 
 	// Create path processor, Wood12 uses Catmull splines
 	hpp := &g2d.HandyProc{N: 4, R: 4}
