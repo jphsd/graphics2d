@@ -332,7 +332,9 @@ func BoxTransform(x1, y1, x2, y2, h, x1p, y1p, x2p, y2p, hp float64) *Aff3 {
 // BBTransform produces a transform that maps bounding box bb1 to bb2.
 func BBTransform(bb1, bb2 [][]float64) *Aff3 {
 	dx, dy := bb2[0][0]-bb1[0][0], bb2[0][1]-bb1[0][1]
-	xfm := Translate(dx, dy)
+	xfm := NewAff3()
+	// Reverse order
+	xfm.Translate(dx, dy)
 	dx1, dy1, dx2, dy2 := bb1[1][0]-bb1[0][0], bb1[1][1]-bb1[0][1], bb2[1][0]-bb2[0][0], bb2[1][1]-bb2[0][1]
 	sx, sy := dx2/dx1, dy2/dy1
 	xfm.ScaleAbout(sx, sy, bb1[0][0], bb1[0][1])
@@ -379,6 +381,7 @@ func ScaleAndInset(width, height, iwidth, iheight float64, fix bool, bb [][]floa
 	h := height - 2*iheight
 
 	xfm := NewAff3()
+	// Reverse order
 	xfm.Translate(width/2, height/2)
 	if fix {
 		s := dx
@@ -398,6 +401,7 @@ func ScaleAndInset(width, height, iwidth, iheight float64, fix bool, bb [][]floa
 func FlipY(height float64) *Aff3 {
 	yoffs := height / 2
 	xfm := NewAff3()
+	// Reverse order
 	xfm.Translate(0, yoffs)
 	xfm.Scale(1, -1)
 	xfm.Translate(0, -yoffs)
