@@ -19,8 +19,11 @@ import (
 // NewRGBA is a wrapper for image.RGBA which returns a new image of the desired size filled with color.
 func NewRGBA(w, h int, col color.Color) *RGBA {
 	res := image.NewRGBA(image.Rect(0, 0, w, h))
-	bg := NewUniform(col)
-	draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	r, g, b, _ := col.RGBA()
+	if r != 0 || g != 0 || b != 0 {
+		bg := NewUniform(col)
+		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	}
 	return res
 }
 
