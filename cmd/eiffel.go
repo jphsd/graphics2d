@@ -26,7 +26,7 @@ func main() {
 
 	shape := g2d.NewShape(path)
 	shape1 := shape.Transform(g2d.CreateTransform(-20, -20, 1, 0))
-	path1 := path.Transform(g2d.CreateTransform(20, 20, 1, 0))
+	path1 := path.Process(g2d.CreateTransform(20, 20, 1, 0))[0]
 
 	// Fill the shape with blue
 	g2d.RenderColoredShape(img, shape1, color.Blue)
