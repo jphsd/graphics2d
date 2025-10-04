@@ -122,13 +122,12 @@ func (s *Shape) Copy() *Shape {
 
 // Transform applies a transform to all the paths in the shape
 // and returns a new shape.
+//JH deprecate this
 func (s *Shape) Transform(xfm Transform) *Shape {
-	np := make([]*Path, len(s.paths))
-	for i, path := range s.paths {
-		np[i] = path.Process(&TransformProc{xfm})[0]
-	}
-	return &Shape{np, nil, nil, s}
+	return s.ProcessPaths(TransformProc{xfm})
 }
+
+// Transform applies a transform to all the paths in the shape
 
 // Process applies a shape processor to the shape and
 // returns a collection of new shapes.

@@ -407,3 +407,23 @@ func FlipY(height float64) *Aff3 {
 	xfm.Translate(0, -yoffs)
 	return xfm
 }
+
+// Process implements the PathProcessor interface.
+func (a *Aff3) Process(p *Path) []*Path {
+	psteps := p.Steps()
+	steps := make([][][]float64, len(psteps))
+	for i, step := range psteps {
+		steps[i] = a.Apply(step...)
+	}
+
+	path := NewPath(steps[0][0])
+	for _, step := range steps {
+		path.AddStep(step...)
+	}
+
+	if p.Closed() {
+		path.Close()
+	}
+
+	return []*Path{path}
+}

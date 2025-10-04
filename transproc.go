@@ -6,7 +6,7 @@ type TransformProc struct {
 }
 
 // Process implements the PathProcessor interface.
-func (tp *TransformProc) Process(p *Path) []*Path {
+func (tp TransformProc) Process(p *Path) []*Path {
 	psteps := p.Steps()
 	steps := make([][][]float64, len(psteps))
 	for i, step := range psteps {
