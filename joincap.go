@@ -6,6 +6,8 @@ import (
 	"github.com/jphsd/graphics2d/util"
 )
 
+// Join and Cap functions for Trace and Stroke procs
+
 // PointSquare renders points as squares aligned in x/y.
 func PointSquare(pt []float64, w float64) [][][]float64 {
 	hw := w / 2

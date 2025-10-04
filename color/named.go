@@ -49,10 +49,8 @@ var (
 )
 
 func init() {
-	reader := csv.NewReader(bytes.NewReader(ColorFile0()))
-	BestNamedRGBs = parse(reader, bestMap)
-	reader = csv.NewReader(bytes.NewReader(ColorFile1()))
-	CSSNamedRGBs = parse(reader, cssMap)
+	BestNamedRGBs = NewNamedRGBSlice(ColorFile0(), bestMap)
+	CSSNamedRGBs = NewNamedRGBSlice(ColorFile1(), cssMap)
 }
 
 func parse(reader *csv.Reader, nmap map[string]*NamedRGB) []*NamedRGB {
@@ -82,6 +80,15 @@ func parse(reader *csv.Reader, nmap map[string]*NamedRGB) []*NamedRGB {
 		return res
 	}
 	return nil
+}
+
+// NewNamedRGBSlice parses the data provided to it into a slice of named colors.
+// It uses csv.Reader to perform the parsing and expects the name in first entry and the color
+// in the second as #RRGGBB hex.
+// The first line of data is assumed to be a header and is skipped.
+func NewNamedRGBSlice(data []byte, names map[string]*NamedRGB) []*NamedRGB {
+	reader := csv.NewReader(bytes.NewReader(data))
+	return parse(reader, names)
 }
 
 // ByName returns the color given by the name. If there's no match, error will be set.
