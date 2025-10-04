@@ -33,7 +33,7 @@ func (hp *HandyProc) Process(p *Path) []*Path {
 			// Just jitter control and end points
 			for _, path := range paths {
 				sps := make([][]float64, nc+1)
-				for j := range nc+1 {
+				for j := range nc + 1 {
 					sps[j] = jitter(steps[i][j], hp.R)
 				}
 				path.AddStep(sps...)

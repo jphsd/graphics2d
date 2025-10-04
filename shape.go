@@ -122,7 +122,7 @@ func (s *Shape) Copy() *Shape {
 
 // Transform applies a transform to all the paths in the shape
 // and returns a new shape.
-//JH deprecate this
+// JH deprecate this
 func (s *Shape) Transform(xfm Transform) *Shape {
 	return s.ProcessPaths(TransformProc{xfm})
 }
