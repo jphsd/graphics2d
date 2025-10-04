@@ -662,6 +662,15 @@ func (p *Path) Tangents() [][][]float64 {
 	return res
 }
 
+// unit converts a normal to a unit normal
+func unit(dx, dy float64) (float64, float64) {
+	d := math.Hypot(dx, dy)
+	if util.Equals(0, d) {
+		return 0, 0
+	}
+	return dx / d, dy / d
+}
+
 // PartsIntersection returns the location of where the two parts intersect or nil. Assumes the parts
 // are the result of simplification. Uses a brute force approach for curves with d as the flattening
 // value.

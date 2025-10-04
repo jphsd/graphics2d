@@ -1,11 +1,5 @@
 package graphics2d
 
-import (
-	"math"
-
-	"github.com/jphsd/graphics2d/util"
-)
-
 // Constant width path stroker which uses TraceProc to calculate the two sides for it.
 // if closed => two closed paths
 // if open => single closed path with end caps
@@ -101,28 +95,4 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 	bp := PartsToPath(both...)
 	bp.Close()
 	return []*Path{bp}
-}
-
-// unit converts a normal to a unit normal
-func unit(dx, dy float64) (float64, float64) {
-	d := math.Hypot(dx, dy)
-	if util.Equals(0, d) {
-		return 0, 0
-	}
-	return dx / d, dy / d
-}
-
-// [part][start/end][x/y/dx/dy]
-func reverseOffs(parts [][][]float64) [][][]float64 {
-	n := len(parts)
-	res := make([][][]float64, n)
-	for i, j := 0, n-1; i < n; i++ {
-		res[i] = make([][]float64, 2)
-		res[i][0], res[i][1] = parts[j][1], parts[j][0]
-		// flip dx and dy
-		res[i][0][2], res[i][0][3] = -res[i][0][2], -res[i][0][3]
-		res[i][1][2], res[i][1][3] = -res[i][1][2], -res[i][1][3]
-		j--
-	}
-	return res
 }
