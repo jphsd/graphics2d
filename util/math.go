@@ -242,8 +242,8 @@ func LineAngle(p1, p2 []float64) float64 {
 
 // AngleBetweenLines using Atan2 vs calculating the dot product (2xSqrt+Acos).
 // Retains the directionality of the rotation from l1 to l2, unlike dot product.
-// The result is in the range [-Pi,Pi].
-func AngleBetweenLines(p1, p2, p3, p4 []float64) float64 {
+// The result is in the range [-Pi,Pi]. The angle of each line is also returned.
+func AngleBetweenLines(p1, p2, p3, p4 []float64) (float64, float64, float64) {
 	a1 := LineAngle(p1, p2)
 	a2 := LineAngle(p3, p4)
 	da := a2 - a1
@@ -252,7 +252,7 @@ func AngleBetweenLines(p1, p2, p3, p4 []float64) float64 {
 	} else if da > Pi {
 		da -= TwoPi
 	}
-	return da
+	return da, a1, a2
 }
 
 // DotProductAngle returns the angle between two lines using the dot product method. The

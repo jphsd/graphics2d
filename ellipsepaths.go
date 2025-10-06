@@ -226,7 +226,7 @@ func EllipticalArcFromPoints2(p1, p2 []float64, rx, ry, xang float64, arc, swp b
 	// F6.5 Step4 (differs from spec)
 	c := []float64{cx1, cy1}
 	offs := util.LineAngle(c, p1)
-	ang := util.AngleBetweenLines(c, p1, c, p2)
+	ang, _, _ := util.AngleBetweenLines(c, p1, c, p2)
 
 	if !swp && ang > 0 {
 		ang -= TwoPi
@@ -486,7 +486,7 @@ func findFurthest(points [][]float64) int {
 // Find p on line f0->f1, such that d(p,fi)+d(p,f1) = l
 func findEllipseIntersection(f0, f1, fi []float64, l float64) ([]float64, float64) {
 	a := util.DistanceE(f1, fi)
-	th := util.AngleBetweenLines(f1, f0, f1, fi)
+	th, _, _ := util.AngleBetweenLines(f1, f0, f1, fi)
 	if th < 0 {
 		th = -th
 	}
@@ -557,7 +557,7 @@ func (fe *fflEllipse) toEllipseArcArgs() ([]float64, float64, float64, float64, 
 	ry := math.Sqrt(rx*rx - df*df/4)
 	theta := math.Atan2(dy, dx)
 	offs := util.LineAngle(c, fe.i1)
-	ang := util.AngleBetweenLines(c, fe.i1, c, fe.i2)
+	ang, _, _ := util.AngleBetweenLines(c, fe.i1, c, fe.i2)
 	return c, rx, ry, offs, ang, theta
 }
 

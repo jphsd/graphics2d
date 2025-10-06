@@ -86,6 +86,9 @@ func NewShape(paths ...*Path) *Shape {
 // AddPaths adds paths to the shape.
 func (s *Shape) AddPaths(paths ...*Path) {
 	for _, p := range paths {
+		if p == nil {
+			continue
+		}
 		lp := p.Copy()
 		if s.paths == nil {
 			s.paths = make([]*Path, 1)

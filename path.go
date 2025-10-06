@@ -382,7 +382,9 @@ func (p *Path) Process(proc PathProcessor) []*Path {
 	paths := proc.Process(p)
 	// Fix parent
 	for _, path := range paths {
-		path.parent = p
+		if path != nil {
+			path.parent = p
+		}
 	}
 
 	return paths

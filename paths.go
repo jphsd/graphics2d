@@ -59,7 +59,7 @@ func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 
 // MakeRoundedParts uses the tangents p1-p2 and p2-p3, and the radius r to figure an arc between them.
 func MakeRoundedParts(p1, p2, p3 []float64, r float64) [][][]float64 {
-	theta := util.AngleBetweenLines(p1, p2, p3, p2)
+	theta, _, _ := util.AngleBetweenLines(p1, p2, p3, p2)
 	neg := theta < 0
 	if neg {
 		theta = -theta
