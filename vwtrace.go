@@ -1,20 +1,21 @@
 package graphics2d
 
 import (
-	//"fmt"
 	"github.com/jphsd/graphics2d/util"
 	"math"
 )
 
-// VWTraceProc path processor uses a function to determine the length of a line from the point
-// where two parts meet, at an angle that bisects the angle between the two parts.
-// The line end points are used to create an always open path.
+// VWTraceProc path processor creates a variable width trace of a path
+// using a function to determine the length of a line from the point
+// where two path parts meet, at an angle that bisects the angle between the two parts.
+// The line end points are used to create path that will always be open.
 type VWTraceProc struct {
-	Width   float64
-	Flatten float64
-	Func    func(float64, float64) float64 // Func(t, w) where t [0,1]
+	Width   float64                        // Distance from path
+	Flatten float64                        // See Path.Flatten
+	Func    func(float64, float64) float64 // Func(t, Width) where t [0,1]
 }
 
+// Process implements the path processor interface.
 func (s VWTraceProc) Process(p *Path) []*Path {
 	// Flatten
 	parts := p.Parts()
