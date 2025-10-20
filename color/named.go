@@ -112,11 +112,11 @@ func ByCSSName(name string) (*NamedRGB, error) {
 }
 
 // String returns a string represntation of NamedRGB.
-func (nc *NamedRGB) String() string {
+func (nc NamedRGB) String() string {
 	return fmt.Sprintf("%s #%02x%02x%02xff", nc.Name, nc.Color.R, nc.Color.G, nc.Color.B)
 }
 
 // RGBA implements the color.Color interface.
-func (nc *NamedRGB) RGBA() (uint32, uint32, uint32, uint32) {
+func (nc NamedRGB) RGBA() (uint32, uint32, uint32, uint32) {
 	return nc.Color.RGBA()
 }
