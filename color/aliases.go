@@ -4,6 +4,8 @@ import "image/color"
 
 type Color = color.Color
 
+type Alpha = color.Alpha
+type Alpha16 = color.Alpha16
 type Gray = color.Gray
 type Gray16 = color.Gray16
 type RGBA = color.RGBA

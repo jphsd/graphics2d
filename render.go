@@ -3,9 +3,9 @@ package graphics2d
 import (
 	//"fmt"
 	"image"
-	"image/color"
 	"image/draw"
 
+	"github.com/jphsd/graphics2d/color"
 	"github.com/jphsd/graphics2d/util"
 	"golang.org/x/image/vector"
 )
