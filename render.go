@@ -36,7 +36,7 @@ var RenderFlatten = DefaultRenderFlatten
 
 // RenderShapeExt renders the supplied shape with the fill and clip images into
 // the destination image region using op.
-func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler image.Image, fp image.Point, clip *image.Alpha, cp image.Point, op draw.Op) {
+func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler image.Image, fp image.Point, mask *image.Alpha, mp image.Point, op draw.Op) {
 	orig := drect.Min
 
 	// To avoid unnecessary work, reduce the rasterizer size to the shape width and height
@@ -46,8 +46,8 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler 
 	// the filler bounds
 	drect = drect.Intersect(filler.Bounds().Add(orig.Sub(fp)))
 	// and the clip bounds (if present)
-	if clip != nil {
-		drect = drect.Intersect(clip.Bounds().Add(orig.Sub(cp)))
+	if mask != nil {
+		drect = drect.Intersect(mask.Bounds().Add(orig.Sub(mp)))
 	}
 	if drect.Empty() {
 		return
@@ -82,43 +82,15 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler 
 	fp.X += dx
 	fp.Y += dy
 
-	if clip == nil {
+	if mask == nil {
 		rasterizer.Draw(dst, drect, filler, fp)
 		return
 	}
 
 	// Process clip mask - obtain rasterizer mask and intersect it against the clip mask
-	mask := image.NewAlpha(drect)
-	cp.X += dx
-	cp.Y += dy
-	rasterizer.Draw(mask, drect, clip, cp)
-	draw.DrawMask(dst, drect, filler, fp, mask, drect.Min, op)
-}
-
-// RenderShapeAlpha creates and returns the shape's alpha mask. The mask size and location are
-// determined by the shape's bounds.
-func RenderShapeAlpha(shape *Shape) *image.Alpha {
-	srect := shape.Bounds()
-	size := srect.Size()
-
-	// Make rasterizer, note rasterizer has implicit r.Min of {0, 0}
-	rasterizer := vector.NewRasterizer(size.X, size.Y)
-	rasterizer.DrawOp = draw.Src
-
-	// Process paths translated by -srect.Min
-	minx, miny := float32(srect.Min.X), float32(srect.Min.Y)
-	for _, path := range shape.paths {
-		fp := path.Flatten(RenderFlatten) // tolerance 0.6
-		step := util.ToF32(fp.steps[0][0]...)
-		rasterizer.MoveTo(step[0]-minx, step[1]-miny)
-		for i, lp := 1, len(fp.steps); i < lp; i++ {
-			step = util.ToF32(fp.steps[i][0]...)
-			rasterizer.LineTo(step[0]-minx, step[1]-miny)
-		}
-		rasterizer.ClosePath()
-	}
-
-	mask := image.NewAlpha(srect)
-	rasterizer.Draw(mask, srect, image.Opaque, image.Point{})
-	return mask
+	nmask := image.NewAlpha(drect)
+	mp.X += dx
+	mp.Y += dy
+	rasterizer.Draw(nmask, drect, mask, mp)
+	draw.DrawMask(dst, drect, filler, fp, nmask, drect.Min, op)
 }

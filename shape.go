@@ -51,7 +51,9 @@ func (s *Shape) Mask() *image.Alpha {
 	if s.mask != nil {
 		return s.mask
 	}
-	s.mask = RenderShapeAlpha(s)
+	srect := s.Bounds()
+	s.mask = image.NewAlpha(srect)
+	RenderShape(s.mask, s, image.Opaque)
 	return s.mask
 }
 
