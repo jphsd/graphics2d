@@ -14,7 +14,8 @@ func main() {
 	img := image.NewRGBA(width, height, color.White)
 
 	// Create a path describing the box
-	box := g2d.Square([]float64{200, 200}, 200)
+	//box := g2d.RegularPolygon(4, []float64{200, 200}, 200, 0)
+	box := g2d.Rectangle([]float64{200, 200}, 200, 200)
 	g2d.DrawPath(img, box, g2d.RedPen)
 
 	// Capture image output

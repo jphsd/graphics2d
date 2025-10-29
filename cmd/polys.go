@@ -6,37 +6,28 @@ import (
 	g2d "github.com/jphsd/graphics2d"
 	"github.com/jphsd/graphics2d/color"
 	"github.com/jphsd/graphics2d/image"
-	"math"
 )
 
 func main() {
 	// Create image to write into
-	width, height := 300, 300
-	img := image.NewRGBA(width, height, color.White)
+	width, height := 900, 900
 
 	n := 3
-	dx, dy := width/n, height/n
-	mdw := float64(dx) * 0.4
-	dp1x, dp1y := float64(dx)*0.5, float64(dy)*0.9
-	cx, cy := 0, 0
+	dx, dy := float64(width/n), float64(height/n)
+	cx, cy := dx/2, dy/2
 	shape := &g2d.Shape{}
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
+	for i := range n {
+		for j := range n {
 			ns := i*n + j + 3
-			dw := mdw * math.Tan(g2d.Pi/float64(ns))
-			if dw > mdw {
-				dw = mdw
-			}
-			shape.AddPaths(g2d.RegularPolygon([]float64{float64(cx) + dp1x + dw, float64(cy) + dp1y},
-				[]float64{float64(cx) + dp1x - dw, float64(cy) + dp1y}, ns))
+			path := g2d.RegularPolygon(ns, []float64{cx, cy}, 50, 0)
+			shape.AddPaths(path)
 			cx += dx
 		}
-		cx = 0
+		cx = dx / 2
 		cy += dy
 	}
-	g2d.RenderColoredShape(img, shape, color.Red)
-	g2d.DrawShape(img, shape, g2d.BlackPen)
 
-	// Capture image output
+	img := image.NewRGBA(width, height, color.White)
+	g2d.FillShape(img, shape, g2d.RedPen)
 	image.SaveImage(img, "polys")
 }

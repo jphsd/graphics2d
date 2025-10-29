@@ -258,22 +258,22 @@ func Circle(c []float64, r float64) *Path {
 	return np
 }
 
-// RegularPolygon returns a closed path describing an n-sided polygon given the initial edge.
-func RegularPolygon(pt1, pt2 []float64, n int) *Path {
-	da := TwoPi / float64(n)
-	cosDa, sinDa := math.Cos(da), math.Sin(da)
-	dx, dy := pt2[0]-pt1[0], pt2[1]-pt1[1]
-	np := NewPath(pt1)
-	cp := pt2
-	np.AddStep(cp)
-	for i := 1; i < n-1; i++ {
-		ncp := []float64{cp[0] + dx*cosDa - dy*sinDa, cp[1] + dx*sinDa + dy*cosDa}
-		np.AddStep(ncp)
-		dx, dy = ncp[0]-cp[0], ncp[1]-cp[1]
-		cp = ncp
+// RegularPolygon returns a closed path describing an n-sided polygon centered on c
+// rotated by th. th = 0 => polygon sits on its base.
+func RegularPolygon(n int, c []float64, s, th float64) *Path {
+	if n < 3 {
+		n = 3
 	}
-	np.Close()
-	return np
+	a := Pi / float64(n)
+	r := s / (2 * math.Sin(a))
+	sa := HalfPi + a + th
+	da := 2 * a
+	points := make([][]float64, n)
+	for i, _ := range points {
+		points[i] = []float64{r*math.Cos(sa) + c[0], r*math.Sin(sa) + c[1]}
+		sa += da
+	}
+	return Polygon(points...)
 }
 
 // ReentrantPolygon returns a closed path describing an n pointed star.
@@ -301,7 +301,7 @@ func ReentrantPolygon(c []float64, r float64, n int, t, ang float64) *Path {
 
 // IrregularPolygon returns an n sided polgon guaranteed to be located within a circle of radius r centered on cp.
 // If nr is set to true then polygon is forced to be non-reentrant.
-func IrregularPolygon(cp []float64, r float64, n int, nr bool) *Path {
+func IrregularPolygon(c []float64, r float64, n int, nr bool) *Path {
 	if n < 3 {
 		n = 3
 	}
@@ -317,8 +317,8 @@ func IrregularPolygon(cp []float64, r float64, n int, nr bool) *Path {
 		}
 		fs[i] = f
 		xr, yr := math.Cos(toffs)*r, math.Sin(toffs)*r
-		rs[i] = []float64{xr + cp[0], yr + cp[1]}
-		ps[i] = []float64{xr*f + cp[0], yr*f + cp[1]}
+		rs[i] = []float64{xr + c[0], yr + c[1]}
+		ps[i] = []float64{xr*f + c[0], yr*f + c[1]}
 		toffs += tinc
 	}
 
@@ -338,14 +338,14 @@ func IrregularPolygon(cp []float64, r float64, n int, nr bool) *Path {
 		} else {
 			post = ps[cur+1]
 		}
-		isect, _ := util.IntersectionTValsP(cp, rs[cur], pre, post)
+		isect, _ := util.IntersectionTValsP(c, rs[cur], pre, post)
 		if isect[0] > fs[cur] {
 			// Move point outwards
 			fs[cur] = isect[0] + 0.1
 			if fs[cur] > 1 {
 				fs[cur] = 1
 			}
-			ps[cur] = []float64{(rs[cur][0]-cp[0])*fs[cur] + cp[0], (rs[cur][1]-cp[1])*fs[cur] + cp[1]}
+			ps[cur] = []float64{(rs[cur][0]-c[0])*fs[cur] + c[0], (rs[cur][1]-c[1])*fs[cur] + c[1]}
 			cur++
 			if cur == n {
 				cur = 0
@@ -438,19 +438,6 @@ func Lune2(p1, p2 []float64, r1, r2 float64) *Path {
 	d := math.Hypot(dx, dy)
 
 	return Lune([]float64{p1[0] + dx/2, p1[1] + dy/2}, d/2, r1, r2, th)
-}
-
-// Square returns a closed path describing a square with side s, centered on c.
-func Square(c []float64, s float64) *Path {
-	hs := s / 2
-	sx, sy := c[0]-hs, c[1]-hs
-	points := [][]float64{
-		{sx, sy},
-		{sx + s, sy},
-		{sx + s, sy + s},
-		{sx, sy + s},
-	}
-	return Polygon(points...)
 }
 
 // Rectangle returns a closed path describing a rectangle with sides w and h, centered on c.
