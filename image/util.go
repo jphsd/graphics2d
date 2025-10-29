@@ -37,8 +37,11 @@ func CopyRGBA(in *RGBA) *RGBA {
 // NewRGBA64 is a wrapper for RGBA64 which returns a new image of the desired size filled with color.
 func NewRGBA64(w, h int, col color.Color) *RGBA64 {
 	res := image.NewRGBA64(Rect(0, 0, w, h))
-	bg := NewUniform(col)
-	draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	r, g, b, _ := col.RGBA()
+	if r != 0 || g != 0 || b != 0 {
+		bg := NewUniform(col)
+		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	}
 	return res
 }
 
@@ -52,8 +55,11 @@ func CopyRGBA64(in *RGBA64) *RGBA64 {
 // NewAlpha is a wrapper for Alpha which returns a new image of the desired size filled with color.
 func NewAlpha(w, h int, col color.Color) *Alpha {
 	res := image.NewAlpha(Rect(0, 0, w, h))
-	bg := NewUniform(col)
-	draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	_, _, _, a := col.RGBA()
+	if a != 0 {
+		bg := NewUniform(col)
+		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	}
 	return res
 }
 
@@ -67,8 +73,11 @@ func CopyAlpha(in *Alpha) *Alpha {
 // NewAlpha16 is a wrapper for Alpha16 which returns a new image of the desired size filled with color.
 func NewAlpha16(w, h int, col color.Color) *Alpha16 {
 	res := image.NewAlpha16(Rect(0, 0, w, h))
-	bg := NewUniform(col)
-	draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	_, _, _, a := col.RGBA()
+	if a != 0 {
+		bg := NewUniform(col)
+		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	}
 	return res
 }
 
@@ -82,8 +91,12 @@ func CopyAlpha16(in *Alpha16) *Alpha16 {
 // NewGray is a wrapper for Gray which returns a new image of the desired size filled with color.
 func NewGray(w, h int, col color.Color) *Gray {
 	res := image.NewGray(Rect(0, 0, w, h))
-	bg := NewUniform(col)
-	draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	r, _, _, _ := col.RGBA()
+	if r != 0 {
+		bg := NewUniform(col)
+		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	}
+	return res
 	return res
 }
 
@@ -97,8 +110,11 @@ func CopyGray(in *Gray) *Gray {
 // NewGray16 is a wrapper for Gray16 which returns a new image of the desired size filled with color.
 func NewGray16(w, h int, col color.Color) *Gray16 {
 	res := image.NewGray16(Rect(0, 0, w, h))
-	bg := NewUniform(col)
-	draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	r, _, _, _ := col.RGBA()
+	if r != 0 {
+		bg := NewUniform(col)
+		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+	}
 	return res
 }
 

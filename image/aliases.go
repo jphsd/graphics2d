@@ -20,3 +20,5 @@ type Rectangle = image.Rectangle
 
 var Rect func(int, int, int, int) Rectangle = image.Rect
 var NewUniform func(color.Color) *Uniform = image.NewUniform
+var Opaque = image.Opaque
+var Transparent = image.Transparent
