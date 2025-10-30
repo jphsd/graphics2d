@@ -149,11 +149,6 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 	return res
 }
 
-// Lerp performs a linear interpolation between two points.
-func Lerp(t float64, p1, p2 []float64) []float64 {
-	return []float64{util.Lerp(t, p1[0], p2[0]), util.Lerp(t, p1[1], p2[1])}
-}
-
 func (cp *CurveProc) calcControlOpp(p1, op1, p2, op2 []float64) ([]float64, []float64) {
 	dx1, dy1 := op1[0]*cp.Scale, op1[1]*cp.Scale
 	dx2, dy2 := -op2[0]*cp.Scale, -op2[1]*cp.Scale

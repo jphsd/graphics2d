@@ -704,7 +704,8 @@ func PartsIntersection(part1, part2 [][]float64, d float64) []float64 {
 			if err != nil || tvals[0] < 0 || tvals[0] > 1 || tvals[1] < 0 || tvals[1] > 1 {
 				continue
 			}
-			return []float64{util.Lerp(tvals[0], s1[0], e1[0]), util.Lerp(tvals[0], s1[1], e1[1])}
+			//return []float64{util.Lerp(tvals[0], s1[0], e1[0]), util.Lerp(tvals[0], s1[1], e1[1])}
+			return Lerp(tvals[0], s1, e1)
 		}
 	}
 
@@ -856,4 +857,9 @@ func (p *Path) UnmarshalJSON(b []byte) error {
 	p.parent = nil
 
 	return nil
+}
+
+// Lerp performs a linear interpolation between two points.
+func Lerp(t float64, p1, p2 []float64) []float64 {
+	return []float64{util.Lerp(t, p1[0], p2[0]), util.Lerp(t, p1[1], p2[1])}
 }
