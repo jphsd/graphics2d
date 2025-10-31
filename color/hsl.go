@@ -101,8 +101,8 @@ func NewHSL(col Color) HSL {
 	return HSL{h, s, l, a}
 }
 
-// NewHSLFromHSV is a convenience function that maps HSV to HSL (all in [0,1])
-func NewHSLFromHSV(h, sv, v float64) HSL {
+// HSVToHSL is a convenience function that maps HSV to HSL (all in [0,1])
+func HSVToHSL(h, sv, v float64) HSL {
 	l := v * (1 - sv/2)
 	var sl float64
 	if l > 0 && l < 1 {
