@@ -2,7 +2,7 @@ package graphics2d
 
 // StrandedProc takes a path and converts it into a number of parallel paths.
 type StrandedProc struct {
-	Traces []*TraceProc
+	Traces []TraceProc
 }
 
 // NewStrandedProc returns a new stranded path processor.
@@ -15,7 +15,7 @@ func NewStrandedProc(n int, w float64) *StrandedProc {
 	}
 	dw := w / float64(n-1)
 	w = -w / 2
-	traces := make([]*TraceProc, n)
+	traces := make([]TraceProc, n)
 	for i := 0; i < n; i++ {
 		traces[i] = NewTraceProc(w)
 		w += dw

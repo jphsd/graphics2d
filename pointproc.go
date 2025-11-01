@@ -97,7 +97,7 @@ type ShapesProc struct {
 }
 
 // NewShapesProc creates a new shapes path processor with the supplied shapes, spacing and rotation flag.
-func NewShapesProc(shapes []*Shape, spacing float64, rot PointRot) *ShapesProc {
+func NewShapesProc(shapes []*Shape, spacing float64, rot PointRot) ShapesProc {
 	pattern := []float64{spacing, spacing}
 	spaces := NewSnipProc(2, pattern, 0)
 	n := len(shapes)
@@ -112,11 +112,11 @@ func NewShapesProc(shapes []*Shape, spacing float64, rot PointRot) *ShapesProc {
 	// be sufficient.
 	comp := NewCompoundProc(NewMunchProc(1), spaces)
 	comp.Concatenate = true
-	return &ShapesProc{comp, NewPointsProc(nshapes, rot)}
+	return ShapesProc{comp, NewPointsProc(nshapes, rot)}
 }
 
 // Process implements the PathProcessor interface.
-func (sp *ShapesProc) Process(p *Path) []*Path {
+func (sp ShapesProc) Process(p *Path) []*Path {
 	path := p.Process(sp.Comp)[0]
 
 	return path.Process(sp.Shapes)

@@ -9,12 +9,12 @@ type BoxerProc struct {
 }
 
 // NewBoxerProc returns a new BoxerProc path processor.
-func NewBoxerProc(width, offs float64) *BoxerProc {
-	return &BoxerProc{width, offs, RenderFlatten}
+func NewBoxerProc(width, offs float64) BoxerProc {
+	return BoxerProc{width, offs, RenderFlatten}
 }
 
 // Process implements the PathProcessor interface.
-func (bp *BoxerProc) Process(p *Path) []*Path {
+func (bp BoxerProc) Process(p *Path) []*Path {
 	paths := []*Path{}
 	hw := bp.Width / 2
 	for _, part := range p.Flatten(bp.Flat).Parts() {

@@ -11,12 +11,12 @@ type PathSnipProc struct {
 }
 
 // NewPathSnipProc creates a new path snip path processor with the supplied path.
-func NewPathSnipProc(path *Path) *PathSnipProc {
-	return &PathSnipProc{RenderFlatten, path}
+func NewPathSnipProc(path *Path) PathSnipProc {
+	return PathSnipProc{RenderFlatten, path}
 }
 
 // Process implements the PathProcessor interface.
-func (psp *PathSnipProc) Process(p *Path) []*Path {
+func (psp PathSnipProc) Process(p *Path) []*Path {
 	// Flatten the paths and get the parts
 	spparts := psp.Path.Flatten(psp.Flatten).Parts()
 	if len(spparts) == 0 {

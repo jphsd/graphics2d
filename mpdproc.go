@@ -16,16 +16,16 @@ type MPDProc struct {
 }
 
 // NewMPDProc creates an MPDProc with sensible parameters for iterations and Hurst.
-func NewMPDProc(l float64) *MPDProc {
+func NewMPDProc(l float64) MPDProc {
 	if l < 0 {
 		l = -l
 	}
 
-	return &MPDProc{l, 3, 0.5, false}
+	return MPDProc{l, 3, 0.5, false}
 }
 
 // Process implements the PathProcessor interface.
-func (m *MPDProc) Process(p *Path) []*Path {
+func (m MPDProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	np := len(parts)
 	if np == 0 {
@@ -55,7 +55,7 @@ func (m *MPDProc) Process(p *Path) []*Path {
 
 // MPD takes two points and adds points between them using the mid-point displacement algorithm
 // driven by the parameters stored in the MPDProc structure.
-func (m *MPDProc) MPD(a, b []float64) [][]float64 {
+func (m MPDProc) MPD(a, b []float64) [][]float64 {
 	if m.Itrs == 0 {
 		return [][]float64{a, b}
 	}
@@ -68,7 +68,7 @@ func (m *MPDProc) MPD(a, b []float64) [][]float64 {
 	return m.mpdhelper(a, b, n, m.Itrs, d*m.Perc)
 }
 
-func (m *MPDProc) mpdhelper(a, b, n []float64, itr int, disp float64) [][]float64 {
+func (m MPDProc) mpdhelper(a, b, n []float64, itr int, disp float64) [][]float64 {
 	mpx, mpy := (a[0]+b[0])/2, (a[1]+b[1])/2
 	ln := n
 	if m.Rel {
@@ -94,13 +94,13 @@ type HandDrawnProc struct {
 
 // NewHandDrawnProc takes the segment length to apply the MPD path processor to and returns a new
 // HandDrawnProc path processor.
-func NewHandDrawnProc(l float64) *HandDrawnProc {
+func NewHandDrawnProc(l float64) HandDrawnProc {
 	comp := NewCompoundProc(NewFSnipProc(2, []float64{l, l}, 0), &MPDProc{0.1, 3, 0.5, false})
 	comp.Concatenate = true
-	return &HandDrawnProc{comp}
+	return HandDrawnProc{comp}
 }
 
 // Process implements the PathProcessor interface.
-func (h *HandDrawnProc) Process(p *Path) []*Path {
+func (h HandDrawnProc) Process(p *Path) []*Path {
 	return h.Comp.Process(p)
 }

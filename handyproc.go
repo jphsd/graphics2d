@@ -8,14 +8,14 @@ type HandyProc struct {
 }
 
 // Process implements the PathProcessor interface.
-func (hp *HandyProc) Process(p *Path) []*Path {
+func (hp HandyProc) Process(p *Path) []*Path {
 	steps := p.Steps()
 	ns := len(steps)
 	op1 := steps[0][0]
 
 	paths := make([]*Path, hp.N)
 	for i, _ := range paths {
-		paths[i] = NewPath(jitter(op1, hp.R))
+		paths[i] = NewPath(rjitter(op1, hp.R))
 	}
 
 	for i := 1; i < ns; i++ {
@@ -25,16 +25,16 @@ func (hp *HandyProc) Process(p *Path) []*Path {
 			// This is a linear step, add extra points
 			opa, opb := Lerp(0.5, op1, op2), Lerp(0.75, op1, op2)
 			for _, path := range paths {
-				path.AddStep(jitter(opa, hp.R))
-				path.AddStep(jitter(opb, hp.R))
-				path.AddStep(jitter(op2, hp.R))
+				path.AddStep(rjitter(opa, hp.R))
+				path.AddStep(rjitter(opb, hp.R))
+				path.AddStep(rjitter(op2, hp.R))
 			}
 		} else {
 			// Just jitter control and end points
 			for _, path := range paths {
 				sps := make([][]float64, nc+1)
 				for j := range nc + 1 {
-					sps[j] = jitter(steps[i][j], hp.R)
+					sps[j] = rjitter(steps[i][j], hp.R)
 				}
 				path.AddStep(sps...)
 			}

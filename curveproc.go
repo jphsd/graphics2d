@@ -22,7 +22,7 @@ type CurveProc struct {
 }
 
 // Process implements the PathProcessor interface.
-func (cp *CurveProc) Process(p *Path) []*Path {
+func (cp CurveProc) Process(p *Path) []*Path {
 	steps := p.Steps()
 	ns := len(steps)
 	if ns < 2 {
@@ -149,7 +149,7 @@ func (cp *CurveProc) Process(p *Path) []*Path {
 	return res
 }
 
-func (cp *CurveProc) calcControlOpp(p1, op1, p2, op2 []float64) ([]float64, []float64) {
+func (cp CurveProc) calcControlOpp(p1, op1, p2, op2 []float64) ([]float64, []float64) {
 	dx1, dy1 := op1[0]*cp.Scale, op1[1]*cp.Scale
 	dx2, dy2 := -op2[0]*cp.Scale, -op2[1]*cp.Scale
 	return []float64{p1[0] + dx1, p1[1] + dy1}, []float64{p2[0] + dx2, p2[1] + dy2}

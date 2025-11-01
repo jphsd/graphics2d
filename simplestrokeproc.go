@@ -8,7 +8,7 @@ type SimpleStrokeProc struct {
 }
 
 // Process implements the PathProcessor interface.
-func (cp *SimpleStrokeProc) Process(p *Path) []*Path {
+func (cp SimpleStrokeProc) Process(p *Path) []*Path {
 	p = p.Flatten(RenderFlatten)
 	d := cp.Width / 2
 

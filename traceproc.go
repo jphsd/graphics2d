@@ -12,12 +12,12 @@ type TraceProc struct {
 }
 
 // NewTraceProc creates a trace path processor with width w, the bevel join and butt cap types.
-func NewTraceProc(w float64) *TraceProc {
-	return &TraceProc{w, 0.5, JoinBevel} // 10 degrees
+func NewTraceProc(w float64) TraceProc {
+	return TraceProc{w, 0.5, JoinBevel} // 10 degrees
 }
 
 // Process implements the PathProcessor interface.
-func (tp *TraceProc) Process(p *Path) []*Path {
+func (tp TraceProc) Process(p *Path) []*Path {
 	path := PartsToPath(tp.ProcessParts(p)...)
 	if path == nil {
 		return []*Path{}
@@ -35,7 +35,7 @@ func (tp *TraceProc) Process(p *Path) []*Path {
 
 // ProcessParts returns the processed path as a slice of parts, rather a path so other path
 // processors don't have to round trip path -> parts -> path -> parts (e.g. StrokeProc).
-func (tp *TraceProc) ProcessParts(p *Path) [][][]float64 {
+func (tp TraceProc) ProcessParts(p *Path) [][][]float64 {
 	// A point isn't traceable.
 	if len(p.Steps()) == 1 {
 		return [][][]float64{}

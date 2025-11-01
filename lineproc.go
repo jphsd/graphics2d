@@ -6,7 +6,7 @@ type StepsToLinesProc struct {
 }
 
 // Process implements the PathProcessor interface.
-func (clp *StepsToLinesProc) Process(p *Path) []*Path {
+func (clp StepsToLinesProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	nparts := [][][]float64{}
 

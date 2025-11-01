@@ -167,12 +167,12 @@ type DashProc struct {
 
 // NewDashProc creates a new dash path processor with the supplied pattern and offset. If the pattern is
 // odd in length then it is replicated to create an even length pattern.
-func NewDashProc(pattern []float64, offs float64) *DashProc {
-	return &DashProc{NewFSnipProc(2, pattern, offs)}
+func NewDashProc(pattern []float64, offs float64) DashProc {
+	return DashProc{NewFSnipProc(2, pattern, offs)}
 }
 
 // Process implements the PathProcessor interface.
-func (d *DashProc) Process(p *Path) []*Path {
+func (d DashProc) Process(p *Path) []*Path {
 	paths := d.Snip.Process(p)
 	np := len(paths)
 	dp := np / 2
@@ -198,15 +198,15 @@ type MunchProc struct {
 
 // NewMunchProc creates a munching path processor. It calculates points along a path spaced l apart
 // and creates new paths that join the points with lines.
-func NewMunchProc(l float64) *MunchProc {
+func NewMunchProc(l float64) MunchProc {
 	if l < 0 {
 		l = -l
 	}
 
-	return &MunchProc{NewCompoundProc(NewFSnipProc(2, []float64{l, l}, 0), &StepsToLinesProc{false})}
+	return MunchProc{NewCompoundProc(NewFSnipProc(2, []float64{l, l}, 0), &StepsToLinesProc{false})}
 }
 
 // Process implements the PathProcessor interface.
-func (mp *MunchProc) Process(p *Path) []*Path {
+func (mp MunchProc) Process(p *Path) []*Path {
 	return p.Process(mp.Comp)
 }

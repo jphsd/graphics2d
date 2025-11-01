@@ -11,12 +11,12 @@ type SquareWaveProc struct {
 }
 
 // NewSquareWaveProc creates a new SquareWaveProc with the supplied wave length and amplitude.
-func NewSquareWaveProc(lambda, amplitude float64) *SquareWaveProc {
-	return &SquareWaveProc{lambda / 2, amplitude / lambda, false, false}
+func NewSquareWaveProc(lambda, amplitude float64) SquareWaveProc {
+	return SquareWaveProc{lambda / 2, amplitude / lambda, false, false}
 }
 
 // Process implements the PathProcessor interface.
-func (sp *SquareWaveProc) Process(p *Path) []*Path {
+func (sp SquareWaveProc) Process(p *Path) []*Path {
 	// Chunk up path into pieces
 	pp1 := NewMunchProc(sp.HalfLambda).Process(p)
 	p1, _ := ConcatenatePaths(pp1...)

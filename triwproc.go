@@ -11,12 +11,12 @@ type TriangleWaveProc struct {
 }
 
 // NewTriangleWaveProc creates a new TriangleWaveProc with the supplied wave length and amplitutde.
-func NewTriangleWaveProc(lambda, amplitude float64) *TriangleWaveProc {
-	return &TriangleWaveProc{lambda / 2, amplitude / lambda, false, false}
+func NewTriangleWaveProc(lambda, amplitude float64) TriangleWaveProc {
+	return TriangleWaveProc{lambda / 2, amplitude / lambda, false, false}
 }
 
 // Process implements the PathProcessor interface.
-func (tp *TriangleWaveProc) Process(p *Path) []*Path {
+func (tp TriangleWaveProc) Process(p *Path) []*Path {
 	// Chunk up path into pieces
 	pp1 := NewMunchProc(tp.HalfLambda).Process(p)
 	p1, _ := ConcatenatePaths(pp1...)

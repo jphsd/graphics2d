@@ -8,7 +8,7 @@ type RoundedProc struct {
 }
 
 // Process implements the PathProcessor interface.
-func (rp *RoundedProc) Process(p *Path) []*Path {
+func (rp RoundedProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	np := len(parts)
 	if np < 2 {

@@ -12,7 +12,7 @@ type JitterProc struct {
 }
 
 // Process implements the PathProcessor interface.
-func (j *JitterProc) Process(p *Path) []*Path {
+func (j JitterProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	np := len(parts)
 	if np == 0 {
@@ -25,18 +25,26 @@ func (j *JitterProc) Process(p *Path) []*Path {
 		return []*Path{res}
 	}
 
-	for i := 0; i < np-1; i++ {
+	for i := range np {
 		part := parts[i]
 		end := len(part) - 1
 		dx, dy := part[end][0]-part[0][0], part[end][1]-part[0][1]
 		l := math.Hypot(dx, dy)
 		nx, ny := dy/l, -dx/l
-		l *= (rand.Float64()*2 - 1) * j.Perc / 2
-		part[end][0] += nx * l
-		part[end][1] += ny * l
-		res.AddStep(part[1:]...)
+		if p.closed && i == 0 {
+			// Jitter first if closed
+			dl := l * (rand.Float64()*2 - 1) * j.Perc / 2
+			part[0][0] += nx * dl
+			part[0][1] += ny * dl
+			res = NewPath(part[0])
+		}
+		if i != np-1 || p.closed {
+			dl := l * (rand.Float64()*2 - 1) * j.Perc / 2
+			part[end][0] += nx * dl
+			part[end][1] += ny * dl
+			res.AddStep(part[1:]...)
+		}
 	}
-	res.AddStep(parts[np-1][1:]...)
 
 	if p.closed {
 		res.Close()
@@ -51,7 +59,7 @@ type CircularJitterProc struct {
 }
 
 // Process implements the PathProcessor interface.
-func (sp *CircularJitterProc) Process(p *Path) []*Path {
+func (sp CircularJitterProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	np := len(parts)
 	if np == 0 {
@@ -64,13 +72,18 @@ func (sp *CircularJitterProc) Process(p *Path) []*Path {
 		return []*Path{res}
 	}
 
-	for i := 0; i < np-1; i++ {
+	for i := range np {
 		part := parts[i]
 		end := len(part) - 1
-		part[end] = jitter(part[end], sp.Radius)
+		if p.closed && i == 0 {
+			part[0] = rjitter(part[0], sp.Radius)
+			res = NewPath(part[0])
+		}
+		if i != np-1 || p.closed {
+			part[end] = rjitter(part[end], sp.Radius)
+		}
 		res.AddStep(part[1:]...)
 	}
-	res.AddStep(parts[np-1][1:]...)
 
 	if p.closed {
 		res.Close()
@@ -79,7 +92,7 @@ func (sp *CircularJitterProc) Process(p *Path) []*Path {
 	return []*Path{res}
 }
 
-func jitter(pt []float64, r float64) []float64 {
+func rjitter(pt []float64, r float64) []float64 {
 	th := rand.Float64() * TwoPi
 	dx, dy := math.Cos(th)*r, math.Sin(th)*r
 	return []float64{pt[0] + dx, pt[1] + dy}
