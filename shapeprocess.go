@@ -14,7 +14,7 @@ type ShapeProcessor interface {
 type PathsProc struct{}
 
 // Process implements the ShapeProcessor interface.
-func (pp *PathsProc) Process(s *Shape) []*Shape {
+func (pp PathsProc) Process(s *Shape) []*Shape {
 	paths := s.Paths()
 	shapes := make([]*Shape, len(paths))
 	for i, path := range paths {
@@ -39,7 +39,7 @@ const (
 )
 
 // Process implements the ShapeProcessor interface.
-func (bp *BucketProc) Process(s *Shape) []*Shape {
+func (bp BucketProc) Process(s *Shape) []*Shape {
 	shapes := make([]*Shape, bp.N)
 	paths := s.Paths()
 	np := len(paths)
