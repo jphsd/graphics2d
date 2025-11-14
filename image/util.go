@@ -19,8 +19,8 @@ import (
 // NewRGBA is a wrapper for image.RGBA which returns a new image of the desired size filled with color.
 func NewRGBA(w, h int, col color.Color) *RGBA {
 	res := image.NewRGBA(image.Rect(0, 0, w, h))
-	r, g, b, _ := col.RGBA()
-	if r != 0 || g != 0 || b != 0 {
+	r, g, b, a := col.RGBA()
+	if r != 0 || g != 0 || b != 0 || a != 0 {
 		bg := NewUniform(col)
 		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
 	}
@@ -37,8 +37,8 @@ func CopyRGBA(in *RGBA) *RGBA {
 // NewRGBA64 is a wrapper for RGBA64 which returns a new image of the desired size filled with color.
 func NewRGBA64(w, h int, col color.Color) *RGBA64 {
 	res := image.NewRGBA64(Rect(0, 0, w, h))
-	r, g, b, _ := col.RGBA()
-	if r != 0 || g != 0 || b != 0 {
+	r, g, b, a := col.RGBA()
+	if r != 0 || g != 0 || b != 0 || a != 0 {
 		bg := NewUniform(col)
 		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
 	}
