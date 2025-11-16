@@ -7,13 +7,13 @@ import (
 	"github.com/jphsd/graphics2d/util"
 )
 
-// Aff3 is a 3x3 affine transformation matrix in row major order, where the
-// bottom row is implicitly [0 0 1].
+// Aff3 is a 3x3 affine transformation matrix in row major order,
+// where the bottom row is implicitly [0 0 1].
 //
 // m[3*r+c] is the element in the r'th row and c'th column.
 type Aff3 [6]float64
 
-// NewAff3 creates the identity transform.
+// NewAff3 creates the identity affine transform.
 func NewAff3() *Aff3 {
 	var res Aff3
 	res[3*0+0] = 1
@@ -21,75 +21,75 @@ func NewAff3() *Aff3 {
 	return &res
 }
 
-// Translate creates a translation transform.
+// Translate creates an affine translation transform.
 func Translate(x, y float64) *Aff3 {
 	xfm := NewAff3()
 	xfm.Translate(x, y)
 	return xfm
 }
 
-// Rotate creates a rotation transform.
+// Rotate creates an affine rotation transform.
 func Rotate(th float64) *Aff3 {
 	xfm := NewAff3()
 	xfm.Rotate(th)
 	return xfm
 }
 
-// RotateAbout creates a rotation transform about a point.
+// RotateAbout creates an affine rotation transform about a point.
 func RotateAbout(th, ax, ay float64) *Aff3 {
 	xfm := NewAff3()
 	xfm.RotateAbout(th, ax, ay)
 	return xfm
 }
 
-// Scale creates a scale transform.
+// Scale creates an affine scale transform.
 func Scale(sx, sy float64) *Aff3 {
 	xfm := NewAff3()
 	xfm.Scale(sx, sy)
 	return xfm
 }
 
-// ScaleAbout creates a scale transform about a point.
+// ScaleAbout creates an affine scale transform about a point.
 func ScaleAbout(sx, sy, ax, ay float64) *Aff3 {
 	xfm := NewAff3()
 	xfm.ScaleAbout(sx, sy, ax, ay)
 	return xfm
 }
 
-// Shear creates a shear transform.
+// Shear creates an affine shear transform.
 func Shear(shx, shy float64) *Aff3 {
 	xfm := NewAff3()
 	xfm.Shear(shx, shy)
 	return xfm
 }
 
-// ShearAbout creates a shear transform about a point.
+// ShearAbout creates an affine shear transform about a point.
 func ShearAbout(shx, shy, ax, ay float64) *Aff3 {
 	xfm := NewAff3()
 	xfm.ShearAbout(shx, shy, ax, ay)
 	return xfm
 }
 
-// Reflect creates a reflection transform.
+// Reflect creates an affine reflection transform.
 func Reflect(x1, y1, x2, y2 float64) *Aff3 {
 	xfm := NewAff3()
 	xfm.Reflect(x1, y1, x2, y2)
 	return xfm
 }
 
-// Determinant calculates the transform's matrix determinant.
+// Determinant calculates the affine transform's matrix determinant.
 func (a *Aff3) Determinant() float64 {
 	return a[3*0+0]*a[3*1+1] - a[3*0+1]*a[3*1+0]
 }
 
-// Translate adds a translation to the transform.
+// Translate adds a translation to the affine transform.
 func (a *Aff3) Translate(x, y float64) *Aff3 {
 	a[3*0+2] = x*a[3*0+0] + y*a[3*0+1] + a[3*0+2]
 	a[3*1+2] = x*a[3*1+0] + y*a[3*1+1] + a[3*1+2]
 	return a
 }
 
-// Rotate adds a rotation to the transform. The rotation is about {0, 0}.
+// Rotate adds a rotation to the affine transform. The rotation is about {0, 0}.
 func (a *Aff3) Rotate(th float64) *Aff3 {
 	sin, cos := math.Sin(th), math.Cos(th)
 	m0, m1 := a[3*0+0], a[3*0+1]
@@ -101,7 +101,7 @@ func (a *Aff3) Rotate(th float64) *Aff3 {
 	return a
 }
 
-// RotateAbout adds a rotation about a point to the transform.
+// RotateAbout adds a rotation about a point to the affine transform.
 func (a *Aff3) RotateAbout(th, ax, ay float64) *Aff3 {
 	// Reverse order
 	a.Translate(ax, ay)
@@ -110,7 +110,7 @@ func (a *Aff3) RotateAbout(th, ax, ay float64) *Aff3 {
 	return a
 }
 
-// QuadrantRotate adds a rotation (n * 90 degrees) to the transform. The rotation is about {0, 0}.
+// QuadrantRotate adds a rotation (n * 90 degrees) to the affine transform. The rotation is about {0, 0}.
 // It avoids rounding issues with the trig functions.
 func (a *Aff3) QuadrantRotate(n int) *Aff3 {
 	n %= 4
@@ -127,7 +127,7 @@ func (a *Aff3) QuadrantRotate(n int) *Aff3 {
 	return a
 }
 
-// QuadrantRotateAbout adds a rotation (n * 90 degrees) about a point to the transform.
+// QuadrantRotateAbout adds a rotation (n * 90 degrees) about a point to the affine transform.
 // It avoids rounding issues with the trig functions.
 func (a *Aff3) QuadrantRotateAbout(n int, ax, ay float64) *Aff3 {
 	// Reverse order
@@ -137,7 +137,7 @@ func (a *Aff3) QuadrantRotateAbout(n int, ax, ay float64) *Aff3 {
 	return a
 }
 
-// Scale adds a scaling to the transform centered on {0, 0}.
+// Scale adds a scaling to the affine transform centered on {0, 0}.
 func (a *Aff3) Scale(sx, sy float64) *Aff3 {
 	a[3*0+0] *= sx
 	a[3*1+1] *= sy
@@ -146,7 +146,7 @@ func (a *Aff3) Scale(sx, sy float64) *Aff3 {
 	return a
 }
 
-// ScaleAbout adds a scale about a point to the transform.
+// ScaleAbout adds a scale about a point to the affine transform.
 func (a *Aff3) ScaleAbout(sx, sy, ax, ay float64) *Aff3 {
 	// Reverse order
 	a.Translate(ax, ay)
@@ -155,7 +155,7 @@ func (a *Aff3) ScaleAbout(sx, sy, ax, ay float64) *Aff3 {
 	return a
 }
 
-// Shear adds a shear to the transform centered on {0, 0}.
+// Shear adds a shear to the affine transform centered on {0, 0}.
 func (a *Aff3) Shear(shx, shy float64) *Aff3 {
 	m0, m1 := a[3*0+0], a[3*0+1]
 	a[3*0+0] = m0 + m1*shy
@@ -167,7 +167,7 @@ func (a *Aff3) Shear(shx, shy float64) *Aff3 {
 	return a
 }
 
-// ShearAbout adds a shear about a point to the transform.
+// ShearAbout adds a shear about a point to the affine transform.
 func (a *Aff3) ShearAbout(shx, shy, ax, ay float64) *Aff3 {
 	// Reverse order
 	a.Translate(ax, ay)
@@ -176,7 +176,7 @@ func (a *Aff3) ShearAbout(shx, shy, ax, ay float64) *Aff3 {
 	return a
 }
 
-// Concatenate concatenates a transform to the transform.
+// Concatenate concatenates an affine transform to the affine transform.
 func (a *Aff3) Concatenate(aff Aff3) *Aff3 {
 	m00, m01, m10, m11 := a[3*0+0], a[3*0+1], a[3*1+0], a[3*1+1]
 	t00, t01, t02, t10, t11, t12 := aff[3*0+0], aff[3*0+1], aff[3*0+2], aff[3*1+0], aff[3*1+1], aff[3*1+2]
@@ -191,7 +191,7 @@ func (a *Aff3) Concatenate(aff Aff3) *Aff3 {
 	return a
 }
 
-// PreConcatenate preconcatenates a transform to the transform.
+// PreConcatenate preconcatenates an affine transform to the affine transform.
 func (a *Aff3) PreConcatenate(aff Aff3) *Aff3 {
 	m00, m01, m02, m10, m11, m12 := a[3*0+0], a[3*0+1], a[3*0+2], a[3*1+0], a[3*1+1], a[3*1+2]
 	t00, t01, t02, t10, t11, t12 := aff[3*0+0], aff[3*0+1], aff[3*0+2], aff[3*1+0], aff[3*1+1], aff[3*1+2]
@@ -209,7 +209,7 @@ func (a *Aff3) PreConcatenate(aff Aff3) *Aff3 {
 	return a
 }
 
-// InverseOf returns the inverse of the transform.
+// InverseOf returns the inverse of the affine transform.
 func (a *Aff3) InverseOf() (*Aff3, error) {
 	res := a.Copy()
 	if err := res.Invert(); err != nil {
@@ -219,7 +219,7 @@ func (a *Aff3) InverseOf() (*Aff3, error) {
 	return res, nil
 }
 
-// Invert inverts the transform.
+// Invert inverts the affine transform.
 func (a *Aff3) Invert() error {
 	det := a.Determinant()
 	if util.Equals(math.Abs(det), 0) {
@@ -232,14 +232,14 @@ func (a *Aff3) Invert() error {
 	return nil
 }
 
-// String converts the transform into a string.
+// String converts the affine transform into a string.
 func (a *Aff3) String() string {
 	return fmt.Sprintf("{{%f, %f, %f}, {%f, %f, %f}, {0, 0, 1}}",
 		a[3*0+0], a[3*0+1], a[3*0+2],
 		a[3*1+0], a[3*1+1], a[3*1+2])
 }
 
-// Identity returns true if the transform is the identity.
+// Identity returns true if the affine transform is the identity.
 func (a *Aff3) Identity() bool {
 	if !util.Equals(a[3*0+0], 1) {
 		return false
@@ -262,7 +262,7 @@ func (a *Aff3) Identity() bool {
 	return true
 }
 
-// Copy returns a copy of the transform.
+// Copy returns a copy of the affine transform.
 func (a *Aff3) Copy() *Aff3 {
 	res := *a
 	return &res
@@ -297,7 +297,7 @@ func (a *Aff3) Reflect(x1, y1, x2, y2 float64) *Aff3 {
 	return a
 }
 
-// LineTransform produces a transform that maps the line {p1, p2} to {p1', p2'}.
+// LineTransform produces an affine transform that maps the line {p1, p2} to {p1', p2'}.
 // Assumes neither of the lines are degenerate.
 func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {
 	// Calculate the offset, the rotation and the scale
@@ -313,7 +313,7 @@ func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {
 	return xfm
 }
 
-// BoxTransform produces a transform that maps the line {p1, p2} to {p1', p2'} and
+// BoxTransform produces an affine transform that maps the line {p1, p2} to {p1', p2'} and
 // scales the perpendicular by hp / h. Assumes neither of the lines nor h are degenerate.
 func BoxTransform(x1, y1, x2, y2, h, x1p, y1p, x2p, y2p, hp float64) *Aff3 {
 	// Calculate the offset, the rotation and the scale
@@ -329,7 +329,7 @@ func BoxTransform(x1, y1, x2, y2, h, x1p, y1p, x2p, y2p, hp float64) *Aff3 {
 	return xfm
 }
 
-// BBTransform produces a transform that maps bounding box bb1 to bb2.
+// BBTransform produces an affine transform that maps bounding box bb1 to bb2.
 func BBTransform(bb1, bb2 [][]float64) *Aff3 {
 	dx, dy := bb2[0][0]-bb1[0][0], bb2[0][1]-bb1[0][1]
 	xfm := NewAff3()
@@ -341,9 +341,9 @@ func BBTransform(bb1, bb2 [][]float64) *Aff3 {
 	return xfm
 }
 
-// CreateTransform returns a transform that performs the requested translation,
+// CreateAffineTransform returns an affine transform that performs the requested translation,
 // scaling and rotation based on {0, 0}.
-func CreateTransform(x, y, scale, rotation float64) *Aff3 {
+func CreateAffineTransform(x, y, scale, rotation float64) *Aff3 {
 	xfm := NewAff3()
 	xfm.Translate(x, y)
 	xfm.Scale(scale, scale)
@@ -371,8 +371,9 @@ func (a *Aff3) Apply(pts ...[]float64) [][]float64 {
 	return npts
 }
 
-// ScaleAndInset produces a transform that will scale and translate a set of points bounded by bb so they fit inside the
-// inset box described by width, height, iwidth, iheight located at {0, 0}. If fix is true then the aspect ratio is maintained.
+// ScaleAndInset produces an affine transform that will scale and translate a set of points bounded by bb so they
+// fit inside the inset box described by width, height, iwidth, iheight located at {0, 0}.
+// If fix is true then the aspect ratio is maintained.
 func ScaleAndInset(width, height, iwidth, iheight float64, fix bool, bb [][]float64) *Aff3 {
 	ox, oy := bb[0][0], bb[0][1]
 	dx, dy := bb[1][0]-ox, bb[1][1]-oy
@@ -397,7 +398,7 @@ func ScaleAndInset(width, height, iwidth, iheight float64, fix bool, bb [][]floa
 	return xfm
 }
 
-// FlipY is a convenience function to create a transform that has +ve Y point up rather than down.
+// FlipY is a convenience function to create an affine transform that has +ve Y point up rather than down.
 func FlipY(height float64) *Aff3 {
 	yoffs := height / 2
 	xfm := NewAff3()

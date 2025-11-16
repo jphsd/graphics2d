@@ -12,6 +12,7 @@ const (
 	Pi     = math.Pi
 	TwoPi  = 2 * Pi
 	HalfPi = Pi / 2
+	Sqrt3  = 1.7320508075688772935274463415058723669428052538103806280558069794519330169088
 )
 
 // A collection of part and path creation functions.
@@ -449,22 +450,6 @@ func Rectangle(c []float64, w, h float64) *Path {
 		{sx + w, sy},
 		{sx + w, sy + h},
 		{sx, sy + h},
-	}
-	return Polygon(points...)
-}
-
-// Sqrt3 is the square root of 3
-const Sqrt3 = 1.7320508075688772935274463415058723669428052538103806280558069794519330169088
-
-// Equilateral returns a closed path describing an equliateral triangle with side s, centered on c.
-func Equilateral(c []float64, s float64) *Path {
-	sx, sy := c[0], c[1]-s/Sqrt3
-	hs := s / 2
-	dy := hs * Sqrt3
-	points := [][]float64{
-		{sx, sy},
-		{sx + hs, sy + dy},
-		{sx - hs, sy + dy},
 	}
 	return Polygon(points...)
 }
