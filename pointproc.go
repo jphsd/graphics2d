@@ -53,14 +53,14 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 			default:
 				fallthrough
 			case RotFixed:
-				xfm = CreateTransform(part[0][0], part[0][1], 1, 0)
+				xfm = CreateAffineTransform(part[0][0], part[0][1], 1, 0)
 			case RotRelative:
 				t0 := util.DeCasteljau(part, 0)
 				ang := math.Atan2(t0[3], t0[2])
-				xfm = CreateTransform(t0[0], t0[1], 1, ang)
+				xfm = CreateAffineTransform(t0[0], t0[1], 1, ang)
 			case RotRandom:
 				t0 := util.DeCasteljau(part, 0)
-				xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*TwoPi)
+				xfm = CreateAffineTransform(t0[0], t0[1], 1, rand.Float64()*TwoPi)
 			}
 			res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
 		}
@@ -74,13 +74,13 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 		part := parts[len(parts)-1]
 		switch pp.Rotate {
 		case RotFixed:
-			xfm = CreateTransform(part[0][0], part[0][1], 1, 0)
+			xfm = CreateAffineTransform(part[0][0], part[0][1], 1, 0)
 		case RotRelative:
 			t0 := util.DeCasteljau(part, 1)
-			xfm = CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
+			xfm = CreateAffineTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
 		case RotRandom:
 			t0 := util.DeCasteljau(part, 1)
-			xfm = CreateTransform(t0[0], t0[1], 1, rand.Float64()*TwoPi)
+			xfm = CreateAffineTransform(t0[0], t0[1], 1, rand.Float64()*TwoPi)
 		}
 		res = append(res, pp.Points[cp].Transform(xfm).Paths()...)
 	}

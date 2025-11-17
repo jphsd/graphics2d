@@ -51,7 +51,7 @@ func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 
 	res := make([][][]float64, n)
 	for i := 0; i < n; i++ {
-		xfm := CreateTransform(cx, cy, r, offs+a/2)
+		xfm := CreateAffineTransform(cx, cy, r, offs+a/2)
 		res[i] = xfm.Apply(cp...)
 		offs += a
 	}

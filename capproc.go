@@ -17,27 +17,27 @@ type CapsProc struct {
 }
 
 // Process implements the PathProcessor interface.
-func (cp *CapsProc) Process(p *Path) []*Path {
+func (cp CapsProc) Process(p *Path) []*Path {
 	res := make([]*Path, 0, 2)
 	parts := p.Parts()
 	lp := len(parts)
 	if cp.Rotate {
 		if cp.Start != nil {
 			t0 := util.DeCasteljau(parts[0], 0)
-			xfm := CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
+			xfm := CreateAffineTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
 			res = append(res, cp.Start.Transform(xfm).Paths()...)
 		}
 		if cp.Mid != nil {
 			for i := 1; i < lp; i++ {
 				t0 := util.DeCasteljau(parts[i], 0)
-				xfm := CreateTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
+				xfm := CreateAffineTransform(t0[0], t0[1], 1, math.Atan2(t0[3], t0[2]))
 				res = append(res, cp.Mid.Transform(xfm).Paths()...)
 			}
 		}
 		// Only apply end cap to open paths
 		if cp.End != nil && !p.Closed() {
 			t1 := util.DeCasteljau(parts[lp-1], 1)
-			xfm := CreateTransform(t1[0], t1[1], 1, math.Atan2(t1[3], t1[2]))
+			xfm := CreateAffineTransform(t1[0], t1[1], 1, math.Atan2(t1[3], t1[2]))
 			res = append(res, cp.End.Transform(xfm).Paths()...)
 		}
 		return res
@@ -45,19 +45,19 @@ func (cp *CapsProc) Process(p *Path) []*Path {
 
 	if cp.Start != nil {
 		part := parts[0]
-		xfm := CreateTransform(part[0][0], part[0][1], 1, 0)
+		xfm := CreateAffineTransform(part[0][0], part[0][1], 1, 0)
 		res = append(res, cp.Start.Transform(xfm).Paths()...)
 	}
 	if cp.Mid != nil {
 		for i := 1; i < lp; i++ {
 			part := parts[i]
-			xfm := CreateTransform(part[0][0], part[0][1], 1, 0)
+			xfm := CreateAffineTransform(part[0][0], part[0][1], 1, 0)
 			res = append(res, cp.Mid.Transform(xfm).Paths()...)
 		}
 	}
 	if cp.End != nil && !p.Closed() {
 		part := parts[lp-1]
-		xfm := CreateTransform(part[len(part)-1][0], part[len(part)-1][1], 1, 0)
+		xfm := CreateAffineTransform(part[len(part)-1][0], part[len(part)-1][1], 1, 0)
 		res = append(res, cp.End.Transform(xfm).Paths()...)
 	}
 	return res
