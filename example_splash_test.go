@@ -43,10 +43,10 @@ func Example_splash() {
 	// Figure bounding box and scaling transform
 	bb := shape.BoundingBox()
 	xfm := g2d.ScaleAndInset(1000, 200, 20, 20, false, bb)
+	shape = shape.ProcessPaths(xfm)
 
 	// Render string to image
 	pen := g2d.NewPen(color.White, 8)
-	shape = shape.ProcessPaths(xfm)
 	g2d.RenderColoredShape(img, shape, color.Black)
 	g2d.DrawShape(img, shape, pen)
 	image.SaveImage(img, "splash")
