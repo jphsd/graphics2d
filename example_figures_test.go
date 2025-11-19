@@ -9,8 +9,8 @@ import (
 	"golang.org/x/image/font/sfnt"
 )
 
-// Example_fig1 generates a series of outlined regular shapes.
-func Example_fig1() {
+// Example_fig01 generates a series of outlined regular shapes.
+func Example_fig01() {
 	paths := []*g2d.Path{
 		g2d.Line([]float64{20, 20}, []float64{130, 130}),
 		g2d.RegularPolygon(3, []float64{225, 75}, 110, g2d.HalfPi),
@@ -30,8 +30,8 @@ func Example_fig1() {
 	// Output: See fig1.png
 }
 
-// Example_fig2 generates a series of Bezier curves of increasing order.
-func Example_fig2() {
+// Example_fig02 generates a series of Bezier curves of increasing order.
+func Example_fig02() {
 	// Create curves of order 2, 3 and 4
 	quad := g2d.NewPath([]float64{175, 25})
 	quad.AddStep([]float64{25, 25}, []float64{25, 175})
@@ -66,8 +66,8 @@ func Example_fig2() {
 	// Output: See fig2.png
 }
 
-// Example_fig3 generates arcs with different [ArcStyle]
-func Example_fig3() {
+// Example_fig03 generates arcs with different [ArcStyle]
+func Example_fig03() {
 	// Arcs
 	paths := []*g2d.Path{
 		// Top row
@@ -104,8 +104,8 @@ func Example_fig3() {
 	// Output: See fig3.png
 }
 
-// Example_fig4 generates a series of reentrant shapes.
-func Example_fig4() {
+// Example_fig04 generates a series of reentrant shapes.
+func Example_fig04() {
 	shape := g2d.NewShape(g2d.ReentrantPolygon([]float64{100, 100}, 90, 3, 0.5, 0))
 	shape.AddPaths(g2d.ReentrantPolygon([]float64{300, 100}, 90, 4, 0.5, 0))
 	shape.AddPaths(g2d.ReentrantPolygon([]float64{500, 100}, 90, 5, 0.5, 0))
@@ -120,8 +120,8 @@ func Example_fig4() {
 	// Output: See fig4.png
 }
 
-// Example_fig5 displays the different CurveProc path processor styles.
-func Example_fig5() {
+// Example_fig05 displays the different CurveProc path processor styles.
+func Example_fig05() {
 	// A closed and open path
 	closed := g2d.ReentrantPolygon([]float64{100, 100}, 90, 5, 0.5, 0)
 	parts := closed.Parts()
@@ -159,8 +159,8 @@ func Example_fig5() {
 	// Output: See fig5.png
 }
 
-// Example_fig6 displays the RoundedProc path processor with different radii.
-func Example_fig6() {
+// Example_fig06 displays the RoundedProc path processor with different radii.
+func Example_fig06() {
 	// A closed and open path
 	closed := g2d.ReentrantPolygon([]float64{100, 100}, 90, 5, 0.5, 0)
 	parts := closed.Parts()
@@ -198,8 +198,8 @@ func Example_fig6() {
 	// Output: See fig6.png
 }
 
-// Example_fig7 creates a string from a font file and displays the control points too.
-func Example_fig7() {
+// Example_fig07 creates a string from a font file and displays the control points too.
+func Example_fig07() {
 	// Load font and create shapes
 	ttf, err := sfnt.Parse(goitalic.TTF)
 	if err != nil {
@@ -240,8 +240,8 @@ func Example_fig7() {
 	// Output: See fig7.png
 }
 
-// Example_fig8 generates a series of regular shapes with dashed outlines.
-func Example_fig8() {
+// Example_fig08 generates a series of regular shapes with dashed outlines.
+func Example_fig08() {
 	paths := []*g2d.Path{
 		g2d.Line([]float64{20, 20}, []float64{130, 130}),
 		g2d.RegularPolygon(3, []float64{225, 75}, 110, g2d.HalfPi),
@@ -279,8 +279,8 @@ func Example_fig8() {
 	// Output: See fig8.png
 }
 
-// Example_fig9 generates a series of path traces using different join functions.
-func Example_fig9() {
+// Example_fig09 generates a series of path traces using different join functions.
+func Example_fig09() {
 	path := g2d.PolyLine(
 		[]float64{20, 50},
 		[]float64{120, 150},
