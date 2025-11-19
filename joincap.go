@@ -1,7 +1,6 @@
 package graphics2d
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/jphsd/graphics2d/util"
@@ -214,11 +213,8 @@ func (oc OvalCap) CapInvOval(p1 Part, p []float64, p2 Part) []Part {
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
 	e2 := []float64{e1[0] - dy, e1[1] + dx}
 	s2 := []float64{s1[0] - dy, s1[1] + dx}
-	fmt.Printf("p %.2f,%.2f dx %.2f dy %.2f\n", p[0], p[1], dx, dy)
-	fmt.Printf("s1 %.2f,%.2f s2 %.2f,%.2f e1 %.2f,%.2f e2 %.2f,%.2f\n", s1[0], s1[1], s2[0], s2[1], e1[0], e1[1], e2[0], e2[1])
 	offs := math.Atan2(dy, dx)
 	xoffs := offs - HalfPi
-	fmt.Printf("Offs %.2f XOffs %.2f\n", offs, xoffs)
 	ry := math.Sqrt(dx*dx + dy*dy)
 	rx := ry * oc.Rxy
 	tp := EllipticalArc([]float64{p[0] - dy*oc.Rxy, p[1] + dx*oc.Rxy}, rx, ry, offs, -Pi, xoffs, ArcOpen).Parts()
