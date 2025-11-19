@@ -169,9 +169,22 @@ func (p *Path) Steps() [][][]float64 {
 	return p.steps[:]
 }
 
+// Part represents a path step with the previous step's end point prepended.
 type Part [][]float64
 
-// AddParts adds the parts to the path and returns it.
+// String converts a part into a string.
+func (p Part) String() string {
+	res := ""
+	for i, pt := range p {
+		if i != 0 {
+			res += " "
+		}
+		res += fmt.Sprintf("%.2f,%.2f", pt[0], pt[1])
+	}
+	return res
+}
+
+// AddParts adds parts to the path and returns it.
 func (p *Path) AddParts(parts ...Part) *Path {
 	for i, part := range parts {
 		for j, pt := range part {

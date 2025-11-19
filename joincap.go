@@ -199,7 +199,8 @@ func (oc OvalCap) CapOval(p1 Part, p []float64, p2 Part) []Part {
 	s1 := p2[0]
 	t := (oc.Offs + 1) / 2
 	omt := 1 - t
-	cp := []float64{e1[0]*omt + s1[0]*t, e1[1]*omt + s1[1]*t}
+	//cp := []float64{e1[0]*omt + s1[0]*t, e1[1]*omt + s1[1]*t}
+	cp := Lerp(t, e1, s1)
 	d := 2 * ry
 	ry1, ry2 := d*t, d*omt
 	res := EllipticalArc(cp, rx, ry1, offs, HalfPi, offs-HalfPi, ArcOpen).Parts()
@@ -211,22 +212,23 @@ func (oc OvalCap) CapOval(p1 Part, p []float64, p2 Part) []Part {
 func (oc OvalCap) CapInvOval(p1 Part, p []float64, p2 Part) []Part {
 	e1, s1 := p1[len(p1)-1], p2[0]
 	dx, dy := e1[0]-p[0], e1[1]-p[1]
-	e2 := []float64{e1[0] - dy, e1[1] + dx}
-	s2 := []float64{s1[0] - dy, s1[1] + dx}
 	offs := math.Atan2(dy, dx)
 	xoffs := offs - HalfPi
 	ry := math.Sqrt(dx*dx + dy*dy)
 	rx := ry * oc.Rxy
 	tp := EllipticalArc([]float64{p[0] - dy*oc.Rxy, p[1] + dx*oc.Rxy}, rx, ry, offs, -Pi, xoffs, ArcOpen).Parts()
-	res := make([]Part, 1, len(tp)+2)
+	ltp := len(tp)
+	e2 := tp[0][0]
+	s2 := tp[ltp-1][len(tp[ltp-1])-1]
+	res := make([]Part, 1, ltp+2)
 	res[0] = Part{e1, e2}
 	res = append(res, tp...)
 	res = append(res, Part{s2, s1})
 	return res
 }
 
-// RSCap contains the percentage [0,1] of the corner taken up by an arc. Perc = 1 is equivalent to CapRound
-// Perc = 0, to CapSquare.
+// RSCap contains the percentage [0,1] of the corner taken up by an arc.
+// Perc = 1 is equivalent to CapRound, Perc = 0, to CapSquare.
 type RSCap struct {
 	Perc float64
 }
@@ -242,4 +244,21 @@ func (rc RSCap) CapRoundedSquare(p1 Part, p []float64, p2 Part) []Part {
 	path := PartsToPath(parts...)
 	rp := &RoundedProc{r}
 	return path.Process(rp)[0].Parts()
+}
+
+// CapPoint draws an arrow head from e1 to s1 centered on p.
+func CapPoint(p1 Part, p []float64, p2 Part) []Part {
+	e1, s1 := p1[len(p1)-1], p2[0]
+	dx, dy := e1[0]-p[0], e1[1]-p[1]
+	pp := []float64{p[0] - dy, p[1] + dx}
+	return []Part{{e1, pp}, {pp, s1}}
+}
+
+// CapInvPoint extends e1 and s1 and draws an arrow tail that passes through p.
+func CapInvPoint(p1 Part, p []float64, p2 Part) []Part {
+	e1, s1 := p1[len(p1)-1], p2[0]
+	dx, dy := e1[0]-p[0], e1[1]-p[1]
+	e2 := []float64{e1[0] - dy, e1[1] + dx}
+	s2 := []float64{s1[0] - dy, s1[1] + dx}
+	return []Part{{e1, e2}, {e2, p}, {p, s2}, {s2, s1}}
 }
