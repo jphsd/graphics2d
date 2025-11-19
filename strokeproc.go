@@ -14,10 +14,10 @@ type StrokeProc struct {
 	PostSideProc PathProcessor
 	Width        float64 // Default
 	// point(pt, r) []part
-	PointFunc func([]float64, float64) [][][]float64
+	PointFunc func([]float64, float64) []Part
 	// cap(part1, pt, part2) []part
-	CapStartFunc func([][]float64, []float64, [][]float64) [][][]float64
-	CapEndFunc   func([][]float64, []float64, [][]float64) [][][]float64
+	CapStartFunc func(Part, []float64, Part) []Part
+	CapEndFunc   func(Part, []float64, Part) []Part
 }
 
 // Process implements the PathProcessor interface and will return either one or two paths
@@ -54,7 +54,7 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 	// Path is open, construct end caps and concatenate RHS with LHS, return it
 	rhsp, lhsp := rhs.Parts(), lhs.Parts()
 
-	both := make([][][]float64, 0, len(rhsp)+len(lhsp)+2)
+	both := make([]Part, 0, len(rhsp)+len(lhsp)+2)
 	both = append(both, rhsp...)
 
 	rhsl := rhsp[len(rhsp)-1]
@@ -90,9 +90,9 @@ func NewStrokeProc(w float64) *StrokeProc {
 // separately for each side of the stroke. This allows the stroke to be offset to the left or right
 // of the path being processed.
 func NewStrokeProcExt(rw, lw float64,
-	jf func([][]float64, []float64, [][]float64) [][][]float64,
+	jf func(Part, []float64, Part) []Part,
 	d float64,
-	cf func([][]float64, []float64, [][]float64) [][][]float64) *StrokeProc {
+	cf func(Part, []float64, Part) []Part) *StrokeProc {
 	if rw < 0 {
 		rw = -rw
 	}
@@ -100,8 +100,8 @@ func NewStrokeProcExt(rw, lw float64,
 		lw = -lw
 	}
 	return &StrokeProc{
-		RHSProc:      &TraceProc{rw / 2, d, JoinBevel},
-		LHSProc:      &TraceProc{lw / 2, d, JoinBevel},
+		RHSProc:      TraceProc{rw / 2, d, JoinBevel},
+		LHSProc:      TraceProc{lw / 2, d, JoinBevel},
 		PostSideProc: nil,
 		Width:        rw - lw,
 		PointFunc:    PointCircle,

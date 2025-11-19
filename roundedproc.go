@@ -15,7 +15,7 @@ func (rp RoundedProc) Process(p *Path) []*Path {
 		return []*Path{p}
 	}
 
-	res := [][][]float64{}
+	res := []Part{}
 	for i, part := range parts {
 		if len(part) != 2 {
 			res = append(res, part)
@@ -25,7 +25,7 @@ func (rp RoundedProc) Process(p *Path) []*Path {
 			if len(parts[i+1]) == 2 {
 				mp1, mp2 := Lerp(0.5, part[0], part[1]), Lerp(0.5, part[1], parts[i+1][1])
 				nparts := MakeRoundedParts(mp1, part[1], mp2, rp.Radius)
-				res = append(res, [][]float64{part[0], nparts[0][0]})
+				res = append(res, Part{part[0], nparts[0][0]})
 				res = append(res, nparts...)
 			} else {
 				res = append(res, part)
@@ -38,7 +38,7 @@ func (rp RoundedProc) Process(p *Path) []*Path {
 			// Path is closed and the first part is also a line
 			mp1, mp2 := Lerp(0.5, part[0], part[1]), Lerp(0.5, part[1], parts[0][1])
 			nparts := MakeRoundedParts(mp1, part[1], mp2, rp.Radius)
-			res = append(res, [][]float64{part[0], nparts[0][0]})
+			res = append(res, Part{part[0], nparts[0][0]})
 			res = append(res, nparts...)
 			lnp := len(nparts) - 1
 			res[0][0] = nparts[lnp][len(nparts[lnp])-1]

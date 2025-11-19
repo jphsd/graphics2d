@@ -19,11 +19,11 @@ const (
 
 // MakeArcParts creates at least one cubic bezier that describes a curve from offs to
 // offs+ang centered on {cx, cy} with radius r.
-func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
+func MakeArcParts(cx, cy, r, offs, ang float64) []Part {
 	if util.Equals(ang, 0) {
 		// Return just a point
 		pt := []float64{cx + r*math.Cos(offs), cy + r*math.Sin(offs)}
-		return [][][]float64{{pt, pt}}
+		return []Part{{pt, pt}}
 	}
 
 	a := ang
@@ -45,11 +45,11 @@ func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 	cp := util.CalcPointsForArc(a)
 
 	if rev {
-		cp = [][]float64{cp[3], cp[2], cp[1], cp[0]}
+		cp = Part{cp[3], cp[2], cp[1], cp[0]}
 		a = -a
 	}
 
-	res := make([][][]float64, n)
+	res := make([]Part, n)
 	for i := 0; i < n; i++ {
 		xfm := CreateAffineTransform(cx, cy, r, offs+a/2)
 		res[i] = xfm.Apply(cp...)
@@ -59,7 +59,7 @@ func MakeArcParts(cx, cy, r, offs, ang float64) [][][]float64 {
 }
 
 // MakeRoundedParts uses the tangents p1-p2 and p2-p3, and the radius r to figure an arc between them.
-func MakeRoundedParts(p1, p2, p3 []float64, r float64) [][][]float64 {
+func MakeRoundedParts(p1, p2, p3 []float64, r float64) []Part {
 	theta, _, _ := util.AngleBetweenLines(p1, p2, p3, p2)
 	neg := theta < 0
 	if neg {
@@ -234,7 +234,7 @@ func PolyArcFromPoint(pt []float64, cs [][]float64, angs []float64) *Path {
 		n = na
 	}
 
-	parts := [][][]float64{}
+	parts := []Part{}
 	cp := pt
 	for i := 0; i < n; i++ {
 		dx := cp[0] - cs[i][0]

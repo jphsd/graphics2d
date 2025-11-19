@@ -108,7 +108,7 @@ func (sp *FSnipProc) Process(p *Path) []*Path {
 	pi := 0
 	cur, end := parts[pi][0], parts[pi][1]
 	avail := math.Hypot(end[0]-cur[0], end[1]-cur[1])
-	sparts := [][][]float64{}
+	sparts := []Part{}
 
 	// Turn parts into snip paths
 	res := []*Path{}
@@ -118,7 +118,7 @@ func (sp *FSnipProc) Process(p *Path) []*Path {
 		// Once delta met, add path to res, bump State, patind and delta
 		// and continue
 		if avail < delta {
-			sparts = append(sparts, [][]float64{cur, end})
+			sparts = append(sparts, Part{cur, end})
 			delta -= avail
 			pi++
 			if pi > len(parts)-1 {
@@ -132,7 +132,7 @@ func (sp *FSnipProc) Process(p *Path) []*Path {
 			t := delta / avail
 			omt := 1 - t
 			tmp := []float64{cur[0]*omt + end[0]*t, cur[1]*omt + end[1]*t}
-			sparts = append(sparts, [][]float64{cur, tmp})
+			sparts = append(sparts, Part{cur, tmp})
 			avail -= delta
 			res = append(res, PartsToPath(sparts...))
 			sparts = nil

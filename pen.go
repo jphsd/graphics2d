@@ -48,8 +48,8 @@ func NewProcessorPen(color color.Color, width float64, proc PathProcessor) *Pen 
 // NewStrokedPen returns a pen that will render a shape with the given pen
 // width and color into an image using the supplied join and cap functions.
 func NewStrokedPen(color color.Color, width float64,
-	join func([][]float64, []float64, [][]float64) [][][]float64,
-	cap func([][]float64, []float64, [][]float64) [][][]float64) *Pen {
+	join func(Part, []float64, Part) []Part,
+	cap func(Part, []float64, Part) []Part) *Pen {
 	if width < 0 {
 		width = -width
 	}

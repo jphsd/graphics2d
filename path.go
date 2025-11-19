@@ -169,8 +169,23 @@ func (p *Path) Steps() [][][]float64 {
 	return p.steps[:]
 }
 
+type Part [][]float64
+
+// AddParts adds the parts to the path and returns it.
+func (p *Path) AddParts(parts ...Part) *Path {
+	for i, part := range parts {
+		for j, pt := range part {
+			if InvalidPoint(pt) {
+				panic(fmt.Sprintf("invalid point (NaN) in part %d,%d", i, j))
+			}
+		}
+		p.AddStep(part[1:]...)
+	}
+	return p
+}
+
 // Parts returns the steps of a path, each prepended with its start.
-func (p *Path) Parts() [][][]float64 {
+func (p *Path) Parts() []Part {
 	n := len(p.steps)
 	if n == 0 {
 		return nil
@@ -179,16 +194,16 @@ func (p *Path) Parts() [][][]float64 {
 	if n == 1 {
 		// This is a point
 		// Deep copy
-		return [][][]float64{{{cp[0], cp[1]}}}
+		return []Part{{{cp[0], cp[1]}}}
 	}
-	parts := make([][][]float64, n-1, n)
+	parts := make([]Part, n-1, n)
 	for i := 1; i < n; i++ {
 		part := toPart(cp, p.steps[i])
 		parts[i-1] = part
 		cp = part[len(part)-1]
 	}
 	if p.closed && !util.EqualsP(cp, p.steps[0][0]) {
-		parts = append(parts, [][]float64{cp, p.steps[0][0]})
+		parts = append(parts, Part{cp, p.steps[0][0]})
 	}
 	return parts
 }
@@ -209,7 +224,7 @@ func (p *Path) Closed() bool {
 }
 
 // PartsToPath constructs a new path by concatenating the parts.
-func PartsToPath(parts ...[][]float64) *Path {
+func PartsToPath(parts ...Part) *Path {
 	if len(parts) == 0 {
 		return nil
 	}
@@ -253,7 +268,7 @@ func (p *Path) Flatten(d float64) *Path {
 		fp := flattenPart(d2, toPart(cp, sp.steps[i]))
 		for _, ns := range fp {
 			// ns length is always 2
-			res = append(res, [][]float64{ns[1]})
+			res = append(res, Part{ns[1]})
 			cp = ns[1]
 		}
 	}
@@ -267,8 +282,8 @@ func (p *Path) Flatten(d float64) *Path {
 }
 
 // Deep copy
-func toPart(cp []float64, pts [][]float64) [][]float64 {
-	res := make([][]float64, len(pts)+1)
+func toPart(cp []float64, pts [][]float64) Part {
+	res := make(Part, len(pts)+1)
 	res[0] = []float64{cp[0], cp[1]}
 	for i, pt := range pts {
 		res[i+1] = []float64{pt[0], pt[1]}
@@ -278,17 +293,17 @@ func toPart(cp []float64, pts [][]float64) [][]float64 {
 
 // flattenPart successively splits the part until the control points are within d2 of the line
 // joing the part start with the part end. Returns a list of line parts.
-func flattenPart(d2 float64, part [][]float64) [][][]float64 {
+func flattenPart(d2 float64, part Part) []Part {
 	if cpWithinD2(d2, part) {
-		return [][][]float64{{part[0], part[len(part)-1]}}
+		return []Part{{part[0], part[len(part)-1]}}
 	}
 	lr := util.SplitCurve(part, 0.5)
-	res := append([][][]float64{}, flattenPart(d2, lr[0])...)
+	res := append([]Part{}, flattenPart(d2, lr[0])...)
 	res = append(res, flattenPart(d2, lr[1])...)
 	return res
 }
 
-func cpWithinD2(d2 float64, part [][]float64) bool {
+func cpWithinD2(d2 float64, part Part) bool {
 	// First and last are end points
 	l := len(part)
 	if l == 2 {
@@ -308,12 +323,12 @@ func cpWithinD2(d2 float64, part [][]float64) bool {
 
 // FlattenPart works by subdividing the curve until its control points are within d^2 (d squared)
 // of the line through the end points.
-func FlattenPart(d float64, part [][]float64) [][][]float64 {
+func FlattenPart(d float64, part Part) []Part {
 	return flattenPart(d*d, part)
 }
 
 // PartLength returns the approximate length of a part by flattening it to the supplied degree of flatness.
-func PartLength(d float64, part [][]float64) float64 {
+func PartLength(d float64, part Part) float64 {
 	parts := flattenPart(d*d, part)
 	sum := 0.0
 	for _, part := range parts {
@@ -464,7 +479,7 @@ func (p *Path) Simplify() *Path {
 	if p.simplified != nil {
 		return p.simplified
 	}
-	res := [][][]float64{}
+	res := []Part{}
 	parts := p.Parts()
 	for _, part := range parts {
 		if len(part) > 2 {
@@ -489,11 +504,11 @@ func (p *Path) Simplify() *Path {
 }
 
 // SimplifyExtremities chops curve into pieces based on maxima, minima and inflections in x and y.
-func SimplifyExtremities(part [][]float64) [][][]float64 {
+func SimplifyExtremities(part Part) []Part {
 	tvals := util.CalcExtremities(part)
 	nt := len(tvals)
 	if nt < 3 {
-		return [][][]float64{part}
+		return []Part{part}
 	}
 	// Convert tvals to relative tvals
 	rtvals := make([]float64, nt)
@@ -515,7 +530,7 @@ func SimplifyExtremities(part [][]float64) [][][]float64 {
 	}
 
 	rhs := part
-	res := make([][][]float64, nt-1)
+	res := make([]Part, nt-1)
 	for i := 1; i < nt-1; i++ {
 		lr := util.SplitCurve(rhs, rtvals[i])
 		res[i-1] = lr[0]
@@ -527,12 +542,12 @@ func SimplifyExtremities(part [][]float64) [][][]float64 {
 
 // SimplifyPart recursively cuts the curve in half until CPSafe is
 // satisfied.
-func SimplifyPart(part [][]float64) [][][]float64 {
+func SimplifyPart(part Part) []Part {
 	if CPSafe(part) {
-		return [][][]float64{part}
+		return []Part{part}
 	}
 	lr := util.SplitCurve(part, 0.5)
-	res := append([][][]float64{}, SimplifyPart(lr[0])...)
+	res := append([]Part{}, SimplifyPart(lr[0])...)
 	res = append(res, SimplifyPart(lr[1])...)
 	return res
 }
@@ -545,7 +560,7 @@ var SafeFraction float64 = -1
 // CPSafe returns true if all the control points are on the same side of
 // the line formed by start and the last part points and the point at t = 0.5 is close
 // to the centroid of the part.
-func CPSafe(part [][]float64) bool {
+func CPSafe(part Part) bool {
 	n := len(part)
 	if n < 3 {
 		// Either a point or line
@@ -610,9 +625,9 @@ func (p *Path) Reverse() *Path {
 }
 
 // ReverseParts reverses the order (and points) of the supplied part slice.
-func ReverseParts(parts [][][]float64) [][][]float64 {
+func ReverseParts(parts []Part) []Part {
 	n := len(parts)
-	res := make([][][]float64, n)
+	res := make([]Part, n)
 	for i, j := 0, n-1; i < n; i++ {
 		res[i] = ReversePoints(parts[j])
 		j--
@@ -621,9 +636,9 @@ func ReverseParts(parts [][][]float64) [][][]float64 {
 }
 
 // [pts][x/y]
-func ReversePoints(cp [][]float64) [][]float64 {
+func ReversePoints(cp Part) Part {
 	n := len(cp)
-	res := make([][]float64, n)
+	res := make(Part, n)
 	for i, j := 0, n-1; i < n; i++ {
 		res[i] = cp[j]
 		j--
@@ -676,7 +691,7 @@ func unit(dx, dy float64) (float64, float64) {
 // PartsIntersection returns the location of where the two parts intersect or nil. Assumes the parts
 // are the result of simplification. Uses a brute force approach for curves with d as the flattening
 // value.
-func PartsIntersection(part1, part2 [][]float64, d float64) []float64 {
+func PartsIntersection(part1, part2 Part, d float64) []float64 {
 	// Test bounding boxes first
 	bb1, bb2 := util.BoundingBox(part1...), util.BoundingBox(part2...)
 	if !util.BBOverlap(bb1, bb2) {
@@ -764,7 +779,7 @@ func dist2(a, b []float64) float64 {
 }
 
 // Returns closest point on part to pt, dist2 and t [0-1]
-func bs(pt []float64, ts, ds, te, de float64, part [][]float64) ([]float64, float64, float64) {
+func bs(pt []float64, ts, ds, te, de float64, part Part) ([]float64, float64, float64) {
 	dt := te - ts
 	if dt < 0.00001 {
 		prj := util.DeCasteljau(part, ts)

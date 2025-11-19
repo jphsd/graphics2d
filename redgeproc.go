@@ -15,7 +15,7 @@ type RoundedEdgeProc struct {
 // Process implements the PathProcessor interface.
 func (rp RoundedEdgeProc) Process(p *Path) []*Path {
 	parts := p.Parts()
-	nparts := [][][]float64{}
+	nparts := []Part{}
 	for _, part := range parts {
 		cs, ce := part[0], part[len(part)-1]
 		dx, dy := ce[0]-cs[0], ce[1]-cs[1]

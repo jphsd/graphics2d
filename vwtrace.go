@@ -19,7 +19,7 @@ type VWTraceProc struct {
 func (s VWTraceProc) Process(p *Path) []*Path {
 	// Flatten
 	parts := p.Parts()
-	nparts := make([][][]float64, 0, len(parts))
+	nparts := make([]Part, 0, len(parts))
 	for _, part := range parts {
 		nparts = append(nparts, FlattenPart(s.Flatten, part)...)
 	}
@@ -34,7 +34,7 @@ func (s VWTraceProc) Process(p *Path) []*Path {
 		sum += plens[i]
 	}
 
-	points := make([][]float64, 0, np+1)
+	points := make(Part, 0, np+1)
 	clen := 0.0
 	for i, part := range parts {
 		clen += plens[i]

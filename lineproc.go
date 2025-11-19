@@ -8,7 +8,7 @@ type StepsToLinesProc struct {
 // Process implements the PathProcessor interface.
 func (clp StepsToLinesProc) Process(p *Path) []*Path {
 	parts := p.Parts()
-	nparts := [][][]float64{}
+	nparts := []Part{}
 
 	cp := parts[0][0]
 	for _, part := range parts {
