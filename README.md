@@ -21,8 +21,10 @@ The primary type in the package is the [Path](https://pkg.go.dev/github.com/jphs
 A path represents a single movement of a pen, from pen down to pen up. Paths are composed of steps with
 some number of points in them.
 The number of points determines the order of the Bezier curve generated.
-The path methods [LineTo]() and [CurveTo]() are just synonyms for [AddStep]()
-Once created, a path can be left as is (open), or closed [Close]().
+The path methods [LineTo](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.LineTo)
+and [CurveTo](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.CurveTo)
+are just synonyms for [AddStep](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.AddStep)
+Once created, a path can be left as is (open), or closed [Close](https://pkg.go.dev/github.com/jphsd/graphics2d#Path).
 A closed path can no longer be extended and a line is created from the first point in the path to its last.
 
 ### Shapes
@@ -32,13 +34,26 @@ For example, the figure 8 is composed of three paths; the outline, and the two h
 
 ## 2. Basic Shapes
 [![Fig1 image created with graphics2d](./doc/fig1.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig01)
-The shapes above were created using [Line](), [RegularPolygon](), [Circle](), and [Oval]().
+The shapes above were created using [Line](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.Line),
+[RegularPolygon](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.RegularPolygon),
+[Circle](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.Circle),
+and [Oval](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.Oval).
+These are just some of the constructors available for the Path type.
 
-## 3. Arcs And ArcStyles
+## 3. Bezier Curves
 [![Fig2 image created with graphics2d](./doc/fig2.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig02)
+[Bezier curves](https://en.wikipedia.org/wiki/B%C3%A9zier_curve)
+are polynomial curves.
+Most vector packages support first, second and third order curves, lines, quadratic and cubic curves respectively.
+The path AddStep method has no upper limit on the number of control points that can be specified.
+The last example above on the right is a quartic curve.
 
-## 4. Bezier Curves
-[![Fig3 image created with graphics2d](./doc/fig3.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig03)
+## 4. Arcs And ArcStyles
+[![Fig3 image created with graphics3d](./doc/fig3.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig03)
+Various arc path constructors are available and typically take an offset start angle and a sweep angle.
+The arcs are approximated from cubic bezier curves. 
+Arcs must have a [style](https://pkg.go.dev/github.com/jphsd/graphics2d#ArcStyle)
+associated with them which is one of ArcOpen, ArcPie or ArcChord as shown above.
 
 ## 5. Reentrant Shapes
 [![Fig4 image created with graphics2d](./doc/fig4.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig04)
