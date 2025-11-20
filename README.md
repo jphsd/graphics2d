@@ -32,6 +32,14 @@ A closed path can no longer be extended and a line is created from the first poi
 Shapes allow multiple paths to be combined to produce more complex drawings.
 For example, the figure 8 is composed of three paths; its outline, and the two holes in it.
 
+### Rendering
+
+Shapes are rendered to an image using a source filler image and the mask generated from the shape,
+[RenderShape](https://pkg.go.dev/github.com/jphsd/graphics2d#RenderShape).
+If the filler is all one color,
+then [RenderColoredShape](https://pkg.go.dev/github.com/jphsd/graphics2d#RenderColoredShape)
+can be used.
+
 ## 2. Basic Shapes
 [![Fig1 image created with graphics2d](./doc/fig1.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig01)
 
@@ -133,7 +141,7 @@ is used to convert open paths to closed ones,
 since only closed paths can be filled by the renderer.
 
 A stroke is comprised of left and right trace path processors,
-and functions that defien the start and end caps of the path.
+and functions that define the start and end caps of the path.
 
 This example shows the [CapButt](https://pkg.go.dev/github.com/jphsd/graphics2d#CapButt),
 [CapSquare](https://pkg.go.dev/github.com/jphsd/graphics2d#CapSquare),
@@ -147,8 +155,12 @@ This example shows the [CapButt](https://pkg.go.dev/github.com/jphsd/graphics2d#
 
 End caps are only used when the path is open.
 When a stroke processor is applied to a closed path,
-two paths outlines of the path are created forming an outline of the original.
+two closed paths are created forming an outline of the original.
 
 ### Pens
 
-A [Pen] is a convenient abstraction that
+A [Pen](https://pkg.go.dev/github.com/jphsd/graphics2d#Pen)
+is a convenient abstraction that ties a filler image to a path processor,
+like the stroke one,
+so that the user doesn't have to write the mechanics of the stroke and call it every time a shape is rendered.
+A collection of pens is predefined [here](https://pkg.go.dev/github.com/jphsd/graphics2d#pkg-variables).
