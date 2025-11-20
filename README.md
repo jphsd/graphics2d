@@ -176,4 +176,4 @@ Convenience functions that take a pen argument are:
 - [DrawPoint](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawPoint)
 - [DrawShape](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawShape)
 
-[![Fall](./doc/fig11.png)](https://www.reddit.com/r/generative/comments/1nqebye/fall/)
+[![Fall](./doc/fall.png)](https://www.reddit.com/r/generative/comments/1nqebye/fall/)
