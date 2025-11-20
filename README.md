@@ -34,6 +34,7 @@ For example, the figure 8 is composed of three paths; the outline, and the two h
 
 ## 2. Basic Shapes
 [![Fig1 image created with graphics2d](./doc/fig1.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig01)
+
 The shapes above were created using [Line](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.Line),
 [RegularPolygon](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.RegularPolygon),
 [Circle](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.Circle),
@@ -42,6 +43,7 @@ These are just some of the constructors available for the Path type.
 
 ## 3. Bezier Curves
 [![Fig2 image created with graphics2d](./doc/fig2.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig02)
+
 [Bezier curves](https://en.wikipedia.org/wiki/B%C3%A9zier_curve)
 are polynomial curves.
 Most vector packages support first, second and third order curves, lines, quadratic and cubic curves respectively.
@@ -50,6 +52,7 @@ The last example above on the right is a quartic curve.
 
 ## 4. Arcs And ArcStyles
 [![Fig3 image created with graphics3d](./doc/fig3.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig03)
+
 Various arc path constructors are available and typically take an offset start angle and a sweep angle.
 The arcs are approximated from cubic bezier curves. 
 Arcs must have a [style](https://pkg.go.dev/github.com/jphsd/graphics2d#ArcStyle)
