@@ -110,7 +110,7 @@ on the paths from running DashProc to add the arrow heads.
 
 The [TraceProc](https://pkg.go.dev/github.com/jphsd/graphics2d#TraceProc)
 path processor traces a path,
-either to the left or the right depending on the offset value supplied.
+either to the left or the right, depending on the offset value supplied.
 How path steps are joined is specified by a function that the processor calls.
 The following join functions are shown:
 [JoinButt](https://pkg.go.dev/github.com/jphsd/graphics2d#JoinButt),
@@ -126,7 +126,29 @@ This example uses `(1-t) * offset` as the offset function.
 The joins are all miter joins, implicitly.
 
 ## 10. Outlining With Stroke Path Processor
-### Cap
 [![Fig11 image created with graphics2d](./doc/fig11.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig11)
 
+The [StrokeProc](https://pkg.go.dev/github.com/jphsd/graphics2d#StrokeProc)
+is used to convert open paths to closed ones,
+since only closed paths can be filled by the renderer.
+
+A stroke is comprised of left and right trace path processors,
+and functions that defien the start and end caps of the path.
+
+This example shows the [CapButt](https://pkg.go.dev/github.com/jphsd/graphics2d#CapButt),
+[CapSquare](https://pkg.go.dev/github.com/jphsd/graphics2d#CapSquare),
+[CapRoundedSquare](https://pkg.go.dev/github.com/jphsd/graphics2d#RSCap,CapRoundedSquare),
+[CapInvRound](https://pkg.go.dev/github.com/jphsd/graphics2d#CapInvRound) and
+[CapRound](https://pkg.go.dev/github.com/jphsd/graphics2d#CapRound),
+[CapInvOval](https://pkg.go.dev/github.com/jphsd/graphics2d#OvalCap.CapInvOval) and
+[CapOval](https://pkg.go.dev/github.com/jphsd/graphics2d#OvalCap.CapOval), and
+[CapInvPoint](https://pkg.go.dev/github.com/jphsd/graphics2d#CapInvPoint) and
+[CapPoint](https://pkg.go.dev/github.com/jphsd/graphics2d#CapPoint).
+
+End caps are only used when the path is open.
+When a stroke processor is applied to a closed path,
+two paths outlines of the path are created forming an outline of the original.
+
 ### Pens
+
+A [Pen] is a convenient abstraction that
