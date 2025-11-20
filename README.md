@@ -89,17 +89,26 @@ This example uses increasing curve radii from L to R.
 
 The [golang.org/x/image/font/sfnt](https://pkg.go.dev/golang.org/x/image/font/sfnt)
 package can read in and parse TrueType and OpenType fonts.
-Strings can be turned into shapes using [StringToShape](https://pkg.go.dev/github.com/jphsd/graphics2d#StringToShape).
+Strings can be turned into shapes using a parsed font and [StringToShape](https://pkg.go.dev/github.com/jphsd/graphics2d#StringToShape).
 The shape will be in font units.
 [ScaleAndInset](https://pkg.go.dev/github.com/jphsd/graphics2d#ScaleAndInset)
 can be used to fit the result into the desired location.
+This example also uses path processors to show the control points for the font curves.
 
 ## 8. Dashing With Path Processors
 [![Fig8 image created with graphics2d](./doc/fig8.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig08)
 
+These were created from the paths in the earleir example using the [DashProc](https://pkg.go.dev/github.com/jphsd/graphics2d#DashProc)
+path processor.
+The dash patterns are {4, 2}, {8, 2, 2, 2} and {10, 4}.
+The bottom row also uses another path processor,
+[CapsProc](https://pkg.go.dev/github.com/jphsd/graphics2d#CapsProc),
+on the paths from running DashProc to add the arrow heads.
+
 ## 9. Tracing With Path Processors
-### Join
 [![Fig9 image created with graphics2d](./doc/fig9.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig09)
+
+### Join
 
 [![Fig10 image created with graphics2d](./doc/fig10.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig10)
 
