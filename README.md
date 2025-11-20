@@ -57,20 +57,32 @@ The last example on the right is a quartic curve.
 Various arc path constructors are available and typically take an start angle and a sweep angle.
 The sign of the sweep angle determines whether it goes clockwise or counter-clockwise.
 The arcs are approximated from cubic Bezier curves. 
-Arcs must have a [style](https://pkg.go.dev/github.com/jphsd/graphics2d#ArcStyle)
+Arcs must have a [ArcStyle](https://pkg.go.dev/github.com/jphsd/graphics2d#ArcStyle)
 associated with them, one of ArcOpen, ArcPie or ArcChord as shown above.
 
 ## 5. Reentrant Shapes
 [![Fig4 image created with graphics2d](./doc/fig4.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig04)
 
-Examples or different regular reentrant polygons made with [ReentrantPolygon](https://pkg.go.dev/github.com/jphsd/graphics2d#).
+Examples of different regular reentrant polygons made with [ReentrantPolygon](https://pkg.go.dev/github.com/jphsd/graphics2d#).
 The degree of reentrancy is controlled by a value in the range \[0,1) where 0 represents a regular polygon and 1,
 a polygon with no area.
 A value of 0.5 was used for these polygons.
 
 ## 6. Using Path Processors
 [![Fig5 image created with graphics2d](./doc/fig5.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig05)
+
+Paths have a [Process](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.Process)
+method that allows a [PathProcessor](https://pkg.go.dev/github.com/jphsd/graphics2d#PathProcessor)
+to be applied to a path which will generate one or more paths.
+This example shows what the effect of the [CurveProc](https://pkg.go.dev/github.com/jphsd/graphics2d#CurveProc)
+looks like applied to both a closed and an open path.
+CurveProc requires a [CurveStyle](https://pkg.go.dev/github.com/jphsd/graphics2d#CurveStyle)
+to be specified too, one of Quad, Bezier or CatmullRom (L to R in the example).
+
 [![Fig6 image created with graphics2d](./doc/fig6.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig06)
+
+Another path processor that can be used to convert curved results is [RoundedProc](https://pkg.go.dev/github.com/jphsd/graphics2d#RoundedProc).
+This example uses increasing radii from L to R.
 
 ## 7. Using Fonts
 [![Fig7 image created with graphics2d](./doc/fig7.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig07)
