@@ -166,7 +166,7 @@ A [Pen](https://pkg.go.dev/github.com/jphsd/graphics2d#Pen)
 is a convenient abstraction that ties a filler image to a path processor,
 like StrokeProc, that creates closed paths
 so that the user doesn't have to write the mechanics of outlining every time a shape is rendered.
-A predefined collection of pens is available in a variety of colors
+A predefined collection of colored pens is available
 [here](https://pkg.go.dev/github.com/jphsd/graphics2d#pkg-variables).
 
 Convenience functions that take a pen argument are:
