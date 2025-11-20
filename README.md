@@ -12,8 +12,10 @@ leverages [golang.org/x/image/vector](https://pkg.go.dev/golang.org/x/image/vect
 
 The vector package extends [image/draw](https://pkg.go.dev/image/draw) to create a mask that a source image
 is rendered through into the destination image.
-
 Graphics2D follows this convention.
+
+All the pictures and diagrams referenced in the README were created with this package.
+Clicking on one will take you to the code that created it.
 
 ### Paths
 
