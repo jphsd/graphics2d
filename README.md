@@ -87,6 +87,13 @@ This example uses increasing curve radii from L to R.
 ## 7. Using Fonts
 [![Fig7 image created with graphics2d](./doc/fig7.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig07)
 
+The [golang.org/x/image/font/sfnt](https://pkg.go.dev/golang.org/x/image/font/sfnt)
+package can read in and parse TrueType and OpenType fonts.
+Strings can be turned into shapes using [StringToShape](https://pkg.go.dev/github.com/jphsd/graphics2d#StringToShape).
+The shape will be in font units.
+[ScaleAndInset](https://pkg.go.dev/github.com/jphsd/graphics2d#ScaleAndInset)
+can be used to fit the result into the desired location.
+
 ## 8. Dashing With Path Processors
 [![Fig8 image created with graphics2d](./doc/fig8.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig08)
 
