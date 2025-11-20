@@ -63,7 +63,7 @@ associated with them, one of ArcOpen, ArcPie or ArcChord as shown above.
 ## 5. Reentrant Shapes
 [![Fig4 image created with graphics2d](./doc/fig4.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig04)
 
-Examples of different regular reentrant polygons made with [ReentrantPolygon](https://pkg.go.dev/github.com/jphsd/graphics2d#).
+Examples of different regular reentrant polygons made with [ReentrantPolygon](https://pkg.go.dev/github.com/jphsd/graphics2d#ReentrantPolygon).
 The degree of reentrancy is controlled by a value in the range \[0,1) where 0 represents a regular polygon and 1,
 a polygon with no area.
 A value of 0.5 was used for these polygons.
@@ -81,8 +81,8 @@ to be specified too, one of Quad, Bezier or CatmullRom (L to R in the example).
 
 [![Fig6 image created with graphics2d](./doc/fig6.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig06)
 
-Another path processor that can be used to convert curved results is [RoundedProc](https://pkg.go.dev/github.com/jphsd/graphics2d#RoundedProc).
-This example uses increasing radii from L to R.
+Another path processor that can be used to create curved paths is [RoundedProc](https://pkg.go.dev/github.com/jphsd/graphics2d#RoundedProc).
+This example uses increasing curve radii from L to R.
 
 ## 7. Using Fonts
 [![Fig7 image created with graphics2d](./doc/fig7.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig07)
@@ -93,8 +93,11 @@ This example uses increasing radii from L to R.
 ## 9. Tracing With Path Processors
 ### Join
 [![Fig9 image created with graphics2d](./doc/fig9.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig09)
+
 [![Fig10 image created with graphics2d](./doc/fig10.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig10)
 
 ## 10. Outlining With Stroke Path Processor
 ### Cap
 [![Fig11 image created with graphics2d](./doc/fig11.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig11)
+
+### Pens
