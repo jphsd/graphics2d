@@ -108,7 +108,7 @@ This example also uses path processors to show the control points for the font c
 ## 8. Dashing With Path Processors
 [![Fig8 image created with graphics2d](./doc/fig8.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig08)
 
-These were created from the paths in the earleir example using the [DashProc](https://pkg.go.dev/github.com/jphsd/graphics2d#DashProc)
+These were created from the paths in the earlier example using the [DashProc](https://pkg.go.dev/github.com/jphsd/graphics2d#DashProc)
 path processor.
 The dash patterns are {4, 2}, {8, 2, 2, 2} and {10, 4}.
 The bottom row also uses another path processor,
@@ -121,10 +121,10 @@ on the paths from running DashProc to add the arrow heads.
 The [TraceProc](https://pkg.go.dev/github.com/jphsd/graphics2d#TraceProc)
 path processor traces a path,
 either to the left or the right, depending on the offset value supplied.
-How path steps are joined is specified by a function that the processor calls.
-The following join functions are shown:
+How path steps are joined is specified by a join function that the processor calls.
+The following functions are shown:
 [JoinButt](https://pkg.go.dev/github.com/jphsd/graphics2d#JoinButt),
-[JoinRound](https://pkg.go.dev/github.com/jphsd/graphics2d#JoinRound),
+[JoinRound](https://pkg.go.dev/github.com/jphsd/graphics2d#JoinRound), and
 [JoinMiter](https://pkg.go.dev/github.com/jphsd/graphics2d#MiterJoin.JoinMiter).
 
 [![Fig10 image created with graphics2d](./doc/fig10.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig10)
@@ -153,7 +153,8 @@ This example shows the [CapButt](https://pkg.go.dev/github.com/jphsd/graphics2d#
 [CapInvOval](https://pkg.go.dev/github.com/jphsd/graphics2d#OvalCap.CapInvOval) and
 [CapOval](https://pkg.go.dev/github.com/jphsd/graphics2d#OvalCap.CapOval), and
 [CapInvPoint](https://pkg.go.dev/github.com/jphsd/graphics2d#CapInvPoint) and
-[CapPoint](https://pkg.go.dev/github.com/jphsd/graphics2d#CapPoint).
+[CapPoint](https://pkg.go.dev/github.com/jphsd/graphics2d#CapPoint),
+from left to right.
 
 End caps are only used when the path is open.
 When a stroke processor is applied to a closed path,
@@ -163,9 +164,10 @@ two closed paths are created forming an outline of the original.
 
 A [Pen](https://pkg.go.dev/github.com/jphsd/graphics2d#Pen)
 is a convenient abstraction that ties a filler image to a path processor,
-like the StrokeProc,
-so that the user doesn't have to write the mechanics of the stroke and call it every time a shape is rendered.
-A predefined collection of pens is available [here](https://pkg.go.dev/github.com/jphsd/graphics2d#pkg-variables).
+like StrokeProc, that creates closed paths
+so that the user doesn't have to write the mechanics of outlining every time a shape is rendered.
+A predefined collection of pens is available in a variety of colors
+[here](https://pkg.go.dev/github.com/jphsd/graphics2d#pkg-variables).
 
 Convenience functions that take a pen argument are:
 - [DrawArc](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawArc)
