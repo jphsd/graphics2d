@@ -161,6 +161,13 @@ two closed paths are created forming an outline of the original.
 
 A [Pen](https://pkg.go.dev/github.com/jphsd/graphics2d#Pen)
 is a convenient abstraction that ties a filler image to a path processor,
-like the stroke,
+like the StrokeProc,
 so that the user doesn't have to write the mechanics of the stroke and call it every time a shape is rendered.
 A predefined collection of pens is available [here](https://pkg.go.dev/github.com/jphsd/graphics2d#pkg-variables).
+
+Convenience functions that take a pen argument are:
+- [DrawArc](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawArc)
+- [DrawLine](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawLine)
+- [DrawPath](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawPath)
+- [DrawPoint](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawPoint)
+- [DrawShape](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawShape)
