@@ -108,9 +108,22 @@ on the paths from running DashProc to add the arrow heads.
 ## 9. Tracing With Path Processors
 [![Fig9 image created with graphics2d](./doc/fig9.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig09)
 
-### Join
+The [TraceProc](https://pkg.go.dev/github.com/jphsd/graphics2d#TraceProc)
+path processor traces a path,
+either to the left or the right depending on the offset value supplied.
+How path steps are joined is specified by a function that the processor calls.
+The following join functions are shown:
+[JoinButt](https://pkg.go.dev/github.com/jphsd/graphics2d#JoinButt),
+[JoinRound](https://pkg.go.dev/github.com/jphsd/graphics2d#JoinRound),
+[JoinMiter](https://pkg.go.dev/github.com/jphsd/graphics2d#MiterJoin.JoinMiter).
 
 [![Fig10 image created with graphics2d](./doc/fig10.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig10)
+
+A variable width trace path processor,
+[VWTraceProc](https://pkg.go.dev/github.com/jphsd/graphics2d#VWTraceProc),
+uses the distance along the path, t (range \[0,1\]), to figure the current offset of the trace.
+This example uses `(1-t) * offset` as the offset function.
+The joins are all miter joins, implicitly.
 
 ## 10. Outlining With Stroke Path Processor
 ### Cap
