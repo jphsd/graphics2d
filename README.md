@@ -83,7 +83,7 @@ A value of 0.5 was used for these polygons.
 
 Paths have a [Process](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.Process)
 method that allows a [PathProcessor](https://pkg.go.dev/github.com/jphsd/graphics2d#PathProcessor)
-to be applied to a path which will generate one or more paths.
+to be applied to it which will generate one or more new paths.
 This example shows what the effect of the [CurveProc](https://pkg.go.dev/github.com/jphsd/graphics2d#CurveProc)
 looks like applied to both a closed and an open path.
 CurveProc requires a [CurveStyle](https://pkg.go.dev/github.com/jphsd/graphics2d#CurveStyle)
