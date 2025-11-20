@@ -14,7 +14,7 @@ The vector package extends [image/draw](https://pkg.go.dev/image/draw) to create
 is rendered through into the destination image.
 Graphics2D follows this convention.
 
-All the pictures and diagrams referenced in the README were created with this package.
+All the pictures and diagrams referenced in this README were created with this package.
 Clicking on one will take you to the code that created it.
 
 ### Paths
@@ -36,7 +36,7 @@ For example, the figure 8 is composed of three paths; its outline, and the two h
 
 ### Rendering
 
-Shapes are rendered to an image using a source filler image and the mask generated from the shape,
+Shapes are rendered to an image using a source filler image and the mask generated from the shape by
 [RenderShape](https://pkg.go.dev/github.com/jphsd/graphics2d#RenderShape).
 If the filler is all one color,
 then [RenderColoredShape](https://pkg.go.dev/github.com/jphsd/graphics2d#RenderColoredShape)
