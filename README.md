@@ -27,12 +27,13 @@ The path methods [LineTo](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.Li
 and [CurveTo](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.CurveTo)
 are just synonyms for [AddStep](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.AddStep).
 Once created, a path can be left as is (open), or closed [Close](https://pkg.go.dev/github.com/jphsd/graphics2d#Path).
-A closed path can no longer be extended and a line is created from the first point in the path to its last.
+A closed path can no longer be extended and a line is automatically created from
+the first point in the path to its last.
 
 ### Shapes
 
 Shapes allow multiple paths to be combined to produce more complex drawings.
-For example, the figure 8 is composed of three paths; its outline, and the two holes in it.
+For example, the figure 8 is composed of three paths; its external outline, and the two holes in it.
 
 ### Rendering
 
@@ -64,10 +65,10 @@ The last example on the right is a quartic curve.
 ## 4. Arcs And ArcStyles
 [![Fig3 image created with graphics3d](./doc/fig3.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig03)
 
-Various arc path constructors are available and typically take an start angle and a sweep angle.
+Various arc path constructors are available and typically take a start angle and a sweep angle.
 The sign of the sweep angle determines whether it goes clockwise or counter-clockwise.
 The arcs are approximated from cubic Bezier curves. 
-Arcs must have a [ArcStyle](https://pkg.go.dev/github.com/jphsd/graphics2d#ArcStyle)
+Arcs must have an [ArcStyle](https://pkg.go.dev/github.com/jphsd/graphics2d#ArcStyle)
 associated with them, one of ArcOpen, ArcPie or ArcChord as shown above.
 
 ## 5. Reentrant Shapes
@@ -83,9 +84,9 @@ A value of 0.5 was used for these polygons.
 
 Paths have a [Process](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.Process)
 method that allows a [PathProcessor](https://pkg.go.dev/github.com/jphsd/graphics2d#PathProcessor)
-to be applied to it which will generate one or more new paths.
+to be applied to them which will generate one or more new paths.
 This example shows what the effect of the [CurveProc](https://pkg.go.dev/github.com/jphsd/graphics2d#CurveProc)
-looks like applied to both a closed and an open path.
+looks like applied to both a closed and an open path made up of multiple line segments.
 CurveProc requires a [CurveStyle](https://pkg.go.dev/github.com/jphsd/graphics2d#CurveStyle)
 to be specified too, one of Quad, Bezier or CatmullRom (L to R in the example).
 
@@ -93,6 +94,9 @@ to be specified too, one of Quad, Bezier or CatmullRom (L to R in the example).
 
 Another path processor that can be used to create curved paths is [RoundedProc](https://pkg.go.dev/github.com/jphsd/graphics2d#RoundedProc).
 This example uses increasing curve radii from L to R.
+
+Shapes have a similar function [ProcessPaths](https://pkg.go.dev/github.com/jphsd/graphics2d#Shape.ProcessPaths)
+which runs a path processor over all of the paths in a shape.
 
 ## 7. Using Fonts
 [![Fig7 image created with graphics2d](./doc/fig7.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig07)
@@ -102,7 +106,7 @@ package can read in and parse TrueType and OpenType fonts.
 Strings can be turned into shapes using a parsed font and [StringToShape](https://pkg.go.dev/github.com/jphsd/graphics2d#StringToShape).
 The shape will be in font units.
 [ScaleAndInset](https://pkg.go.dev/github.com/jphsd/graphics2d#ScaleAndInset)
-can be used to fit the result into the desired location.
+can be used to fit the result to the desired location.
 This example also uses path processors to show the control points for the font curves.
 
 ## 8. Dashing With Path Processors
@@ -113,14 +117,14 @@ path processor.
 The dash patterns are {4, 2}, {8, 2, 2, 2} and {10, 4}.
 The bottom row also uses another path processor,
 [CapsProc](https://pkg.go.dev/github.com/jphsd/graphics2d#CapsProc),
-on the paths from running DashProc to add the arrow heads.
+on the paths, from running DashProc, to add the arrow heads.
 
 ## 9. Tracing With Path Processors
 [![Fig9 image created with graphics2d](./doc/fig9.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig09)
 
 The [TraceProc](https://pkg.go.dev/github.com/jphsd/graphics2d#TraceProc)
 path processor traces a path,
-either to the left or the right, depending on the offset value supplied.
+either to the left or the right of the original, depending on the offset value supplied.
 How path steps are joined is specified by a join function that the processor calls.
 The following functions are shown:
 [JoinButt](https://pkg.go.dev/github.com/jphsd/graphics2d#JoinButt),
