@@ -424,9 +424,8 @@ func Lune(c []float64, r0, r1, r2, th float64) *Path {
 
 	p1.Concatenate(p2)
 	p1.Close()
-	xfm := NewAff3()
-	xfm.RotateAbout(th, c[0], c[1])
-	p1 = p1.Process(&TransformProc{xfm})[0]
+	xfm := RotateAbout(th, c[0], c[1])
+	p1 = p1.Process(xfm)[0]
 	return p1
 }
 

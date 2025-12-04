@@ -40,7 +40,7 @@ func (rp RoundedEdgeProc) Process(p *Path) []*Path {
 			cp := []float64{mpx, mpy}
 			cpath = EllipticalArc(cp, l/2, ry, Pi, ang, 0, ArcOpen)
 			xfm := RotateAbout(th, mpx, mpy)
-			cpath = cpath.Process(&TransformProc{xfm})[0]
+			cpath = cpath.Process(xfm)[0]
 		} else {
 			cm := []float64{mpx + nx*d, mpy + ny*d}
 			cpath = ArcFromPoints(cs, cm, ce, ArcOpen)

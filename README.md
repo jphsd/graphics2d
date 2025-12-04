@@ -117,7 +117,7 @@ path processor.
 The dash patterns are {4, 2}, {8, 2, 2, 2} and {10, 4}.
 The bottom row also uses another path processor,
 [CapsProc](https://pkg.go.dev/github.com/jphsd/graphics2d#CapsProc),
-on the paths, from running DashProc, to add the arrow heads.
+on the paths from running DashProc, to add the arrow heads.
 
 ## 9. Tracing With Path Processors
 [![Fig9 image created with graphics2d](./doc/fig9.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig09)
@@ -183,11 +183,10 @@ Convenience functions that take a pen argument are:
 ## 11. Gradients
 [![Fig12 image created with graphics2d](./doc/fig12.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig12)
 
-Gradients aren't strictly part of the graphics2d package since what's used to fill a shape just comes
-from a regular image.
-Gradient images can be created using the [texture](https://pkg.go.dev/github.com/jphsd/texture) package as shown here.
-The texture package supports linear, radial and conic gradients with convenience functions for both gray scale and
-RGBA images.
+Gradients aren't strictly part of the graphics2d package since what's used to fill a shape is just an image.
+Gradient images can be created using the [texture](https://pkg.go.dev/github.com/jphsd/texture) package.
+This package supports linear, radial, elliptical and conic gradients with convenience functions for gray scale
+and RGBA images.
 The gradients can be set to repeat and to mirror.
 The RGBA gradients are just [Colorizer](https://pkg.go.dev/github.com/jphsd/graphics2d/image#Colorizer)
 wrappers around their Gray16 counterparts,
@@ -196,7 +195,9 @@ allowing for multiple color stops in the gradient.
 Here is the complete list of gradient image functions:
 - [NewLinearGray16](https://pkg.go.dev/github.com/jphsd/texture#NewLinearGray16)
 - [NewRadialGray16](https://pkg.go.dev/github.com/jphsd/texture#NewRadialGray16)
+- [NewEllipticalGray16](https://pkg.go.dev/github.com/jphsd/texture#NewEllipticalGray16)
 - [NewConicGray16](https://pkg.go.dev/github.com/jphsd/texture#NewConicGray16)
 - [NewLinearRGBA](https://pkg.go.dev/github.com/jphsd/texture#NewLinearRGBA)
 - [NewRadialRGBA](https://pkg.go.dev/github.com/jphsd/texture#NewRadialRGBA)
+- [NewEllipticalRGBA](https://pkg.go.dev/github.com/jphsd/texture#NewEllipticalRGBA)
 - [NewConicRGBA](https://pkg.go.dev/github.com/jphsd/texture#NewConicRGBA)

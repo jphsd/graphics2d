@@ -305,9 +305,8 @@ func LineTransform(x1, y1, x2, y2, x1p, y1p, x2p, y2p float64) *Aff3 {
 	dx, dy, dxp, dyp := x2-x1, y2-y1, x2p-x1p, y2p-y1p
 	th := math.Atan2(dyp, dxp) - math.Atan2(dy, dx)
 	s := math.Hypot(dxp, dyp) / math.Hypot(dx, dy)
-	xfm := NewAff3()
 	// Reverse order
-	xfm.RotateAbout(th, x1p, y1p)
+	xfm := RotateAbout(th, x1p, y1p)
 	xfm.ScaleAbout(s, s, x1p, y1p)
 	xfm.Translate(ox, oy)
 	return xfm
@@ -321,9 +320,8 @@ func BoxTransform(x1, y1, x2, y2, h, x1p, y1p, x2p, y2p, hp float64) *Aff3 {
 	dx, dy, dxp, dyp := x2-x1, y2-y1, x2p-x1p, y2p-y1p
 	th := math.Atan2(dyp, dxp) - math.Atan2(dy, dx)
 	s := math.Hypot(dxp, dyp) / math.Hypot(dx, dy)
-	xfm := NewAff3()
 	// Reverse order
-	xfm.RotateAbout(th, x1p, y1p)
+	xfm := RotateAbout(th, x1p, y1p)
 	xfm.ScaleAbout(s, hp/h, x1p, y1p)
 	xfm.Translate(ox, oy)
 	return xfm
@@ -332,9 +330,8 @@ func BoxTransform(x1, y1, x2, y2, h, x1p, y1p, x2p, y2p, hp float64) *Aff3 {
 // BBTransform produces an affine transform that maps bounding box bb1 to bb2.
 func BBTransform(bb1, bb2 [][]float64) *Aff3 {
 	dx, dy := bb2[0][0]-bb1[0][0], bb2[0][1]-bb1[0][1]
-	xfm := NewAff3()
 	// Reverse order
-	xfm.Translate(dx, dy)
+	xfm := Translate(dx, dy)
 	dx1, dy1, dx2, dy2 := bb1[1][0]-bb1[0][0], bb1[1][1]-bb1[0][1], bb2[1][0]-bb2[0][0], bb2[1][1]-bb2[0][1]
 	sx, sy := dx2/dx1, dy2/dy1
 	xfm.ScaleAbout(sx, sy, bb1[0][0], bb1[0][1])
@@ -344,8 +341,7 @@ func BBTransform(bb1, bb2 [][]float64) *Aff3 {
 // CreateAffineTransform returns an affine transform that performs the requested translation,
 // scaling and rotation based on {0, 0}.
 func CreateAffineTransform(x, y, scale, rotation float64) *Aff3 {
-	xfm := NewAff3()
-	xfm.Translate(x, y)
+	xfm := Translate(x, y)
 	xfm.Scale(scale, scale)
 	xfm.Rotate(rotation)
 	return xfm
@@ -381,9 +377,8 @@ func ScaleAndInset(width, height, iwidth, iheight float64, fix bool, bb [][]floa
 	w := width - 2*iwidth
 	h := height - 2*iheight
 
-	xfm := NewAff3()
 	// Reverse order
-	xfm.Translate(width/2, height/2)
+	xfm := Translate(width/2, height/2)
 	if fix {
 		s := dx
 		if dy > s {
@@ -401,9 +396,8 @@ func ScaleAndInset(width, height, iwidth, iheight float64, fix bool, bb [][]floa
 // FlipY is a convenience function to create an affine transform that has +ve Y point up rather than down.
 func FlipY(height float64) *Aff3 {
 	yoffs := height / 2
-	xfm := NewAff3()
 	// Reverse order
-	xfm.Translate(0, yoffs)
+	xfm := Translate(0, yoffs)
 	xfm.Scale(1, -1)
 	xfm.Translate(0, -yoffs)
 	return xfm

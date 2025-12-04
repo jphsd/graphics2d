@@ -14,13 +14,12 @@ func Ellipse(c []float64, rx, ry, xang float64) *Path {
 	ax, ay := c[0], c[1]
 	np := PartsToPath(MakeArcParts(ax, ay, rx, 0, TwoPi)...)
 	np.Close()
-	xfm := NewAff3()
 	// Reverse order
-	xfm.Translate(ax, ay)
+	xfm := Translate(ax, ay)
 	xfm.Rotate(xang)
 	xfm.Scale(1, ry/rx)
 	xfm.Translate(-ax, -ay)
-	return np.Process(&TransformProc{xfm})[0]
+	return np.Process(xfm)[0]
 }
 
 // EllipseFromPoints returns a path describing the smallest ellipse containing points p1 and p2.
@@ -44,8 +43,7 @@ func EllipseFromPoints(p1, p2, c []float64) *Path {
 
 	// Transform p1, p2 and c so that c is at the origin and p1 lies on the x axis.
 	// Figure rx and ry from the transformed points.
-	xfm := NewAff3()
-	xfm.Rotate(-xang)
+	xfm := Rotate(-xang)
 	xfm.Translate(-c[0], -c[1])
 	pts := xfm.Apply(p1, p2, c)
 	rx := pts[0][0]
@@ -66,8 +64,7 @@ func EllipticalArc(c []float64, rx, ry, offs, ang, xang float64, s ArcStyle) *Pa
 	// Angle conversion from elliptical space to circular: offs -> toffs, ang -> tang,
 	// by generating points on unit circle for start and end, transforming them and finding
 	// the new angles.
-	xfm := NewAff3()
-	xfm.Scale(1, rx/ry) // vs inverting the other
+	xfm := Scale(1, rx/ry) // vs inverting the other
 
 	offs -= xang
 	sx, sy := math.Cos(offs), math.Sin(offs)
@@ -94,12 +91,11 @@ func EllipticalArc(c []float64, rx, ry, offs, ang, xang float64, s ArcStyle) *Pa
 	}
 
 	// Turn circle into rotated ellipse
-	xfm = NewAff3()
-	xfm.Translate(c[0], c[1])
+	xfm = Translate(c[0], c[1])
 	xfm.Rotate(xang)
 	xfm.Scale(1, ry/rx)
 
-	return np.Process(&TransformProc{xfm})[0]
+	return np.Process(xfm)[0]
 }
 
 // EllipticalArcFromPoint returns a path describing an ellipse arc from a point. The ratio of rx to ry
@@ -110,8 +106,7 @@ func EllipticalArcFromPoint(pt, c []float64, rxy, ang, xang float64, s ArcStyle)
 	offs := math.Atan2(dy, dx)
 
 	// calc rx and ry from pt and rxy
-	xfm := NewAff3()
-	xfm.Rotate(-xang)
+	xfm := Rotate(-xang)
 	xfm.Translate(-c[0], -c[1])
 	pts := xfm.Apply(pt)
 	dx, dy = pts[0][0], pts[0][1]
@@ -160,8 +155,7 @@ func EllipticalArcFromPoints(p1, p2, c []float64, s ArcStyle) *Path {
 	}
 
 	// Transform p1, p2 and c so that c is at the origin and p1 lies on the x axis
-	xfm := NewAff3()
-	xfm.Rotate(-xang)
+	xfm := Rotate(-xang)
 	xfm.Translate(-c[0], -c[1])
 	pts := xfm.Apply(p1, p2, c)
 	rx := pts[0][0]
@@ -269,11 +263,10 @@ func IrregularEllipse(c []float64, rx1, rx2, ry1, ry2, disp, xang float64) *Path
 	parts = append(parts, EllipticalArc([]float64{dx, 0}, rxx1, ry2, offs, ang, 0, ArcOpen).Parts()...)
 
 	// Move to c and rotate by xang
-	xfm := NewAff3()
-	xfm.Translate(c[0], c[1])
+	xfm := Translate(c[0], c[1])
 	xfm.Rotate(xang)
 
-	path := PartsToPath(parts...).Process(&TransformProc{xfm})[0]
+	path := PartsToPath(parts...).Process(xfm)[0]
 	path.Close()
 	return path
 }

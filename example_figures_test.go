@@ -10,7 +10,7 @@ import (
 	"golang.org/x/image/font/sfnt"
 )
 
-// Example_fig01 generates a series of outlined regular shapes.
+// Generates a series of outlined regular shapes.
 func Example_fig01() {
 	paths := []*g2d.Path{
 		g2d.Line([]float64{20, 20}, []float64{130, 130}),
@@ -31,7 +31,7 @@ func Example_fig01() {
 	// Output: See fig1.png
 }
 
-// Example_fig02 generates a series of Bezier curves of increasing order.
+// Generates a series of Bezier curves of increasing order.
 func Example_fig02() {
 	// Create curves of order 2, 3 and 4
 	quad := g2d.NewPath([]float64{175, 25})
@@ -67,7 +67,7 @@ func Example_fig02() {
 	// Output: See fig2.png
 }
 
-// Example_fig03 generates arcs with different [ArcStyle]
+// Generates arcs with different [ArcStyle]
 func Example_fig03() {
 	// Arcs
 	paths := []*g2d.Path{
@@ -105,7 +105,7 @@ func Example_fig03() {
 	// Output: See fig3.png
 }
 
-// Example_fig04 generates a series of reentrant shapes.
+// Generates a series of reentrant shapes.
 func Example_fig04() {
 	shape := g2d.NewShape(g2d.ReentrantPolygon([]float64{100, 100}, 90, 3, 0.5, 0))
 	shape.AddPaths(g2d.ReentrantPolygon([]float64{300, 100}, 90, 4, 0.5, 0))
@@ -121,7 +121,7 @@ func Example_fig04() {
 	// Output: See fig4.png
 }
 
-// Example_fig05 displays the different CurveProc path processor styles.
+// Displays the different CurveProc path processor styles.
 func Example_fig05() {
 	// A closed and open path
 	closed := g2d.ReentrantPolygon([]float64{100, 100}, 90, 5, 0.5, 0)
@@ -160,7 +160,7 @@ func Example_fig05() {
 	// Output: See fig5.png
 }
 
-// Example_fig06 displays the RoundedProc path processor with different radii.
+// Displays the RoundedProc path processor with different radii.
 func Example_fig06() {
 	// A closed and open path
 	closed := g2d.ReentrantPolygon([]float64{100, 100}, 90, 5, 0.5, 0)
@@ -199,7 +199,7 @@ func Example_fig06() {
 	// Output: See fig6.png
 }
 
-// Example_fig07 creates a string from a font file and displays the control points too.
+// Creates a string from a font file and displays the control points too.
 func Example_fig07() {
 	// Load font and create shapes
 	ttf, err := sfnt.Parse(goitalic.TTF)
@@ -241,7 +241,7 @@ func Example_fig07() {
 	// Output: See fig7.png
 }
 
-// Example_fig08 generates a series of regular shapes with dashed outlines.
+// Generates a series of regular shapes with dashed outlines.
 func Example_fig08() {
 	paths := []*g2d.Path{
 		g2d.Line([]float64{20, 20}, []float64{130, 130}),
@@ -280,7 +280,7 @@ func Example_fig08() {
 	// Output: See fig8.png
 }
 
-// Example_fig09 generates a series of path traces using different join functions.
+// Generates a series of path traces using different join functions.
 func Example_fig09() {
 	path := g2d.PolyLine(
 		[]float64{20, 50},
@@ -315,7 +315,7 @@ func Example_fig09() {
 	// Output: See fig9.png
 }
 
-// Example_fig10 generates a variable width trace of a path.
+// Generates a variable width trace of a path.
 func Example_fig10() {
 	// Line, MPD it, round it - a wriggle
 	path := g2d.Line([]float64{30, 150}, []float64{530, 150})
@@ -341,7 +341,7 @@ func Example_fig10() {
 	// Output: See fig10.png
 }
 
-// Example_fig11 demonstrates the variety of stroke end caps.
+// Demonstrates the variety of stroke end caps.
 func Example_fig11() {
 	img := image.NewRGBA(900, 300, color.White)
 
@@ -406,9 +406,9 @@ func Example_fig11() {
 	// Output: See fig11.png
 }
 
-// Example_fig12 demonstrates the different gradient types, linear, radial and conic.
+// Demonstrates the different gradient types: linear, radial, elliptical and conic.
 func Example_fig12() {
-	width, height := 900, 300
+	width, height := 1200, 300
 
 	shape1 := g2d.NewShape(g2d.Circle([]float64{150, 150}, 100))
 	filler1 := texture.NewLinearRGBA(width, height,
@@ -423,19 +423,28 @@ func Example_fig12() {
 		texture.NewNLLinear(),
 		false, false)
 	shape3 := g2d.NewShape(g2d.Circle([]float64{750, 150}, 100))
-	filler3 := texture.NewConicRGBA(width, height,
-		[]float64{750, 150}, 0,
+	filler3 := texture.NewEllipticalRGBA(width, height,
+		[]float64{750, 150},
+		100, 50, g2d.Pi/4,
 		color.Red, color.Green,
+		texture.NewNLLinear(),
+		true, false)
+	shape4 := g2d.NewShape(g2d.Circle([]float64{1050, 150}, 100))
+	filler4 := texture.NewConicRGBA(width, height,
+		[]float64{1050, 150}, 0,
+		color.Green, color.Red,
 		texture.NewNLLinear())
 
 	img := image.NewRGBA(width, height, color.White)
-	g2d.RenderShape(img, shape1, filler1)
 	pen := g2d.NewPen(color.Black, 3)
+	g2d.RenderShape(img, shape1, filler1)
 	g2d.DrawShape(img, shape1, pen)
 	g2d.RenderShape(img, shape2, filler2)
 	g2d.DrawShape(img, shape2, pen)
 	g2d.RenderShape(img, shape3, filler3)
 	g2d.DrawShape(img, shape3, pen)
+	g2d.RenderShape(img, shape4, filler4)
+	g2d.DrawShape(img, shape4, pen)
 	image.SaveImage(img, "fig12")
 	fmt.Printf("See fig12.png")
 	// Output: See fig12.png
