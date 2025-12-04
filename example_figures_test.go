@@ -5,6 +5,7 @@ import (
 	g2d "github.com/jphsd/graphics2d"
 	"github.com/jphsd/graphics2d/color"
 	"github.com/jphsd/graphics2d/image"
+	"github.com/jphsd/texture"
 	"golang.org/x/image/font/gofont/goitalic"
 	"golang.org/x/image/font/sfnt"
 )
@@ -403,4 +404,39 @@ func Example_fig11() {
 	image.SaveImage(img, "fig11")
 	fmt.Printf("See fig11.png")
 	// Output: See fig11.png
+}
+
+// Example_fig12 demonstrates the different gradient types, linear, radial and conic.
+func Example_fig12() {
+	width, height := 900, 300
+
+	shape1 := g2d.NewShape(g2d.Circle([]float64{150, 150}, 100))
+	filler1 := texture.NewLinearRGBA(width, height,
+		[]float64{50, 150}, []float64{250, 150},
+		color.Green, color.Red,
+		texture.NewNLLinear(),
+		false, false)
+	shape2 := g2d.NewShape(g2d.Circle([]float64{450, 150}, 100))
+	filler2 := texture.NewRadialRGBA(width, height,
+		[]float64{450, 150}, 100,
+		color.Red, color.Green,
+		texture.NewNLLinear(),
+		false, false)
+	shape3 := g2d.NewShape(g2d.Circle([]float64{750, 150}, 100))
+	filler3 := texture.NewConicRGBA(width, height,
+		[]float64{750, 150}, 0,
+		color.Red, color.Green,
+		texture.NewNLLinear())
+
+	img := image.NewRGBA(width, height, color.White)
+	g2d.RenderShape(img, shape1, filler1)
+	pen := g2d.NewPen(color.Black, 3)
+	g2d.DrawShape(img, shape1, pen)
+	g2d.RenderShape(img, shape2, filler2)
+	g2d.DrawShape(img, shape2, pen)
+	g2d.RenderShape(img, shape3, filler3)
+	g2d.DrawShape(img, shape3, pen)
+	image.SaveImage(img, "fig12")
+	fmt.Printf("See fig12.png")
+	// Output: See fig12.png
 }

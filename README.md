@@ -179,3 +179,24 @@ Convenience functions that take a pen argument are:
 - [DrawPath](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawPath)
 - [DrawPoint](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawPoint)
 - [DrawShape](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawShape)
+
+## 11. Gradients
+[![Fig12 image created with graphics2d](./doc/fig12.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig12)
+
+Gradients aren't strictly part of the graphics2d package since what's used to fill a shape just comes
+from a regular image.
+Gradient images can be created using the [texture](https://pkg.go.dev/github.com/jphsd/texture) package as shown here.
+The texture package supports linear, radial and conic gradients with convenience functions for both gray scale and
+RGBA images.
+The gradients can be set to repeat and to mirror.
+The RGBA gradients are just [Colorizer](https://pkg.go.dev/github.com/jphsd/graphics2d/image#Colorizer)
+wrappers around their Gray16 counterparts,
+allowing for multiple color stops in the gradient.
+
+Here is the complete list of gradient image functions:
+- [NewLinearGray16](https://pkg.go.dev/github.com/jphsd/texture#NewLinearGray16)
+- [NewRadialGray16](https://pkg.go.dev/github.com/jphsd/texture#NewRadialGray16)
+- [NewConicGray16](https://pkg.go.dev/github.com/jphsd/texture#NewConicGray16)
+- [NewLinearRGBA](https://pkg.go.dev/github.com/jphsd/texture#NewLinearRGBA)
+- [NewRadialRGBA](https://pkg.go.dev/github.com/jphsd/texture#NewRadialRGBA)
+- [NewConicRGBA](https://pkg.go.dev/github.com/jphsd/texture#NewConicRGBA)
