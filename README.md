@@ -192,7 +192,7 @@ The RGBA gradients are just [Colorizer](https://pkg.go.dev/github.com/jphsd/grap
 wrappers around their Gray16 counterparts,
 allowing for multiple color stops in the gradient.
 
-Here is the complete list of gradient image functions:
+List of gradient image functions:
 - [NewLinearGray16](https://pkg.go.dev/github.com/jphsd/texture#NewLinearGray16)
 - [NewRadialGray16](https://pkg.go.dev/github.com/jphsd/texture#NewRadialGray16)
 - [NewEllipticalGray16](https://pkg.go.dev/github.com/jphsd/texture#NewEllipticalGray16)
