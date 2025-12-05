@@ -7,7 +7,7 @@ import (
 	"github.com/jphsd/graphics2d/image"
 )
 
-// An example using EllipticalArc to create a logo
+// Demonstrates using EllipticalArc to create a logo
 func ExampleEllipticalArc() {
 	width, height := 400, 400
 
