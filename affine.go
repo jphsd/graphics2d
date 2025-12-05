@@ -347,29 +347,9 @@ func CreateAffineTransform(x, y, scale, rotation float64) *Aff3 {
 	return xfm
 }
 
-// Apply implements the Transform interface.
-func (a *Aff3) Apply(pts ...[]float64) [][]float64 {
-	npts := make([][]float64, len(pts))
-	for i, pt := range pts {
-		d := len(pt)
-		npt := make([]float64, d)
-		x, y := pt[0], pt[1]
-		// x' = a[3*0+0]*x + a[3*0+1]*y + a[3*0+2]
-		// y' = a[3*1+0]*x + a[3*1+1]*y + a[3*1+2]
-		npt[0] = a[0]*x + a[1]*y + a[2]
-		npt[1] = a[3]*x + a[4]*y + a[5]
-		// Preserve other values
-		for i := 2; i < d; i++ {
-			npt[i] = pt[i]
-		}
-		npts[i] = npt
-	}
-	return npts
-}
-
 // ScaleAndInset produces an affine transform that will scale and translate a set of points bounded by bb so they
 // fit inside the inset box described by width, height, iwidth, iheight located at {0, 0}.
-// If fix is true then the aspect ratio is maintained.
+// If fix is true then the aspect ratio of bb is maintained.
 func ScaleAndInset(width, height, iwidth, iheight float64, fix bool, bb [][]float64) *Aff3 {
 	ox, oy := bb[0][0], bb[0][1]
 	dx, dy := bb[1][0]-ox, bb[1][1]-oy
@@ -401,6 +381,26 @@ func FlipY(height float64) *Aff3 {
 	xfm.Scale(1, -1)
 	xfm.Translate(0, -yoffs)
 	return xfm
+}
+
+// Apply implements the Transform interface.
+func (a *Aff3) Apply(pts ...[]float64) [][]float64 {
+	npts := make([][]float64, len(pts))
+	for i, pt := range pts {
+		d := len(pt)
+		npt := make([]float64, d)
+		x, y := pt[0], pt[1]
+		// x' = a[3*0+0]*x + a[3*0+1]*y + a[3*0+2]
+		// y' = a[3*1+0]*x + a[3*1+1]*y + a[3*1+2]
+		npt[0] = a[0]*x + a[1]*y + a[2]
+		npt[1] = a[3]*x + a[4]*y + a[5]
+		// Preserve other values
+		for i := 2; i < d; i++ {
+			npt[i] = pt[i]
+		}
+		npts[i] = npt
+	}
+	return npts
 }
 
 // Process implements the PathProcessor interface.
