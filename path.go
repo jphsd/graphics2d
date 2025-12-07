@@ -116,6 +116,18 @@ func (p *Path) ArcTo(p1, p2 []float64, r float64) *Path {
 	return p
 }
 
+// Current returns the last point in the path.
+func (p *Path) Current() []float64 {
+	var pt []float64
+	if p.closed {
+		pt = p.steps[0][0]
+	} else {
+		last := p.steps[len(p.steps)-1]
+		pt = last[len(last)-1]
+	}
+	return []float64{pt[0], pt[1]}
+}
+
 // Concatenate adds the paths to this path. If any path is closed then an error
 // is returned. If the paths aren't coincident, then they are joined with a line.
 func (p *Path) Concatenate(paths ...*Path) error {

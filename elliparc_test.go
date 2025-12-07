@@ -20,9 +20,7 @@ func ExampleEllipticalArc() {
 	path3 := g2d.EllipticalArc(c, r, r*rxy, g2d.Pi, -g2d.TwoPi*0.7, 0, g2d.ArcOpen)
 	p1 := []float64{c[0] - r, c[1]}
 	// Pull p2 from path3
-	steps := path3.Steps()
-	last := steps[len(steps)-1]
-	p2 := last[len(last)-1]
+	p2 := path3.Current()
 	r2 := r * 0.85
 	path4 := g2d.EllipticalArcFromPoints2(p1, p2, r2, r2*rxy, 0, true, false, g2d.ArcOpen)
 
