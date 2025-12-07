@@ -35,7 +35,7 @@ func DrawEye(img *stdimg.RGBA, offs []float64) {
 	iris.AddPaths(g2d.Circle([]float64{offs[0] + 10, offs[1] + 10}, 5).Reverse())
 	xfm := g2d.NewAff3()
 	xfm.Translate(-25, 25)
-	eye2 := iris.Transform(xfm)
+	eye2 := iris.ProcessPaths(xfm)
 	g2d.RenderColoredShape(img, eye2, color.Black)
 }
 
@@ -49,7 +49,7 @@ func DrawTeeth(img *stdimg.RGBA, offs []float64) {
 	// Use a transform to draw the second tooth using the first
 	xfm := g2d.NewAff3()
 	xfm.Translate(20, 0)
-	tooth = tooth.Transform(xfm)
+	tooth = tooth.ProcessPaths(xfm)
 	g2d.RenderColoredShape(img, tooth, color.White)
 	g2d.DrawShape(img, tooth, g2d.BlackPen)
 }

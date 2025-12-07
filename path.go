@@ -135,14 +135,16 @@ func (p *Path) Concatenate(paths ...*Path) error {
 		return fmt.Errorf("path is closed, adding a step is forbidden")
 	}
 	for _, path := range paths {
-		if path.closed {
+		if path != nil && path.closed {
 			return fmt.Errorf("can't add a closed path")
 		}
 	}
 
-	lstep := p.steps[len(p.steps)-1]
-	last := lstep[len(lstep)-1]
 	for _, path := range paths {
+		if path == nil {
+			continue
+		}
+		last := p.Current()
 		steps := path.Steps()
 		if util.EqualsP(last, steps[0][0]) {
 			// End of p is coincident with sep[0][0] of path
@@ -155,8 +157,6 @@ func (p *Path) Concatenate(paths ...*Path) error {
 				p.AddStep(step...)
 			}
 		}
-		lstep = steps[len(steps)-1]
-		last = lstep[len(lstep)-1]
 	}
 	return nil
 }
@@ -164,7 +164,7 @@ func (p *Path) Concatenate(paths ...*Path) error {
 // ConcatenatePaths concatenates all the paths into a new path. If any path is closed then an error
 // is returned. If the paths aren't coincident, then they are joined with a line.
 func ConcatenatePaths(paths ...*Path) (*Path, error) {
-	if len(paths) == 0 {
+	if len(paths) == 0 || paths[0] == nil {
 		return nil, nil
 	}
 

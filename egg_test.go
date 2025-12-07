@@ -20,7 +20,7 @@ func ExampleEgg() {
 	t := dt
 	shape := &g2d.Shape{}
 	for range n {
-		path := g2d.Egg(c, 100, 200, t, 0)
+		path := g2d.Egg(c, 120, 200, t, 0)
 		pbb := path.BoundingBox()
 		// Fix pbb width
 		pbb[0][0] = -100
