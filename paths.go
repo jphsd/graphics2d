@@ -440,6 +440,62 @@ func Lune2(p1, p2 []float64, r1, r2 float64) *Path {
 	return Lune([]float64{p1[0] + dx/2, p1[1] + dy/2}, d/2, r1, r2, th)
 }
 
+// Lune3 returns a closed path made up of the two arcs created at the intersection of circles
+// c1,r1 and c2/r2.
+// If they don't intesect or if one circle is fully contained in the other, nil is returned.
+// The arc selected is determined by the sign of the radius: +ve major; -ve minor.
+func Lune3(c1 []float64, r1 float64, c2 []float64, r2 float64) *Path {
+	dx, dy := c2[0]-c1[0], c2[1]-c1[1]
+	d2 := dx*dx + dy*dy
+	d := math.Sqrt(d2)
+
+	ar1, ar2 := r1, r2
+	if ar1 < 0 {
+		ar1 = -ar1
+	}
+	if ar2 < 0 {
+		ar2 = -ar2
+	}
+
+	if ar1+ar2 < d || d+ar1 < ar2 || d+ar2 < ar1 {
+		// Circles don't intersect
+		return nil
+	}
+
+	th := math.Atan2(dy, dx)
+
+	// Use cosine rule to figure half angles
+	r12, r22 := r1*r1, r2*r2
+	ca1 := (d2 + r12 - r22) / (2 * d * ar1)
+	ca2 := (d2 + r22 - r12) / (2 * d * ar2)
+	a1 := math.Acos(ca1)
+	a2 := math.Acos(ca2)
+
+	min1 := a1 * 2
+	maj1 := TwoPi - min1
+	var s1 float64
+	if r1 < 0 {
+		s1 = -min1
+	} else {
+		s1 = maj1
+	}
+	arc1 := Arc(c1, ar1, a1+th, s1, ArcOpen)
+
+	min2 := a2 * 2
+	maj2 := TwoPi - min2
+	var s2 float64
+	if r2 < 0 {
+		s2 = -min2
+	} else {
+		s2 = maj2
+	}
+	arc2 := ArcFromPoint(arc1.Current(), c2, s2, ArcOpen)
+
+	arc1.Concatenate(arc2)
+	arc1.Close()
+	return arc1
+}
+
 // Rectangle returns a closed path describing a rectangle with sides w and h, centered on c.
 func Rectangle(c []float64, w, h float64) *Path {
 	hw, hh := w/2, h/2
