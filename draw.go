@@ -29,22 +29,22 @@ func DrawPath(dst draw.Image, path *Path, pen *Pen) {
 
 // DrawShape renders a shape with the pen into the destination image.
 func DrawShape(dst draw.Image, shape *Shape, pen *Pen) {
-	if pen.Stroke != nil {
-		shape = shape.ProcessPaths(pen.Stroke)
-	}
 	if pen.Xfm != nil {
 		shape = shape.Transform(pen.Xfm)
+	}
+	if pen.Stroke != nil {
+		shape = shape.ProcessPaths(pen.Stroke)
 	}
 	RenderShape(dst, shape, pen.Filler)
 }
 
 // DrawClippedShape renders a shape with the pen against a clip shape into the destination image.
 func DrawClippedShape(dst draw.Image, shape, clip *Shape, pen *Pen) {
-	if pen.Stroke != nil {
-		shape = shape.ProcessPaths(pen.Stroke)
-	}
 	if pen.Xfm != nil {
 		shape = shape.Transform(pen.Xfm)
+	}
+	if pen.Stroke != nil {
+		shape = shape.ProcessPaths(pen.Stroke)
 	}
 	RenderClippedShape(dst, shape, clip, pen.Filler)
 }

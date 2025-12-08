@@ -14,7 +14,7 @@ The vector package extends [image/draw](https://pkg.go.dev/image/draw) to create
 is rendered through into the destination image.
 Graphics2D follows this convention.
 
-All the pictures and diagrams referenced in this README were created with this package.
+All the pictures and diagrams in this README were created with this package.
 Clicking on one will take you to the code that created it.
 
 ### Paths
@@ -167,11 +167,15 @@ two closed paths are created forming an outline of the original.
 ### Pens
 
 A [Pen](https://pkg.go.dev/github.com/jphsd/graphics2d#Pen)
-is a convenient abstraction that ties a filler image to a path processor,
-like StrokeProc, that creates closed paths,
-so that the user doesn't have to write the mechanics of outlining every time a shape is rendered.
+is a convenient abstraction that ties together a filler image, a path processor, and a transform.
+The path processor creates the closed paths needed for rendering,
+so that the user doesn't have to write the mechanics of outlining for every shape.
+The transform is applied to the shape prior to the path processor so a pen with width 1, for example,
+will draw paths with width 1 in the image and not the shape coordinates.
 A predefined collection of colored pens is available
 [here](https://pkg.go.dev/github.com/jphsd/graphics2d#pkg-variables).
+Dashed pens can be constructed by concatenating DashProc with the path processor.
+See the pen [example](https://pkg.go.dev/github.com/jphsd/graphics2d#example-Pen).
 
 Convenience functions that take a pen argument are:
 - [DrawArc](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawArc)
