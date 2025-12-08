@@ -182,12 +182,12 @@ type shapeJSON struct {
 	Paths []*Path
 }
 
-// MarshalJSON implements the encoding.json.Marshaler interface
+// MarshalJSON implements the encoding/json.Marshaler interface
 func (s *Shape) MarshalJSON() ([]byte, error) {
 	return json.Marshal(shapeJSON{s.paths})
 }
 
-// UnmarshalJSON implements the encoding.json.Unmarshaler interface
+// UnmarshalJSON implements the encoding/json.Unmarshaler interface
 func (s *Shape) UnmarshalJSON(b []byte) error {
 	var sj shapeJSON
 	err := json.Unmarshal(b, &sj)

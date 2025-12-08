@@ -6,7 +6,7 @@ type StrandedProc struct {
 }
 
 // NewStrandedProc returns a new stranded path processor.
-func NewStrandedProc(n int, w float64) *StrandedProc {
+func NewStrandedProc(n int, w float64) StrandedProc {
 	if n < 2 {
 		n = 2
 	}
@@ -20,11 +20,11 @@ func NewStrandedProc(n int, w float64) *StrandedProc {
 		traces[i] = NewTraceProc(w)
 		w += dw
 	}
-	return &StrandedProc{traces}
+	return StrandedProc{traces}
 }
 
 // Process implements the PathProcessor interface.
-func (sp *StrandedProc) Process(p *Path) []*Path {
+func (sp StrandedProc) Process(p *Path) []*Path {
 	paths := []*Path{}
 	for _, tp := range sp.Traces {
 		paths = append(paths, tp.Process(p)...)

@@ -7,7 +7,7 @@ import (
 )
 
 // CapsProc contains a trio of shapes, one which will be placed using the start at the path, one at each step
-// and the last, at the end. If either shape is nil, then it is skipped. The rotation flag indicates if the shapes
+// and the last, at the end. If any shape is nil, then it is skipped. The rotation flag indicates if the shapes
 // should be rotated relative to the path's tangent at that point.
 type CapsProc struct {
 	Start  *Shape

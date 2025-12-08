@@ -873,12 +873,12 @@ type pathJSON struct {
 	Closed bool
 }
 
-// MarshalJSON implements the encoding.json.Marshaler interface
+// MarshalJSON implements the encoding/json.Marshaler interface
 func (p *Path) MarshalJSON() ([]byte, error) {
 	return json.Marshal(pathJSON{p.steps, p.closed})
 }
 
-// UnmarshalJSON implements the encoding.json.Unmarshaler interface
+// UnmarshalJSON implements the encoding/json.Unmarshaler interface
 func (p *Path) UnmarshalJSON(b []byte) error {
 	var pj pathJSON
 	err := json.Unmarshal(b, &pj)

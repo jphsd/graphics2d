@@ -89,7 +89,7 @@ func (m MPDProc) mpdhelper(a, b, n []float64, itr int, disp float64) [][]float64
 
 // HandDrawnProc contains the compound path processor used to create a hand drawn look.
 type HandDrawnProc struct {
-	Comp *CompoundProc
+	Comp CompoundProc
 }
 
 // NewHandDrawnProc takes the segment length to apply the MPD path processor to and returns a new

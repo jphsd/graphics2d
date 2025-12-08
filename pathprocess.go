@@ -16,12 +16,12 @@ type CompoundProc struct {
 }
 
 // NewCompoundProc creates a new CompoundProcessor with the supplied path processors.
-func NewCompoundProc(procs ...PathProcessor) *CompoundProc {
-	return &CompoundProc{procs, false}
+func NewCompoundProc(procs ...PathProcessor) CompoundProc {
+	return CompoundProc{procs, false}
 }
 
 // Process implements the PathProcessor interface.
-func (cp *CompoundProc) Process(p *Path) []*Path {
+func (cp CompoundProc) Process(p *Path) []*Path {
 	paths := []*Path{p}
 	if len(cp.Procs) == 0 {
 		return paths
@@ -56,7 +56,7 @@ type FlattenProc struct {
 }
 
 // Process implements the PathProcessor interface.
-func (fp *FlattenProc) Process(p *Path) []*Path {
+func (fp FlattenProc) Process(p *Path) []*Path {
 	return []*Path{p.Flatten(fp.Flatten)}
 }
 
@@ -64,7 +64,7 @@ func (fp *FlattenProc) Process(p *Path) []*Path {
 type ReverseProc struct{}
 
 // Process implements the PathProcessor interface.
-func (rp *ReverseProc) Process(p *Path) []*Path {
+func (rp ReverseProc) Process(p *Path) []*Path {
 	return []*Path{p.Reverse()}
 }
 
@@ -72,7 +72,7 @@ func (rp *ReverseProc) Process(p *Path) []*Path {
 type SimplifyProc struct{}
 
 // Process implements the PathProcessor interface.
-func (sp *SimplifyProc) Process(p *Path) []*Path {
+func (sp SimplifyProc) Process(p *Path) []*Path {
 	return []*Path{p.Simplify()}
 }
 
@@ -80,7 +80,7 @@ func (sp *SimplifyProc) Process(p *Path) []*Path {
 type StepsProc struct{}
 
 // Process implements the PathProcessor interface.
-func (sp *StepsProc) Process(p *Path) []*Path {
+func (sp StepsProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	np := len(parts)
 	paths := make([]*Path, np)

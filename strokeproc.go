@@ -105,7 +105,7 @@ func NewStrokeProcExt(rw, lw float64,
 		PostSideProc: nil,
 		Width:        rw - lw,
 		PointFunc:    PointCircle,
-		CapStartFunc: CapButt,
-		CapEndFunc:   CapButt,
+		CapStartFunc: cf,
+		CapEndFunc:   cf,
 	}
 }

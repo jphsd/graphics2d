@@ -28,12 +28,12 @@ type PointsProc struct {
 }
 
 // NewPointsProc creates a new points path processor with the supplied shapes and rotation flag.
-func NewPointsProc(shapes []*Shape, rot PointRot) *PointsProc {
-	return &PointsProc{shapes, rot}
+func NewPointsProc(shapes []*Shape, rot PointRot) PointsProc {
+	return PointsProc{shapes, rot}
 }
 
 // Process implements the PathProcessor interface.
-func (pp *PointsProc) Process(p *Path) []*Path {
+func (pp PointsProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	n := len(parts)
 	if !p.Closed() {
@@ -92,8 +92,8 @@ func (pp *PointsProc) Process(p *Path) []*Path {
 // if not closed. If any shape is nil, then it is skipped. The rotation flag indicates if the
 // shapes should be rotated relative to the path's tangent at that point.
 type ShapesProc struct {
-	Comp   *CompoundProc
-	Shapes *PointsProc
+	Comp   CompoundProc
+	Shapes PointsProc
 }
 
 // NewShapesProc creates a new shapes path processor with the supplied shapes, spacing and rotation flag.

@@ -16,6 +16,8 @@ type NRGBA64 = color.NRGBA64
 type Model = color.Model
 
 var (
+	AlphaModel   Model = color.AlphaModel
+	Alpha16Model Model = color.Alpha16Model
 	GrayModel    Model = color.GrayModel
 	Gray16Model  Model = color.Gray16Model
 	RGBAModel    Model = color.RGBAModel

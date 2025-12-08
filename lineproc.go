@@ -29,3 +29,14 @@ func (clp StepsToLinesProc) Process(p *Path) []*Path {
 	}
 	return []*Path{path}
 }
+
+// PathToLineProc reduces a path to a single line, or point if closed.
+type PathToLineProc struct{}
+
+// Process implements the PathProcessor interface.
+func (plp PathToLineProc) Process(p *Path) []*Path {
+	if p.Closed() {
+		return []*Path{Point(p.Current())}
+	}
+	return []*Path{Line(p.steps[0][0], p.Current())}
+}

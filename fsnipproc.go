@@ -193,7 +193,7 @@ func (d DashProc) Process(p *Path) []*Path {
 
 // MunchProc contains the munching compound path processor.
 type MunchProc struct {
-	Comp *CompoundProc
+	Comp CompoundProc
 }
 
 // NewMunchProc creates a munching path processor. It calculates points along a path spaced l apart
@@ -203,7 +203,7 @@ func NewMunchProc(l float64) MunchProc {
 		l = -l
 	}
 
-	return MunchProc{NewCompoundProc(NewFSnipProc(2, []float64{l, l}, 0), &StepsToLinesProc{false})}
+	return MunchProc{NewCompoundProc(NewFSnipProc(2, []float64{l, l}, 0), PathToLineProc{})}
 }
 
 // Process implements the PathProcessor interface.
