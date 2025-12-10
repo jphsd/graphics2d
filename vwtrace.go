@@ -42,14 +42,7 @@ func (s VWTraceProc) Process(p *Path) []*Path {
 			// Last part...
 			if p.Closed() {
 				npart := parts[0]
-				a, a1, _ := util.AngleBetweenLines(part[0], part[1], part[1], npart[1])
-				var ba float64
-				if a < 0 {
-					ba = (-Pi - a) / 2
-				} else {
-					ba = (Pi - a) / 2
-				}
-				th := a1 - Pi - ba
+				th, ba := util.AngleBisect(part[0], part[1], part[1], npart[1])
 				dx, dy := math.Cos(th), math.Sin(th)
 				w0 := s.Func(0, s.Width)
 				w1 := s.Func(1, s.Width)
@@ -72,14 +65,7 @@ func (s VWTraceProc) Process(p *Path) []*Path {
 			break
 		}
 		npart := parts[i+1]
-		a, a1, _ := util.AngleBetweenLines(part[0], part[1], part[1], npart[1]) // [-Pi,Pi]
-		var ba float64                                                          // bisection angle
-		if a < 0 {
-			ba = (-Pi - a) / 2
-		} else {
-			ba = (Pi - a) / 2
-		}
-		th := a1 - Pi - ba
+		th, ba := util.AngleBisect(part[0], part[1], part[1], npart[1])
 		dx, dy := math.Cos(th), math.Sin(th)
 		w := s.Func(clen/sum, s.Width)
 		if ba < 0 {

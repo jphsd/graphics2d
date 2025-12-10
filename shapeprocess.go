@@ -41,12 +41,15 @@ const (
 // Process implements the ShapeProcessor interface.
 func (bp BucketProc) Process(s *Shape) []*Shape {
 	shapes := make([]*Shape, bp.N)
+	for i, _ := range shapes {
+		shapes[i] = &Shape{}
+	}
 	paths := s.Paths()
 	np := len(paths)
 	b := 0
 	switch bp.Style {
 	case Chunk:
-		npb := min(np/bp.N, 1)
+		npb := (np + bp.N - 1) / bp.N
 		for i, path := range paths {
 			shapes[b].AddPaths(path)
 			if i > 0 && i%npb == 0 {

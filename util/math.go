@@ -255,6 +255,19 @@ func AngleBetweenLines(p1, p2, p3, p4 []float64) (float64, float64, float64) {
 	return da, a1, a2
 }
 
+// AngleBisect calcuates the angle of bisection between two lines
+// and returns the absolute and relative angles.
+func AngleBisect(p1, p2, p3, p4 []float64) (float64, float64) {
+	a, a1, _ := AngleBetweenLines(p1, p2, p3, p4)
+	var ba float64
+	if a < 0 {
+		ba = (-Pi - a) / 2
+	} else {
+		ba = (Pi - a) / 2
+	}
+	return a1 - Pi - ba, ba
+}
+
 // DotProductAngle returns the angle between two lines using the dot product method. The
 // result is in the range [0,Pi].
 func DotProductAngle(p1, p2, p3, p4 []float64) float64 {
