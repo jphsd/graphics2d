@@ -288,13 +288,15 @@ func ReentrantPolygon(c []float64, r float64, n int, t, ang float64) *Path {
 	dxi, dyi := ri*math.Cos(ang+da/2), ri*math.Sin(ang+da/2)
 	np := NewPath([]float64{c[0] + dxe, c[1] + dye})
 	dxe, dye = dxe*cosDa-dye*sinDa, dxe*sinDa+dye*cosDa
-	for range n {
+	for i := range n {
 		if !skip {
 			np.AddStep([]float64{c[0] + dxi, c[1] + dyi})
 			dxi, dyi = dxi*cosDa-dyi*sinDa, dxi*sinDa+dyi*cosDa
 		}
-		np.AddStep([]float64{c[0] + dxe, c[1] + dye})
-		dxe, dye = dxe*cosDa-dye*sinDa, dxe*sinDa+dye*cosDa
+		if i != n-1 {
+			np.AddStep([]float64{c[0] + dxe, c[1] + dye})
+			dxe, dye = dxe*cosDa-dye*sinDa, dxe*sinDa+dye*cosDa
+		}
 	}
 	np.Close()
 	return np
