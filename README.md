@@ -164,7 +164,7 @@ End caps are only used when the path is open.
 When a stroke processor is applied to a closed path,
 two closed paths are created forming an outline of the original.
 
-### Pens
+## 11. Pens
 
 A [Pen](https://pkg.go.dev/github.com/jphsd/graphics2d#Pen)
 is a convenient abstraction that ties together a filler image, a path processor, and a transform.
@@ -184,7 +184,7 @@ Convenience functions that take a pen argument are:
 - [DrawPoint](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawPoint)
 - [DrawShape](https://pkg.go.dev/github.com/jphsd/graphics2d#DrawShape)
 
-## 11. Gradients
+## 12. Gradients
 [![Fig12 image created with graphics2d](./doc/fig12.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig12)
 
 Gradients aren't strictly part of the graphics2d package since what's used to fill a shape is just an image.
