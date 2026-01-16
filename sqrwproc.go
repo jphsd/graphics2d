@@ -41,6 +41,9 @@ func (sp SquareWaveProc) Process(p *Path) []*Path {
 	}
 
 	if sp.KeepZero {
+		if p.Closed() {
+			path.Close()
+		}
 		return []*Path{path}
 	}
 
