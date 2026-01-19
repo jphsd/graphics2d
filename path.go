@@ -2,6 +2,7 @@ package graphics2d
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"image"
 	"math"
@@ -868,19 +869,24 @@ func (p *Path) PolyLine() ([][]float64, bool) {
 	return poly, p.closed
 }
 
-type pathJSON struct {
+// Lerp performs a linear interpolation between two points.
+func Lerp(t float64, p1, p2 []float64) []float64 {
+	return []float64{util.Lerp(t, p1[0], p2[0]), util.Lerp(t, p1[1], p2[1])}
+}
+
+type jpath struct {
 	Steps  [][][]float64
 	Closed bool
 }
 
 // MarshalJSON implements the encoding/json.Marshaler interface
 func (p *Path) MarshalJSON() ([]byte, error) {
-	return json.Marshal(pathJSON{p.steps, p.closed})
+	return json.Marshal(jpath{p.steps, p.closed})
 }
 
 // UnmarshalJSON implements the encoding/json.Unmarshaler interface
 func (p *Path) UnmarshalJSON(b []byte) error {
-	var pj pathJSON
+	var pj jpath
 	err := json.Unmarshal(b, &pj)
 	if err != nil {
 		return err
@@ -899,7 +905,40 @@ func (p *Path) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Lerp performs a linear interpolation between two points.
-func Lerp(t float64, p1, p2 []float64) []float64 {
-	return []float64{util.Lerp(t, p1[0], p2[0]), util.Lerp(t, p1[1], p2[1])}
+type xpath struct {
+	Desc string `xml:"d,attr"`
+}
+
+// MarshalXML implements the encoding/xml.Marshaler interface
+func (p *Path) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return e.EncodeElement(xpath{p.StringSVG()}, xml.StartElement{Name: xml.Name{"", "path"}})
+}
+
+func (p *Path) StringSVG() string {
+	// SVG can't handle high order steps
+	fp := p.Flatten(DefaultRenderFlatten)
+	pt := fp.steps[0][0]
+	desc := fmt.Sprintf("M %.2f %.2f", pt[0], pt[1])
+	ns := len(fp.steps)
+	if ns == 1 {
+		if p.closed {
+			desc += " z"
+		}
+		return desc
+	}
+	desc += " L"
+	for i := 1; i < len(fp.steps); i++ {
+		pt := fp.steps[i][0]
+		desc += fmt.Sprintf(" %.2f %.2f", pt[0], pt[1])
+	}
+	if p.closed {
+		desc += " z"
+	}
+	return desc
+}
+
+// UnmarshalXML is not supported.
+// Use the github.com/jphsd/xml/svg framework instead.
+func (p *Path) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	return fmt.Errorf("UnmarshalXML is not supported")
 }

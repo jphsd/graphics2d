@@ -2,6 +2,7 @@ package graphics2d
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"github.com/jphsd/graphics2d/util"
 	"image"
@@ -178,18 +179,18 @@ func (s *Shape) PointInShape(pt []float64) bool {
 	return false
 }
 
-type shapeJSON struct {
+type shape struct {
 	Paths []*Path
 }
 
 // MarshalJSON implements the encoding/json.Marshaler interface
 func (s *Shape) MarshalJSON() ([]byte, error) {
-	return json.Marshal(shapeJSON{s.paths})
+	return json.Marshal(shape{s.paths})
 }
 
 // UnmarshalJSON implements the encoding/json.Unmarshaler interface
 func (s *Shape) UnmarshalJSON(b []byte) error {
-	var sj shapeJSON
+	var sj shape
 	err := json.Unmarshal(b, &sj)
 	if err != nil {
 		return err
@@ -202,4 +203,15 @@ func (s *Shape) UnmarshalJSON(b []byte) error {
 	s.parent = nil
 
 	return nil
+}
+
+// MarshalXML implements the encoding/xml.Marshaler interface
+func (s *Shape) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	return e.EncodeElement(shape{s.paths}, xml.StartElement{Name: xml.Name{"", "g"}})
+}
+
+// UnmarshalXML is not supported.
+// Use the github.com/jphsd/xml/svg framework instead.
+func (s *Shape) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	return fmt.Errorf("UnmarshalXML is not supported")
 }
