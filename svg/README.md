@@ -5,7 +5,7 @@
 This package provides ways to render paths and shapes as [SVG](https://www.w3.org/TR/SVG11/Overview.html)
 documents.
 
-It makes use of the [encodings/xml](https://pkg.go.dev/encodings/xml)
+It makes use of the [encoding/xml](https://pkg.go.dev/encoding/xml)
 package within the standard library.
 
 This package is not intended as a full SVG implementation.
@@ -20,8 +20,8 @@ a [Renderable](https://pkg.go.dev/github.com/jphsd/graphics2d#Renderable).
 
 [Path](https://pkg.go.dev/github.com/jphsd/graphics2d#Path)
 and [Shape](https://pkg.go.dev/github.com/jphsd/graphics2d#Shape)
-both implement the [xml.Marshaler](https://pkg.go.dev/xml#Marshaler)
-interface allowing calls to [xml.Marshal](https://pkg.go.dev/xml#Marshal)
+both implement the [xml.Marshaler](https://pkg.go.dev/encoding/xml#Marshaler)
+interface allowing calls to [xml.Marshal](https://pkg.go.dev/encoding/xml#Marshal)
 to be made with either type as an argument.
 The result will be a snippet of XML.
 
@@ -64,7 +64,7 @@ The same caveats mentioned in section 3 apply.
 
 A convenience function, [NewEncoder](https://pkg.go.dev/github.com/jphsd/graphics2d/svg#NewEncoder),
 is supplied that wraps an [io.Writer](https://pkg.go.dev/io#Writer)
-in an [xml.Encoder](https://pkg.go.dev/xml#Encoder)
+in an [xml.Encoder](https://pkg.go.dev/encoding/xml#Encoder)
 with the standard [SVG element](https://www.w3.org/TR/SVG11/struct.html#SVGElement)
 already applied.
 

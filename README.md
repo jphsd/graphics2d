@@ -205,3 +205,17 @@ List of gradient image functions:
 - [NewRadialRGBA](https://pkg.go.dev/github.com/jphsd/texture#NewRadialRGBA)
 - [NewEllipticalRGBA](https://pkg.go.dev/github.com/jphsd/texture#NewEllipticalRGBA)
 - [NewConicRGBA](https://pkg.go.dev/github.com/jphsd/texture#NewConicRGBA)
+
+## 13. Marshaling
+
+[Text](https://pkg.go.dev/encoding#MarshalText),
+[JSON](https://pkg.go.dev/encoding/json#Mashaler)
+and [XML](https://pkg.go.dev/encoding/xml#Marshaler)
+(as SVG) marshaling of shapes and paths is supported.
+See the [examples](https://pkg.go.dev/github.com/jphsd/graphics2d#pkg-examples)
+in the documentation.
+
+Unmarshaling is only supported for text and JSON.
+
+See the separate [README](https://pkg.go.dev/github.com/jphsd/graphics2d/svg#section-readme)
+for more details on how SVG rendering works.
