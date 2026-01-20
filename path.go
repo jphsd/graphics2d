@@ -432,70 +432,9 @@ func (p *Path) Process(proc PathProcessor) []*Path {
 }
 
 // String converts a path into a string.
-// P %f,%f [S %d [%f,%f ]][C]
 func (p *Path) String() string {
-	step := p.steps[0]
-	str := fmt.Sprintf("P %f,%f ", step[0][0], step[0][1])
-	for i := 1; i < len(p.steps); i++ {
-		step = p.steps[i]
-		str += "S "
-		str += fmt.Sprintf("%d ", len(step))
-		for _, pts := range step {
-			str += fmt.Sprintf("%f,%f ", pts[0], pts[1])
-		}
-	}
-	if p.closed {
-		str += "C"
-	}
-	return str
-}
-
-// StringToPath converts a string created using path.String() back into a path.
-// Returns nil if the string isn't parsable into a path.
-func StringToPath(str string) *Path {
-	parts := strings.Split(str, " ")
-	np := len(parts)
-
-	if np < 2 || parts[0] != "P" {
-		return nil
-	}
-	var x, y float64
-	n, err := fmt.Sscanf(parts[1], "%f,%f", &x, &y)
-	if n != 2 || err != nil {
-		return nil
-	}
-	path := NewPath([]float64{x, y})
-	if np < 3 {
-		return path
-	}
-
-	// Handle steps
-	i := 2
-	for i+1 < np && parts[i] == "S" {
-		i++
-		var s int
-		n, err = fmt.Sscanf(parts[i], "%d", &s)
-		if n != 1 || err != nil {
-			return nil
-		}
-		step := make([][]float64, s)
-		i++
-		for j := 0; i < np && j < s; j++ {
-			n, err := fmt.Sscanf(parts[i], "%f,%f", &x, &y)
-			if n != 2 || err != nil {
-				return nil
-			}
-			step[j] = []float64{x, y}
-			i++
-		}
-		path.AddStep(step...)
-	}
-
-	if i < np && parts[i] == "C" {
-		path.Close()
-	}
-
-	return path
+	b, _ := p.MarshalText()
+	return string(b)
 }
 
 // Simplify breaks up a path into steps where for any step, its control points are all on the
@@ -874,6 +813,10 @@ func Lerp(t float64, p1, p2 []float64) []float64 {
 	return []float64{util.Lerp(t, p1[0], p2[0]), util.Lerp(t, p1[1], p2[1])}
 }
 
+/*
+ * Marshaling functions for JSON, XML/SVG and text.
+ */
+
 type jpath struct {
 	Steps  [][][]float64
 	Closed bool
@@ -941,4 +884,78 @@ func (p *Path) StringSVG() string {
 // Use the github.com/jphsd/xml/svg framework instead.
 func (p *Path) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	return fmt.Errorf("UnmarshalXML is not supported")
+}
+
+// MarshalText implements the encoding.TextMarshaler interface.
+// P %f,%f[ %d[ %f,%f]][ C]
+func (p *Path) MarshalText() ([]byte, error) {
+	step := p.steps[0]
+	str := fmt.Sprintf("P %f,%f", step[0][0], step[0][1])
+	for i := 1; i < len(p.steps); i++ {
+		step = p.steps[i]
+		str += fmt.Sprintf(" %d", len(step))
+		for _, pts := range step {
+			str += fmt.Sprintf(" %f,%f", pts[0], pts[1])
+		}
+	}
+	if p.closed {
+		str += " C"
+	}
+	return []byte(str), nil
+}
+
+// UnmarshalText implements the encoding.TextUnmarshaler interface.
+// Expected format: P %f,%f[ %d[ %f,%f]][ C]
+func (p *Path) UnmarshalText(b []byte) error {
+	str := string(b)
+
+	parts := strings.Split(str, " ")
+	np := len(parts)
+
+	if np < 2 || parts[0] != "P" {
+		return fmt.Errorf("Not a valid Path string")
+	}
+
+	var x, y float64
+	n, err := fmt.Sscanf(parts[1], "%f,%f", &x, &y)
+	if n != 2 || err != nil {
+		return fmt.Errorf("Not a valid Path string")
+	}
+	steps := [][][]float64{{{x, y}}}
+
+	// Handle steps
+	for i := 2; i < np; {
+		if parts[i] == "C" {
+			p.steps = steps
+			p.closed = true
+			return nil
+		}
+		var s int
+		n, err = fmt.Sscanf(parts[i], "%d", &s)
+		if n != 1 || err != nil {
+			return fmt.Errorf("Not a valid Path string")
+		}
+		step := make([][]float64, s)
+		i++
+		for j := 0; i < np && j < s; j++ {
+			n, err := fmt.Sscanf(parts[i], "%f,%f", &x, &y)
+			if n != 2 || err != nil {
+				return fmt.Errorf("Not a valid Path string")
+			}
+			step[j] = []float64{x, y}
+			i++
+		}
+		steps = append(steps, step)
+	}
+	p.steps = steps
+
+	// Reset everything else
+	p.bbox = nil
+	p.flattened = nil
+	p.tolerance = 0
+	p.simplified = nil
+	p.tangents = nil
+	p.parent = nil
+
+	return nil
 }

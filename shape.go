@@ -7,6 +7,7 @@ import (
 	"github.com/jphsd/graphics2d/util"
 	"image"
 	"math"
+	"strings"
 )
 
 // Shape is a fillable collection of paths. For a path to be fillable,
@@ -128,12 +129,15 @@ func (s *Shape) Copy() *Shape {
 
 // Transform applies a transform to all the paths in the shape
 // and returns a new shape.
-// JH deprecate this
 func (s *Shape) Transform(xfm Transform) *Shape {
+	aff, ok := xfm.(*Aff3)
+	if ok {
+		// Aff3 supports the PathProcessor interface
+		return s.ProcessPaths(aff)
+	}
+
 	return s.ProcessPaths(TransformProc{xfm})
 }
-
-// Transform applies a transform to all the paths in the shape
 
 // Process applies a shape processor to the shape and
 // returns a collection of new shapes.
@@ -162,11 +166,8 @@ func (s *Shape) ProcessPaths(proc PathProcessor) *Shape {
 
 // String converts a shape into a string.
 func (s *Shape) String() string {
-	str := fmt.Sprintf("SH %d ", len(s.paths))
-	for _, path := range s.paths {
-		str += path.String() + " "
-	}
-	return str
+	b, _ := s.MarshalText()
+	return string(b)
 }
 
 // PointInShape returns true if the point is contained within any path within the shape.
@@ -178,6 +179,10 @@ func (s *Shape) PointInShape(pt []float64) bool {
 	}
 	return false
 }
+
+/*
+ * Marshaling functions for JSON, XML/SVG and text.
+ */
 
 type shape struct {
 	Paths []*Path
@@ -214,4 +219,45 @@ func (s *Shape) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // Use the github.com/jphsd/xml/svg framework instead.
 func (s *Shape) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	return fmt.Errorf("UnmarshalXML is not supported")
+}
+
+// MarshalText implements the encoding.TextMarshaler interface.
+// S[ P %f,%f[ %d[ %f,%f]][ C]]
+func (s *Shape) MarshalText() ([]byte, error) {
+	str := "S"
+	for _, path := range s.paths {
+		str += " " + path.String()
+	}
+
+	return []byte(str), nil
+}
+
+// UnmarshalText implements the encoding.TextUnmarshaler interface.
+// Expected format: S[ P %f,%f[ %d[ %f,%f]][ C]]
+func (s *Shape) UnmarshalText(b []byte) error {
+	str := string(b)
+
+	pstrs := strings.Split(str, "P")
+	if pstrs[0][0] != 'S' {
+		return fmt.Errorf("Not a valid Shape string")
+	}
+
+	paths := []*Path{}
+	for i := 1; i < len(pstrs); i++ {
+		pstr := "P" + pstrs[i]
+		path := &Path{}
+		err := path.UnmarshalText([]byte(pstr))
+		if err != nil {
+			return fmt.Errorf("Not a valid Shape string")
+		}
+		paths = append(paths, path)
+	}
+	s.paths = paths
+
+	// Reset everything else
+	s.bbox = nil
+	s.mask = nil
+	s.parent = nil
+
+	return nil
 }
