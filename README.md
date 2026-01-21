@@ -208,8 +208,8 @@ List of gradient image functions:
 
 ## 13. Marshaling
 
-[Text](https://pkg.go.dev/encoding#MarshalText),
-[JSON](https://pkg.go.dev/encoding/json#Mashaler)
+[Text](https://pkg.go.dev/encoding#TextMarshaler),
+[JSON](https://pkg.go.dev/encoding/json#Marshaler)
 and [XML](https://pkg.go.dev/encoding/xml#Marshaler)
 (as SVG) marshaling of shapes and paths is supported.
 See the [examples](https://pkg.go.dev/github.com/jphsd/graphics2d#pkg-examples)
