@@ -201,7 +201,7 @@ func Centroid(pts ...[]float64) []float64 {
 		}
 	}
 	// Scale
-	for i := 0; i < d; i++ {
+	for i := range d {
 		res[i] /= float64(n)
 	}
 	return res

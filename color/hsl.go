@@ -131,7 +131,7 @@ func Monochrome(col Color, n int) []HSL {
 	res := make([]HSL, n)
 	dl := 1.0 / float64(n-1)
 	l := dl
-	for i := 0; i < n; i++ {
+	for i := range n {
 		hsl := NewHSL(col)
 		hsl.L = l
 		res[i] = hsl

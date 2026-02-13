@@ -90,7 +90,7 @@ func main() {
 }
 
 func MakeHouse() *g2d.Renderable {
-	// Order is important - furthest from eye obejcts first
+	// Order is important - furthest from eye objects first
 	res := MakeChimney()
 	res.AddRenderable(MakeFirstFloor(), nil)
 	res.AddRenderable(MakeSecondFloor(), nil)

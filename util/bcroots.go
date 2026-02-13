@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"maps"
 	"math"
 	"sort"
 )
@@ -115,9 +116,7 @@ func CalcExtremities(points [][]float64) []float64 {
 
 // Add map2 to map1
 func addMap(map1, map2 map[string]bool) {
-	for k, v := range map2 {
-		map1[k] = v
-	}
+	maps.Copy(map1, map2)
 }
 
 func calcRoots(f, df func(float64) float64, tmap map[string]bool) {
@@ -137,7 +136,7 @@ func calcRoots(f, df func(float64) float64, tmap map[string]bool) {
 func NRM(start float64, f, df func(float64) float64) (float64, error) {
 	t := start
 
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		d := df(t)
 		if Equals(d, 0) {
 			return 0, fmt.Errorf("zero derivative at %f", t)

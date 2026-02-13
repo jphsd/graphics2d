@@ -19,12 +19,12 @@ func NewPatch(colors [][]color.Color) (*Patch, error) {
 	h := len(colors)
 	w := len(colors[0])
 	rgba := make([][]color.RGBA, h)
-	for i := 0; i < h; i++ {
+	for i := range h {
 		if len(colors[i]) != w {
 			return nil, fmt.Errorf("row %d has different length %d vs %d", i, len(colors[i]), w)
 		}
 		rgba[i] = make([]color.RGBA, w)
-		for j := 0; j < w; j++ {
+		for j := range w {
 			rgba[i][j], _ = color.RGBAModel.Convert(colors[i][j]).(color.RGBA)
 		}
 	}

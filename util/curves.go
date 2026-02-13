@@ -92,7 +92,7 @@ func DeCasteljau(pts [][]float64, t float64) []float64 {
 	}
 	npts := make([][]float64, len(pts)-1)
 	omt := 1 - t
-	for i := 0; i < len(npts); i++ {
+	for i := range npts {
 		npts[i] = []float64{
 			omt*pts[i][0] + t*pts[i+1][0], omt*pts[i][1] + t*pts[i+1][1],
 			pts[i+1][0] - pts[i][0], pts[i+1][1] - pts[i][1]}

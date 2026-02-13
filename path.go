@@ -187,14 +187,14 @@ type Part [][]float64
 
 // String converts a part into a string.
 func (p Part) String() string {
-	res := ""
+	var res strings.Builder
 	for i, pt := range p {
 		if i != 0 {
-			res += " "
+			res.WriteString(" ")
 		}
-		res += fmt.Sprintf("%.2f,%.2f", pt[0], pt[1])
+		res.WriteString(fmt.Sprintf("%.2f,%.2f", pt[0], pt[1]))
 	}
-	return res
+	return res.String()
 }
 
 // AddParts adds parts to the path and returns it.
@@ -890,18 +890,19 @@ func (p *Path) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 // P %f,%f[ %d[ %f,%f]][ C]
 func (p *Path) MarshalText() ([]byte, error) {
 	step := p.steps[0]
-	str := fmt.Sprintf("P %f,%f", step[0][0], step[0][1])
+	var str strings.Builder
+	str.WriteString(fmt.Sprintf("P %f,%f", step[0][0], step[0][1]))
 	for i := 1; i < len(p.steps); i++ {
 		step = p.steps[i]
-		str += fmt.Sprintf(" %d", len(step))
+		str.WriteString(fmt.Sprintf(" %d", len(step)))
 		for _, pts := range step {
-			str += fmt.Sprintf(" %f,%f", pts[0], pts[1])
+			str.WriteString(fmt.Sprintf(" %f,%f", pts[0], pts[1]))
 		}
 	}
 	if p.closed {
-		str += " C"
+		str.WriteString(" C")
 	}
-	return []byte(str), nil
+	return []byte(str.String()), nil
 }
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface.

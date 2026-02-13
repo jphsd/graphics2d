@@ -224,12 +224,13 @@ func (s *Shape) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 // MarshalText implements the encoding.TextMarshaler interface.
 // S[ P %f,%f[ %d[ %f,%f]][ C]]
 func (s *Shape) MarshalText() ([]byte, error) {
-	str := "S"
+	var str strings.Builder
+	str.WriteString("S")
 	for _, path := range s.paths {
-		str += " " + path.String()
+		str.WriteString(" " + path.String())
 	}
 
-	return []byte(str), nil
+	return []byte(str.String()), nil
 }
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface.

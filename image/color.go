@@ -25,10 +25,7 @@ type cstop struct {
 func NewColorizer(img Image, c1, c2 color.Color, stops []int, colors []color.Color, post bool) *Colorizer {
 	lut := make([]color.RGBA, 256)
 
-	sc := len(colors)
-	if sc > 254 {
-		sc = 254
-	}
+	sc := min(len(colors), 254)
 	if stops != nil && len(stops) < sc {
 		sc = len(stops)
 	}
@@ -62,7 +59,7 @@ func NewColorizer(img Image, c1, c2 color.Color, stops []int, colors []color.Col
 	// Build lut - simple lerp between c1, stops and c2, unless post set
 	if post {
 		ci := 0
-		for i := 0; i < 256; i++ {
+		for i := range 256 {
 			lut[i] = csl[ci].c
 			if i != 255 && i+1 == csl[ci+1].s {
 				ci++
@@ -71,7 +68,7 @@ func NewColorizer(img Image, c1, c2 color.Color, stops []int, colors []color.Col
 	} else {
 		ci := 0
 		ls := 0
-		for i := 0; i < 256; i++ {
+		for i := range 256 {
 			if i == csl[ci].s {
 				lut[i] = csl[ci].c
 				if i != 255 {
