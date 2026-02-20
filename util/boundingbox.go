@@ -27,15 +27,25 @@ func BoundingBox(pts ...[]float64) [][]float64 {
 			if i > d-1 {
 				break
 			}
-			if v < res[0][i] {
-				res[0][i] = v
-			}
-			if v > res[1][i] {
-				res[1][i] = v
-			}
+			res[0][i] = min(v, res[0][i])
+			res[1][i] = max(v, res[1][i])
 		}
 	}
 
+	return res
+}
+
+// BBCombine combines a list of bounding boxes.
+func BBCombine(bb [][]float64, bbs... [][]float64) [][]float64 {
+	res := make([][]float64, 2)
+	res[0] = []float64{bb[0][0], bb[0][1]}
+	res[1] = []float64{bb[1][0], bb[1][1]}
+	for i, _ := range bbs {
+		res[0][0] = min(bbs[i][0][0], res[0][0])
+		res[0][1] = min(bbs[i][0][1], res[0][1])
+		res[1][0] = max(bbs[i][1][0], res[1][0])
+		res[1][1] = max(bbs[i][1][1], res[1][1])
+	}
 	return res
 }
 
