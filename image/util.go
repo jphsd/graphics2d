@@ -8,12 +8,12 @@ import (
 	"image/png"
 	"os"
 
+	_ "github.com/jdeng/goheif"
 	_ "golang.org/x/image/bmp"
 	_ "golang.org/x/image/tiff"
 	_ "golang.org/x/image/webp"
 	_ "image/jpeg"
 	_ "image/png"
-	//_ "github.com/adrium/goheif"
 )
 
 // NewRGBA is a wrapper for image.RGBA which returns a new image of the desired size filled with color.
@@ -200,7 +200,7 @@ func SaveImage(img Image, name string) error {
 }
 
 // ReadImage is a utility function to read an image from a file.
-// The following formats are supported - bmp, jpeg, png, tiff, webp.
+// The following formats are supported - bmp, heic, jpeg, png, tiff, webp.
 func ReadImage(name string) (Image, error) {
 	f, err := os.Open(name)
 	if err != nil {
