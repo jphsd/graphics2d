@@ -50,6 +50,10 @@ func (c HSL) RGBA() (uint32, uint32, uint32, uint32) {
 		r = chroma
 		b = x
 	}
+	m := c.L - chroma/2
+	r += m
+	g += m
+	b += m
 
 	// Scale by A and convert to uint32
 	return uint32(r * c.A * 0xffff), uint32(g * c.A * 0xffff), uint32(b * c.A * 0xffff), uint32(c.A * 0xffff)
