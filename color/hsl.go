@@ -1,5 +1,9 @@
 package color
 
+import (
+	"math"
+)
+
 // HSL describes a color in Hue Saturation Lightness space. All values are in range [0,1].
 type HSL struct {
 	H, S, L, A float64
@@ -9,34 +13,48 @@ type HSL struct {
 
 // RGBA implements the RGBA function from the color.Color interface.
 func (c HSL) RGBA() (uint32, uint32, uint32, uint32) {
-	m2 := 0.0
-	if c.L > 0.5 {
-		m2 = c.L + c.S - c.L*c.S
-	} else {
-		m2 = c.L * (1 + c.S)
+	// Sanitize H, S, L and A - allow H to wrap
+	c.H = math.Mod(c.H, 1)
+	if c.H < 0 {
+		c.H += 1
 	}
-	m1 := c.L*2 - m2
-	r := uint32(hueConv(m1, m2, c.H+1/3.0) * c.A * 0xffff)
-	g := uint32(hueConv(m1, m2, c.H) * c.A * 0xffff)
-	b := uint32(hueConv(m1, m2, c.H-1/3.0) * c.A * 0xffff)
-	a := uint32(c.A * 0xffff)
-	return r, g, b, a
-}
+	c.S = max(c.S, 0)
+	c.S = min(c.S, 1)
+	c.L = max(c.L, 0)
+	c.L = min(c.L, 1)
+	c.A = max(c.A, 0)
+	c.A = min(c.A, 1)
 
-func hueConv(m1, m2, h float64) float64 {
-	if h < 0 {
-		h += 1
-	} else if h > 1 {
-		h -= 1
+	// Convert HSL to RGB (all in [0,1])
+	// From https://en.wikipedia.org/wiki/HSL_and_HSV
+	l := math.Abs(2*c.L - 1)
+	chroma := (1 - l) * c.S
+	hue := c.H * 6
+	x := chroma * (1 - math.Abs(math.Mod(hue, 2)-1))
+
+	var r, g, b float64
+	if hue < 1 {
+		r = chroma
+		g = x
+	} else if hue < 2 {
+		r = x
+		g = chroma
+	} else if hue < 3 {
+		g = chroma
+		b = x
+	} else if hue < 4 {
+		g = x
+		b = chroma
+	} else if hue < 5 {
+		r = x
+		b = chroma
+	} else {
+		r = chroma
+		b = x
 	}
-	if h*6 < 1 {
-		return m1 + (m2-m1)*h*6
-	} else if h*2 < 1 {
-		return m2
-	} else if h*3 < 2 {
-		return m1 + (m2-m1)*(2/3.0-h)*6
-	}
-	return m1
+
+	// Scale by A and convert to uint32
+	return uint32(r * c.A * 0xffff), uint32(g * c.A * 0xffff), uint32(b * c.A * 0xffff), uint32(c.A * 0xffff)
 }
 
 // HSLModel standard HSL color type with all values in range [0,1]
@@ -103,6 +121,17 @@ func NewHSL(col Color) HSL {
 
 // HSVToHSL is a convenience function that maps HSV to HSL (all in [0,1])
 func HSVToHSL(h, sv, v float64) HSL {
+	// Sanitize H, S, V and A
+	h = math.Mod(h, 1)
+	if h < 0 {
+		h += 1
+	}
+	sv = max(sv, 0)
+	sv = min(sv, 1)
+	v = max(v, 0)
+	v = min(v, 1)
+
+	// Convert
 	l := v * (1 - sv/2)
 	var sl float64
 	if l > 0 && l < 1 {
