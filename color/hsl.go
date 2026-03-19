@@ -1,8 +1,6 @@
 package color
 
-import (
-	"math"
-)
+import "math"
 
 // HSL describes a color in Hue Saturation Lightness space. All values are in range [0,1].
 type HSL struct {
