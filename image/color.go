@@ -14,6 +14,9 @@ type Colorizer struct {
 	G16  bool
 }
 
+// HSLLerp controls if color.HSLLerp is used in place of color.RGBALerp in the [Colorizer].
+var HSLLerp = false
+
 type cstop struct {
 	s int
 	c color.RGBA
@@ -77,7 +80,13 @@ func NewColorizer(img Image, c1, c2 color.Color, stops []int, colors []color.Col
 			} else {
 				ds := i - csl[ci].s
 				t := float64(ds) / float64(ls)
-				lut[i] = color.ColorRGBALerp(t, csl[ci].c, csl[ci+1].c)
+				if HSLLerp {
+					h := color.ColorHSLLerp(t, csl[ci].c, csl[ci+1].c)
+					c, _ = color.RGBAModel.Convert(h).(color.RGBA)
+					lut[i] = c
+				} else {
+					lut[i] = color.ColorRGBALerp(t, csl[ci].c, csl[ci+1].c)
+				}
 			}
 			if i != 255 && i+1 == csl[ci+1].s {
 				ci++
