@@ -57,9 +57,10 @@ These are just some of the constructors available for the Path type.
 
 [Bezier curves](https://en.wikipedia.org/wiki/B%C3%A9zier_curve)
 are polynomial curves.
-Most vector packages support first, second and third order curves; lines, quadratic and cubic curves respectively.
-The path AddStep method has no upper limit on the number of control points that can be specified so higher
-order curves can be created.
+While most vector packages support first, second and third order curves;
+lines, quadratic and cubic curves respectively,
+the path AddStep method has no upper limit on the number of control points that can be specified,
+allowing higher order curves to be created.
 The last example on the right is a quartic curve.
 
 ## 4. Arcs And ArcStyles
