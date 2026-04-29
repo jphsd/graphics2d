@@ -25,8 +25,8 @@ type CurveProc struct {
 func (cp CurveProc) Process(p *Path) []*Path {
 	steps := p.Steps()
 	ns := len(steps)
-	if ns < 2 {
-		return []*Path{p}
+	if ns < 3 {
+		return []*Path{p.Copy()}
 	}
 
 	// Truncate steps to end points
@@ -43,10 +43,11 @@ func (cp CurveProc) Process(p *Path) []*Path {
 
 	// Bezier - curve passes through mid points. If path is open, then passes through start and end too.
 
-	if cp.Style == Bezier {
+	switch cp.Style {
+	case Bezier:
 		// Calc mid points
 		mp := make([][]float64, ns)
-		for i := 0; i < ns-1; i++ {
+		for i := range ns - 1 {
 			mp[i] = util.Centroid(points[i], points[i+1])
 		}
 		mp[ns-1] = util.Centroid(points[ns-1], points[0])
@@ -74,16 +75,9 @@ func (cp CurveProc) Process(p *Path) []*Path {
 		} else {
 			res[0].AddStep(points[ns-1])
 		}
-
-		return res
-	}
-
-	// Quad - curve passes through mid points. If path is open, then passes through start and end too.
-
-	if cp.Style == Quad {
-		// Calc mid points
+	case Quad: // Quad - curve passes through mid points. If path is open, then passes through start and end too.
 		mp := make([][]float64, ns)
-		for i := 0; i < ns-1; i++ {
+		for i := range ns - 1 {
 			mp[i] = util.Centroid(points[i], points[i+1])
 		}
 		mp[ns-1] = util.Centroid(points[ns-1], points[0])
@@ -105,45 +99,43 @@ func (cp CurveProc) Process(p *Path) []*Path {
 		} else {
 			res[0].AddStep(points[ns-1])
 		}
-
-		return res
-	}
-
-	// Catmull-Rom - curve passes through all points
-
-	// Calc opposite tangents
-	ops := make([][]float64, ns)
-	for i := 1; i < ns-1; i++ {
-		ops[i] = []float64{(points[i+1][0] - points[i-1][0]) / 2, (points[i+1][1] - points[i-1][1]) / 2}
-	}
-	if p.closed {
-		ops[0] = []float64{(points[1][0] - points[ns-1][0]) / 2, (points[1][1] - points[ns-1][1]) / 2}
-		ops[ns-1] = []float64{(points[0][0] - points[ns-2][0]) / 2, (points[0][1] - points[ns-2][1]) / 2}
-	} else {
-		ops[0] = []float64{0, 0}
-		ops[ns-1] = ops[0]
-	}
-
-	// Create path
-	res = append(res, NewPath(points[0]))
-	if p.closed {
-		for i := 0; i < ns-1; i++ {
-			c1, c2 := cp.calcControlOpp(points[i], ops[i], points[i+1], ops[i+1])
-			res[0].AddStep(c1, c2, points[i+1])
+	case CatmullRom: // Catmull-Rom - curve passes through all points
+		// Calc opposite tangents
+		ops := make([][]float64, ns)
+		for i := 1; i < ns-1; i++ {
+			ops[i] = []float64{(points[i+1][0] - points[i-1][0]) / 2, (points[i+1][1] - points[i-1][1]) / 2}
 		}
-		c1, c2 := cp.calcControlOpp(points[ns-1], ops[ns-1], points[0], ops[0])
-		res[0].AddStep(c1, c2, points[0])
-		res[0].Close()
-	} else {
-		// Insert quads for start and end
-		_, c2 := cp.calcControlOpp(points[0], ops[0], points[1], ops[1])
-		res[0].AddStep(c2, points[1])
-		for i := 1; i < ns-2; i++ {
-			c1, c2 := cp.calcControlOpp(points[i], ops[i], points[i+1], ops[i+1])
-			res[0].AddStep(c1, c2, points[i+1])
+		if p.closed {
+			ops[0] = []float64{(points[1][0] - points[ns-1][0]) / 2, (points[1][1] - points[ns-1][1]) / 2}
+			ops[ns-1] = []float64{(points[0][0] - points[ns-2][0]) / 2, (points[0][1] - points[ns-2][1]) / 2}
+		} else {
+			ops[0] = []float64{0, 0}
+			ops[ns-1] = ops[0]
 		}
-		c1, _ := cp.calcControlOpp(points[ns-2], ops[ns-2], points[ns-1], ops[ns-1])
-		res[0].AddStep(c1, points[ns-1])
+
+		// Create path
+		res = append(res, NewPath(points[0]))
+		if p.closed {
+			for i := 0; i < ns-1; i++ {
+				c1, c2 := cp.calcControlOpp(points[i], ops[i], points[i+1], ops[i+1])
+				res[0].AddStep(c1, c2, points[i+1])
+			}
+			c1, c2 := cp.calcControlOpp(points[ns-1], ops[ns-1], points[0], ops[0])
+			res[0].AddStep(c1, c2, points[0])
+			res[0].Close()
+		} else {
+			// Insert quads for start and end
+			_, c2 := cp.calcControlOpp(points[0], ops[0], points[1], ops[1])
+			res[0].AddStep(c2, points[1])
+			for i := 1; i < ns-2; i++ {
+				c1, c2 := cp.calcControlOpp(points[i], ops[i], points[i+1], ops[i+1])
+				res[0].AddStep(c1, c2, points[i+1])
+			}
+			c1, _ := cp.calcControlOpp(points[ns-2], ops[ns-2], points[ns-1], ops[ns-1])
+			res[0].AddStep(c1, points[ns-1])
+		}
+	default:
+		res = append(res, p.Copy())
 	}
 
 	return res
