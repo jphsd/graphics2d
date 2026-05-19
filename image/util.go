@@ -27,6 +27,12 @@ func NewRGBA(w, h int, col color.Color) *RGBA {
 	return res
 }
 
+// FillRGBA fills the image with the color
+func FillRGBA(img *image.RGBA, col color.Color) {
+	bg := NewUniform(col)
+	draw.Draw(img, img.Bounds(), bg, Point{}, draw.Src)
+}
+
 // CopyRGBA clones an RGBA image.
 func CopyRGBA(in *RGBA) *RGBA {
 	res := &RGBA{make([]uint8, len(in.Pix)), in.Stride, in.Rect}
@@ -45,6 +51,12 @@ func NewRGBA64(w, h int, col color.Color) *RGBA64 {
 	return res
 }
 
+// FillRGBA64 fills the image with the color
+func FillRGBA64(img *image.RGBA64, col color.Color) {
+	bg := NewUniform(col)
+	draw.Draw(img, img.Bounds(), bg, Point{}, draw.Src)
+}
+
 // CopyRGBA64 clones an RGBA64 image.
 func CopyRGBA64(in *RGBA64) *RGBA64 {
 	res := &RGBA64{make([]uint8, len(in.Pix)), in.Stride, in.Rect}
@@ -61,6 +73,12 @@ func NewAlpha(w, h int, col color.Color) *Alpha {
 		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
 	}
 	return res
+}
+
+// FillAlpha fills the image with the color
+func FillAlpha(img *image.Alpha, col color.Color) {
+	bg := NewUniform(col)
+	draw.Draw(img, img.Bounds(), bg, Point{}, draw.Src)
 }
 
 // CopyAlpha clones an Alpha image.
@@ -97,7 +115,12 @@ func NewGray(w, h int, col color.Color) *Gray {
 		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
 	}
 	return res
-	return res
+}
+
+// FillGray fills the image with the color
+func FillGray(img *image.Gray, col color.Color) {
+	bg := NewUniform(col)
+	draw.Draw(img, img.Bounds(), bg, Point{}, draw.Src)
 }
 
 // CopyGray clones a Gray image.
@@ -116,6 +139,12 @@ func NewGray16(w, h int, col color.Color) *Gray16 {
 		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
 	}
 	return res
+}
+
+// FillGray16 fills the image with the color
+func FillGray16(img *image.Gray16, col color.Color) {
+	bg := NewUniform(col)
+	draw.Draw(img, img.Bounds(), bg, Point{}, draw.Src)
 }
 
 // CopyGray16 clones a Gray16 image.
