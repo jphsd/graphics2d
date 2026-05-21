@@ -10,9 +10,9 @@
 [Graphics2D](https://pkg.go.dev/github.com/jphsd/graphics2d) is a vector based drawing package that
 leverages [golang.org/x/image/vector](https://pkg.go.dev/golang.org/x/image/vector) to render shapes into an image.
 
-The vector package extends [image/draw](https://pkg.go.dev/image/draw) to create a mask that a source image
-is rendered through into the destination image.
-Graphics2D follows this convention.
+The vector package works by extending [image/draw](https://pkg.go.dev/image/draw)
+to create a mask that a source image can then rendered through, into an underlying destination image.
+The graphics2d package follows this convention.
 
 All the pictures and diagrams in this README were created with this package.
 Clicking on one will take you to the code that created it.
