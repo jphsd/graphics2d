@@ -278,7 +278,7 @@ func RegularPolygon(n int, c []float64, s, th float64) *Path {
 }
 
 // Square is a convenience wrapper around RegularPolygon which
-// returns a square centered on c, with side length s, and aligned with the axes.
+// returns an axes aligned square centered on c, with side length s.
 func Square(c []float64, s float64) *Path {
 	return RegularPolygon(4, c, s, 0)
 }
@@ -504,7 +504,7 @@ func Lune3(c1 []float64, r1 float64, c2 []float64, r2 float64) *Path {
 	return arc1
 }
 
-// Rectangle returns a closed path describing a rectangle with sides w and h, centered on c.
+// Rectangle returns a closed path describing an axes aligned rectangle with sides w and h, centered on c.
 func Rectangle(c []float64, w, h float64) *Path {
 	hw, hh := w/2, h/2
 	sx, sy := c[0]-hw, c[1]-hh
