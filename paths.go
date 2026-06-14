@@ -277,6 +277,12 @@ func RegularPolygon(n int, c []float64, s, th float64) *Path {
 	return Polygon(points...)
 }
 
+// Square is a convenience wrapper around RegularPolygon which
+// returns a square centered on c, with side length s, and aligned with the axes.
+func Square(c []float64, s float64) *Path {
+	return RegularPolygon(4, c, s, 0)
+}
+
 // ReentrantPolygon returns a closed path describing an n pointed star.
 func ReentrantPolygon(c []float64, r float64, n int, t, ang float64) *Path {
 	ang -= HalfPi // So ang = 0 has the start of the polygon pointing up
