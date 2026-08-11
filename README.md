@@ -11,11 +11,11 @@
 leverages [golang.org/x/image/vector](https://pkg.go.dev/golang.org/x/image/vector) to render shapes into an image.
 
 The vector package works by extending [image/draw](https://pkg.go.dev/image/draw)
-to create a mask that a source image can then rendered through, into an underlying destination image.
+to create a mask, that the source image is rendered through, into the underlying destination image.
 The graphics2d package follows this convention.
 
-All the pictures and diagrams in this README were created with this package.
-Clicking on one will take you to the code that created it.
+All the pictures and diagrams in this README are created with this package.
+Clicking on one will take you to the code that creates it.
 
 ### Paths
 
@@ -95,6 +95,10 @@ to be specified too, one of Quad, Bezier or CatmullRom (L to R in the example).
 
 Another path processor that can be used to create curved paths is [RoundedProc](https://pkg.go.dev/github.com/jphsd/graphics2d#RoundedProc).
 This example uses increasing curve radii from L to R.
+
+Path processors can be chained together to produce more sophisticated paths using
+[CompoundProc](https://pkg.go.dev/github.com/jphsd/graphics2d#CompoundProc).
+This path processor provides an option to concatenate paths prior to running the next path processor.
 
 Shapes have a similar function [ProcessPaths](https://pkg.go.dev/github.com/jphsd/graphics2d#Shape.ProcessPaths)
 which runs a path processor over all of the paths in a shape.
