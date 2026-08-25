@@ -94,3 +94,13 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler 
 	rasterizer.Draw(nmask, drect, mask, mp)
 	draw.DrawMask(dst, drect, filler, fp, nmask, drect.Min, op)
 }
+
+// Draw is a wrapper around draw.Draw that uses a Uniform color as the src.
+func Draw(dst draw.Image, rect image.Rectangle, col color.Color, op draw.Op) {
+	draw.Draw(dst, rect, &image.Uniform{col}, image.Point{}, op)
+}
+
+// DrawMask is a wrapper around draw.DrawMask that uses a Uniform color as the src.
+func DrawMask(dst draw.Image, rect image.Rectangle, col color.Color, mask *image.Alpha, mp image.Point, op draw.Op) {
+	draw.DrawMask(dst, rect, &image.Uniform{col}, image.Point{}, mask, mp, op)
+}
