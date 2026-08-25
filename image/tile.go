@@ -2,8 +2,7 @@ package image
 
 import (
 	"image"
-	//"image/color"
-	"github.com/jphsd/graphics2d/color"
+	"image/color"
 	"image/draw"
 )
 
@@ -23,6 +22,7 @@ func NewTile(img Image) *Tile {
 	rect := img.Bounds()
 	w, h := rect.Dx(), rect.Dy()
 	tile := image.NewRGBA(image.Rectangle{image.Point{}, rect.Size()})
+	// Copy
 	draw.Draw(tile, tile.Bounds(), img, rect.Min, draw.Src)
 	return &Tile{tile, w, h, 0, 0, 0, 0}
 }

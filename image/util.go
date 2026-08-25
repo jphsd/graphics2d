@@ -18,8 +18,7 @@ import (
 
 // Fill fills the image with the color
 func Fill(img draw.Image, col color.Color) {
-	bg := NewUniform(col)
-	draw.Draw(img, img.Bounds(), bg, Point{}, draw.Src)
+	draw.Draw(img, img.Bounds(), &image.Uniform{col}, Point{}, draw.Src)
 }
 
 // NewRGBA is a wrapper for image.RGBA which returns a new image of the desired size filled with color.
@@ -27,8 +26,7 @@ func NewRGBA(w, h int, col color.Color) *RGBA {
 	res := image.NewRGBA(image.Rect(0, 0, w, h))
 	r, g, b, a := col.RGBA()
 	if r != 0 || g != 0 || b != 0 || a != 0 {
-		bg := NewUniform(col)
-		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+		draw.Draw(res, res.Bounds(), &image.Uniform{col}, Point{}, draw.Src)
 	}
 	return res
 }
@@ -45,8 +43,7 @@ func NewRGBA64(w, h int, col color.Color) *RGBA64 {
 	res := image.NewRGBA64(Rect(0, 0, w, h))
 	r, g, b, a := col.RGBA()
 	if r != 0 || g != 0 || b != 0 || a != 0 {
-		bg := NewUniform(col)
-		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+		draw.Draw(res, res.Bounds(), &image.Uniform{col}, Point{}, draw.Src)
 	}
 	return res
 }
@@ -63,8 +60,7 @@ func NewAlpha(w, h int, col color.Color) *Alpha {
 	res := image.NewAlpha(Rect(0, 0, w, h))
 	_, _, _, a := col.RGBA()
 	if a != 0 {
-		bg := NewUniform(col)
-		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+		draw.Draw(res, res.Bounds(), &image.Uniform{col}, Point{}, draw.Src)
 	}
 	return res
 }
@@ -81,8 +77,7 @@ func NewAlpha16(w, h int, col color.Color) *Alpha16 {
 	res := image.NewAlpha16(Rect(0, 0, w, h))
 	_, _, _, a := col.RGBA()
 	if a != 0 {
-		bg := NewUniform(col)
-		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+		draw.Draw(res, res.Bounds(), &image.Uniform{col}, Point{}, draw.Src)
 	}
 	return res
 }
@@ -99,8 +94,7 @@ func NewGray(w, h int, col color.Color) *Gray {
 	res := image.NewGray(Rect(0, 0, w, h))
 	r, _, _, _ := col.RGBA()
 	if r != 0 {
-		bg := NewUniform(col)
-		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+		draw.Draw(res, res.Bounds(), &image.Uniform{col}, Point{}, draw.Src)
 	}
 	return res
 }
@@ -117,8 +111,7 @@ func NewGray16(w, h int, col color.Color) *Gray16 {
 	res := image.NewGray16(Rect(0, 0, w, h))
 	r, _, _, _ := col.RGBA()
 	if r != 0 {
-		bg := NewUniform(col)
-		draw.Draw(res, res.Bounds(), bg, Point{}, draw.Src)
+		draw.Draw(res, res.Bounds(), &image.Uniform{col}, Point{}, draw.Src)
 	}
 	return res
 }
