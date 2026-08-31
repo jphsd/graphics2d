@@ -6,23 +6,25 @@ import (
 	"github.com/jphsd/graphics2d/util"
 )
 
-// FSnipProc contains the snip pattern and offset. The snip pattern represents lengths of state0, state1,
-// ... stateN-1, and is in the same coordinate system as the path. The offset provides the ability to
-// start from anywhere in the pattern.
+// FSnipProc contains the snip pattern and offset.
+// The snip pattern represents lengths of state0, state1, ... stateN-1,
+// and is in the same coordinate system as the path.
+// The offset provides the ability to start from anywhere in the pattern.
 type FSnipProc struct {
 	N       int
 	Pattern []float64
 	Flatten float64
 	State   int
-	length  float64
-	patind  int
+	length  float64 // pattern length
 	delta   float64
+	patind  int
 }
 
 // SnipProc preserves the curve order of the parts. FSnipProc flattens the path so all parts are linear.
 
-// NewFSnipProc creates a new snip path processor with the supplied pattern and offset. If the pattern is
-// not N in length then it is replicated to create a mod N length pattern.
+// NewFSnipProc creates a new snip path processor with the supplied pattern and offset.
+// If the pattern is not N in length then it is replicated to create a mod N length pattern.
+// All returned paths are composed of possibly multiple lines (flattened).
 func NewFSnipProc(n int, pattern []float64, offs float64) *FSnipProc {
 	pat := pattern[:]
 	for len(pat)%n != 0 {
@@ -97,7 +99,7 @@ func (sp *FSnipProc) Process(p *Path) []*Path {
 	}
 
 	// Flatten the path and get the parts as lines
-	path := p.Flatten(sp.Flatten).Process(&StepsToLinesProc{false})[0]
+	path := p.Flatten(sp.Flatten).Process(StepsToLinesProc{false})[0]
 	parts := path.Parts()
 
 	// Pattern state variables

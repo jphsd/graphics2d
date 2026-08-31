@@ -1,8 +1,8 @@
 package graphics2d
 
-// StepsToLinesProc takes a path and converts all of the points to lines.
+// StepsToLinesProc takes a path and converts all of the polynomial steps to linear ones.
 type StepsToLinesProc struct {
-	IncCP bool
+	IncCP bool // Include control points
 }
 
 // Process implements the PathProcessor interface.

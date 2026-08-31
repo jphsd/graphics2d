@@ -319,10 +319,10 @@ func Example_fig09() {
 func Example_fig10() {
 	// Line, MPD it, round it - a wriggle
 	path := g2d.Line([]float64{30, 150}, []float64{530, 150})
-	path = path.Process(&g2d.MPDProc{.3, 3, 0.5, false})[0]
-	path = path.Process(&g2d.RoundedProc{1000})[0]
+	path = path.Process(g2d.MPDProc{.3, 3, 0.5, false})[0]
+	path = path.Process(g2d.RoundedProc{1000})[0]
 
-	proc := &g2d.VWTraceProc{
+	proc := g2d.VWTraceProc{
 		Width:   -20,
 		Flatten: g2d.RenderFlatten,
 	}

@@ -242,7 +242,7 @@ func (rc RSCap) CapRoundedSquare(p1 Part, p []float64, p2 Part) []Part {
 	s2 := []float64{s1[0] - dy, s1[1] + dx}
 	parts := []Part{{e1, e2}, {e2, s2}, {s2, s1}}
 	path := PartsToPath(parts...)
-	rp := &RoundedProc{r}
+	rp := RoundedProc{r}
 	return path.Process(rp)[0].Parts()
 }
 

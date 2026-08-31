@@ -6,9 +6,10 @@ import (
 	"github.com/jphsd/graphics2d/util"
 )
 
-// SnipProc contains the snip pattern and offset. The snip pattern represents lengths of state0, state1,
-// ... stateN-1, and is in the same coordinate system as the path. The offset provides the ability to
-// start from anywhere in the pattern.
+// SnipProc contains the snip pattern and offset.
+// The snip pattern represents lengths of state0, state1, ... stateN-1,
+// and is in the same coordinate system as the path.
+// The offset provides the ability to start from anywhere in the pattern.
 type SnipProc struct {
 	N       int
 	Pattern []float64
@@ -19,8 +20,9 @@ type SnipProc struct {
 	delta   float64
 }
 
-// NewSnipProc creates a new snip path processor with the supplied pattern and offset. If the pattern is
-// not N in length then it is replicated to create a mod N length pattern.
+// NewSnipProc creates a new snip path processor with the supplied pattern and offset.
+// If the pattern is not N in length then it is replicated to create a mod N length pattern.
+// Curves are preserved.
 func NewSnipProc(n int, pattern []float64, offs float64) *SnipProc {
 	pat := pattern[:]
 	for len(pat)%n != 0 {

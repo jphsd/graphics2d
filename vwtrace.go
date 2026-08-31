@@ -1,6 +1,7 @@
 package graphics2d
 
 import (
+	//"fmt"
 	"github.com/jphsd/graphics2d/util"
 	"math"
 )
@@ -17,13 +18,13 @@ type VWTraceProc struct {
 
 // Process implements the path processor interface.
 func (s VWTraceProc) Process(p *Path) []*Path {
-	// Flatten
-	parts := p.Parts()
-	nparts := make([]Part, 0, len(parts))
-	for _, part := range parts {
-		nparts = append(nparts, FlattenPart(s.Flatten, part)...)
+	fsp := NewFSnipProc(2, []float64{s.Flatten}, 0)
+	fsp.Flatten = s.Flatten
+	paths := p.Process(fsp)
+	parts := []Part{}
+	for _, path := range paths {
+		parts = append(parts, path.Parts()...)
 	}
-	parts = nparts
 
 	// Calculate part lengths
 	np := len(parts)
