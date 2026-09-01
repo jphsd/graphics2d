@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/jphsd/graphics2d/color"
 	"github.com/jphsd/graphics2d/util"
 	"image"
 	"math"
@@ -53,10 +54,17 @@ func (s *Shape) Mask() *image.Alpha {
 	if s.mask != nil {
 		return s.mask
 	}
-	srect := s.Bounds()
-	s.mask = image.NewAlpha(srect)
-	RenderShape(s.mask, s, image.Opaque)
+	s.mask = s.AlphaMask(color.Opaque)
 	return s.mask
+}
+
+// AlphaMask returns an Alpha image defined by the shape's bounds, containing the result
+// of rendering the shape using the supplied alpha value [0,0xff].
+func (s *Shape) AlphaMask(alpha color.Alpha16) *image.Alpha {
+	srect := s.Bounds()
+	mask := image.NewAlpha(srect)
+	RenderColoredShape(mask, s, alpha)
+	return mask
 }
 
 // Contains returns true if the points are contained within the shape, false otherwise.
