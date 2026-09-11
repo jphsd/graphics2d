@@ -854,7 +854,7 @@ type xpath struct {
 
 // MarshalXML implements the encoding/xml.Marshaler interface
 func (p *Path) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	return e.EncodeElement(xpath{p.StringSVG()}, xml.StartElement{Name: xml.Name{"", "path"}})
+	return e.EncodeElement(xpath{p.StringSVG()}, xml.StartElement{Name: xml.Name{Space: "", Local: "path"}})
 }
 
 func (p *Path) StringSVG() string {

@@ -220,7 +220,7 @@ func (s *Shape) UnmarshalJSON(b []byte) error {
 
 // MarshalXML implements the encoding/xml.Marshaler interface
 func (s *Shape) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	return e.EncodeElement(shape{s.paths}, xml.StartElement{Name: xml.Name{"", "g"}})
+	return e.EncodeElement(shape{s.paths}, xml.StartElement{Name: xml.Name{Space: "", Local: "g"}})
 }
 
 // UnmarshalXML is not supported.

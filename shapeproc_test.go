@@ -25,7 +25,7 @@ func ExampleBucketProc() {
 	img := image.NewRGBA(500, 500, color.White)
 	for i, shape := range shapes {
 		// Color shape by index into shapes
-		pen := g2d.NewPen(color.HSL{float64(i+1) / float64(n), 1, 0.5, 1}, 3)
+		pen := g2d.NewPen(color.HSL{H: float64(i+1) / float64(n), S: 1, L: 0.5, A: 1}, 3)
 		g2d.DrawShape(img, shape, pen)
 	}
 	image.SaveImage(img, "stars")

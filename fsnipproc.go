@@ -156,8 +156,6 @@ func (sp *FSnipProc) Process(p *Path) []*Path {
 			}
 		}
 	}
-
-	return res
 }
 
 // DashProc contains the dash pattern and offset. The dash pattern represents lengths of pen down, pen up,
