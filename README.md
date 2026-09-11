@@ -27,8 +27,8 @@ The path methods [LineTo](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.Li
 and [CurveTo](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.CurveTo)
 are just synonyms for [AddStep](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.AddStep).
 Once created, a path can be left as is (open), or closed [Close](https://pkg.go.dev/github.com/jphsd/graphics2d#Path).
-A closed path can no longer be extended and a line is automatically created from
-the first point in the path to its last.
+A closed path can not be extended and a line is automatically created from
+its last point to its first, if necessary.
 
 ### Shapes
 
@@ -37,9 +37,9 @@ For example, the figure 8 is composed of three paths; its external outline, and 
 
 ### Rendering
 
-Shapes are rendered to an image using a source filler image and the mask generated from the shape by
+Shapes are rendered to an image using a source image and the mask generated from the shape, by
 [RenderShape](https://pkg.go.dev/github.com/jphsd/graphics2d#RenderShape).
-If the filler is all one color,
+If the source is a single color,
 then [RenderColoredShape](https://pkg.go.dev/github.com/jphsd/graphics2d#RenderColoredShape)
 can be used.
 
@@ -59,8 +59,9 @@ These are just some of the constructors available for the Path type.
 are polynomial curves.
 While most vector packages support first, second and third order curves;
 lines, quadratic and cubic curves respectively,
-the path AddStep method has no upper limit on the number of control points that can be specified,
-allowing higher order curves to be created.
+the path [AddStep](https://pkg.go.dev/github.com/jphsd/graphics2d#Path.AddStep)
+method has no upper limit on the number of control points that can be specified,
+allowing the creation of higher order curves.
 The last example on the right is a quartic curve.
 
 ## 4. Arcs And ArcStyles
@@ -151,7 +152,7 @@ The joins are all miter joins, implicitly.
 
 The [StrokeProc](https://pkg.go.dev/github.com/jphsd/graphics2d#StrokeProc)
 is used to convert open paths to closed ones,
-since only closed paths can be filled by the renderer.
+since only closed paths are filled by the renderer.
 
 A stroke is comprised of left and right trace path processors,
 and functions that define the start and end caps of the path.
@@ -194,8 +195,10 @@ Convenience functions that take a pen argument are:
 ## 12. Gradients
 [![Fig12 image created with graphics2d](./doc/fig12.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig12)
 
-Gradients aren't strictly part of the graphics2d package since what's used to fill a shape is just an image.
-Gradient images can be created using the [texture](https://pkg.go.dev/github.com/jphsd/texture) package.
+Gradients aren't strictly part of the graphics2d package since a shape just defines a mask
+through which the source image is rendered into the destination.
+Source images containing gradients can be created using the [texture](https://pkg.go.dev/github.com/jphsd/texture)
+package.
 This package supports linear, radial, elliptical and conic gradients with convenience functions for gray scale
 and RGBA images.
 The gradients can be set to repeat and to mirror.
@@ -226,3 +229,16 @@ Unmarshaling is only supported for text and JSON.
 
 See the separate [README](https://pkg.go.dev/github.com/jphsd/graphics2d/svg#section-readme)
 for more details on how SVG rendering works.
+
+## 14. Coda
+
+Shapes are rendered as their masks using whatever source image is provided.
+A shape's mask is obtained using its [Mask](https://pkg.go.dev/github.com/jphsd/graphics2d#Shape.Mask)
+method.
+The mask image can be further manipulated or used for clipping prior to [DrawMask](https://pkg.go.dev/image/draw#DrawMask)
+being called.
+An example is provided in this [gist](https://gist.github.com/jphsd/ee4fe6d918d23257c1eb83da8a3a388f),
+which shows a watercolor like effect of dye pooling at a brush stroke's edge
+by applying a blur to the mask,
+inverting it,
+and then masking it with the original mask.
