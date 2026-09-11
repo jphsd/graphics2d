@@ -107,9 +107,11 @@ which runs a path processor over all of the paths in a shape.
 [![Fig7 image created with graphics2d](./doc/fig7.png)](https://pkg.go.dev/github.com/jphsd/graphics2d#example-package-Fig07)
 
 The [golang.org/x/image/font/sfnt](https://pkg.go.dev/golang.org/x/image/font/sfnt)
-package can read in and parse TrueType and OpenType fonts.
-Strings can be turned into shapes using a parsed font and [StringToShape](https://pkg.go.dev/github.com/jphsd/graphics2d#StringToShape).
-The shape will be in font units.
+package can load TrueType and OpenType fonts.
+Strings can be turned into shapes using such a font
+and [StringToShape](https://pkg.go.dev/github.com/jphsd/graphics2d#StringToShape).
+The shapes will be sized in [font units](https://help.fontlab.com/fontlab-vi/Font-Sizes-and-the-Coordinate-System/),
+the space the font glyphs were originally specified in.
 [ScaleAndInset](https://pkg.go.dev/github.com/jphsd/graphics2d#ScaleAndInset)
 can be used to fit the result to the desired location.
 This example also uses path processors to show the control points for the font curves.
