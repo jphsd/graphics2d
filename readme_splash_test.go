@@ -62,7 +62,7 @@ func makeRegularBackground(n, s int, min, max float64) *image.RGBA {
 	for range n {
 		c := []float64{rand.Float64() * 200, rand.Float64() * 200}
 		l := min + rand.Float64()*dl
-		col := color.HSL{rand.Float64(), 1, 0.5, 1}
+		col := color.HSL{H: rand.Float64(), S: 1, L: 0.5, A: 1}
 		th := rand.Float64() * g2d.TwoPi
 		shape := g2d.NewShape(g2d.RegularPolygon(s, c, l, th))
 		g2d.RenderColoredShape(img, shape, col)
@@ -78,7 +78,7 @@ func makeCircleBackground(n int, min, max float64) *image.RGBA {
 	for range n {
 		c := []float64{rand.Float64() * 200, rand.Float64() * 200}
 		r := min + rand.Float64()*dr
-		col := color.HSL{rand.Float64(), 1, 0.5, 1}
+		col := color.HSL{H: rand.Float64(), S: 1, L: 0.5, A: 1}
 		shape := g2d.NewShape(g2d.Circle(c, r))
 		g2d.RenderColoredShape(img, shape, col)
 	}
@@ -93,7 +93,7 @@ func makeStarBackground(n, s int, min, max float64) *image.RGBA {
 	for range n {
 		c := []float64{rand.Float64() * 200, rand.Float64() * 200}
 		r := min + rand.Float64()*dr
-		col := color.HSL{rand.Float64(), 1, 0.5, 1}
+		col := color.HSL{H: rand.Float64(), S: 1, L: 0.5, A: 1}
 		th := rand.Float64() * g2d.TwoPi
 		shape := g2d.NewShape(g2d.ReentrantPolygon(c, r, s, 0.5, th))
 		g2d.RenderColoredShape(img, shape, col)

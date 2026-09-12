@@ -36,7 +36,7 @@ var RenderFlatten = DefaultRenderFlatten
 
 // RenderShapeExt renders the supplied shape with the fill and clip images into
 // the destination image region using op.
-func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler image.Image, fp image.Point, mask *image.Alpha, mp image.Point, op draw.Op) {
+func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler image.Image, fp image.Point, mask image.Image, mp image.Point, op draw.Op) {
 	orig := drect.Min
 
 	// To avoid unnecessary work, reduce the rasterizer size to the shape width and height
@@ -101,6 +101,6 @@ func Draw(dst draw.Image, rect image.Rectangle, col color.Color, op draw.Op) {
 }
 
 // DrawMask is a wrapper around draw.DrawMask that uses a Uniform color as the src.
-func DrawMask(dst draw.Image, rect image.Rectangle, col color.Color, mask *image.Alpha, mp image.Point, op draw.Op) {
+func DrawMask(dst draw.Image, rect image.Rectangle, col color.Color, mask image.Image, mp image.Point, op draw.Op) {
 	draw.DrawMask(dst, rect, &image.Uniform{col}, image.Point{}, mask, mp, op)
 }
