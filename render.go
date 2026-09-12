@@ -15,17 +15,17 @@ func RenderColoredShape(dst draw.Image, shape *Shape, fill color.Color) {
 	RenderShape(dst, shape, image.NewUniform(fill))
 }
 
-// RenderShape renders the supplied shape with the fill image into the destination image.
-func RenderShape(dst draw.Image, shape *Shape, filler image.Image) {
+// RenderShape renders the supplied shape with the src image into the destination image.
+func RenderShape(dst draw.Image, shape *Shape, src image.Image) {
 	r := dst.Bounds()
-	RenderShapeExt(dst, r, shape, filler, r.Min, nil, image.Point{}, draw.Over)
+	RenderShapeExt(dst, r, shape, src, r.Min, nil, image.Point{}, draw.Over)
 }
 
-// RenderClippedShape renders the supplied shape with the fill image into the destination image
+// RenderClippedShape renders the supplied shape with the src image into the destination image
 // as masked by the clip shape.
-func RenderClippedShape(dst draw.Image, shape, clip *Shape, filler image.Image) {
+func RenderClippedShape(dst draw.Image, shape, clip *Shape, src image.Image) {
 	r := dst.Bounds()
-	RenderShapeExt(dst, r, shape, filler, r.Min, clip.Mask(), r.Min, draw.Over)
+	RenderShapeExt(dst, r, shape, src, r.Min, clip.Mask(), r.Min, draw.Over)
 }
 
 // DefaultRenderFlatten is the standard curve flattening value.
@@ -34,17 +34,17 @@ const DefaultRenderFlatten = 0.6
 // RenderFlatten is the curve flattening value used when rendering.
 var RenderFlatten = DefaultRenderFlatten
 
-// RenderShapeExt renders the supplied shape with the fill and clip images into
+// RenderShapeExt renders the supplied shape with the src and clip images into
 // the destination image region using op.
-func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler image.Image, fp image.Point, mask image.Image, mp image.Point, op draw.Op) {
+func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, src image.Image, sp image.Point, mask image.Image, mp image.Point, op draw.Op) {
 	orig := drect.Min
 
 	// To avoid unnecessary work, reduce the rasterizer size to the shape width and height
 	// clipped by the destination image bounds, the filler image and the clip image
 	srect := shape.Bounds()
 	drect = drect.Intersect(srect)
-	// the filler bounds
-	drect = drect.Intersect(filler.Bounds().Add(orig.Sub(fp)))
+	// the src bounds
+	drect = drect.Intersect(src.Bounds().Add(orig.Sub(sp)))
 	// and the clip bounds (if present)
 	if mask != nil {
 		drect = drect.Intersect(mask.Bounds().Add(orig.Sub(mp)))
@@ -79,11 +79,11 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler 
 		rasterizer.ClosePath()
 	}
 
-	fp.X += dx
-	fp.Y += dy
+	sp.X += dx
+	sp.Y += dy
 
 	if mask == nil {
-		rasterizer.Draw(dst, drect, filler, fp)
+		rasterizer.Draw(dst, drect, src, sp)
 		return
 	}
 
@@ -92,7 +92,7 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, filler 
 	mp.X += dx
 	mp.Y += dy
 	rasterizer.Draw(nmask, drect, mask, mp)
-	draw.DrawMask(dst, drect, filler, fp, nmask, drect.Min, op)
+	draw.DrawMask(dst, drect, src, sp, nmask, drect.Min, op)
 }
 
 // Draw is a wrapper around draw.Draw that uses a Uniform color as the src.
