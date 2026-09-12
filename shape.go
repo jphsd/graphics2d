@@ -16,7 +16,7 @@ import (
 type Shape struct {
 	paths  []*Path
 	bbox   [][]float64
-	mask   *image.Alpha
+	mask   *image.Alpha16
 	parent *Shape
 }
 
@@ -50,7 +50,7 @@ func (s *Shape) Bounds() image.Rectangle {
 
 // Mask returns an Alpha image defined by the shape's bounds, containing the result
 // of rendering the shape.
-func (s *Shape) Mask() *image.Alpha {
+func (s *Shape) Mask() *image.Alpha16 {
 	if s.mask != nil {
 		return s.mask
 	}
@@ -60,9 +60,9 @@ func (s *Shape) Mask() *image.Alpha {
 
 // AlphaMask returns an Alpha image defined by the shape's bounds, containing the result
 // of rendering the shape using the supplied alpha value [0,0xff].
-func (s *Shape) AlphaMask(alpha color.Alpha16) *image.Alpha {
+func (s *Shape) AlphaMask(alpha color.Alpha16) *image.Alpha16 {
 	srect := s.Bounds()
-	mask := image.NewAlpha(srect)
+	mask := image.NewAlpha16(srect)
 	RenderColoredShape(mask, s, alpha)
 	return mask
 }
@@ -81,7 +81,7 @@ func (s *Shape) Contains(pts ...[]float64) bool {
 			return false
 		}
 		// Mask test
-		if mask.AlphaAt(x, y).A < 128 {
+		if mask.Alpha16At(x, y).A < 0x8000 {
 			return false
 		}
 	}

@@ -53,10 +53,8 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, src ima
 		return
 	}
 
-	size := drect.Size()
-	dx, dy := drect.Min.X-orig.X, drect.Min.Y-orig.Y
-
 	// Make rasterizer, note rasterizer has implicit r.Min of {0, 0}
+	size := drect.Size()
 	rasterizer := vector.NewRasterizer(size.X, size.Y)
 	rasterizer.DrawOp = op
 
@@ -64,11 +62,14 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, src ima
 	minx, miny := float32(drect.Min.X), float32(drect.Min.Y)
 
 	for _, path := range shape.paths {
+		// Omit paths outside drect
 		prect := path.Bounds() // shape.Bounds() will have caused these to be generated already
 		prect = drect.Intersect(prect)
 		if prect.Empty() {
 			continue
 		}
+
+		// Flatten steps and rasterize as lines
 		fp := path.Flatten(RenderFlatten) // default tolerance 0.6
 		step := util.ToF32(fp.steps[0][0]...)
 		rasterizer.MoveTo(step[0]-minx, step[1]-miny)
@@ -79,6 +80,8 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, src ima
 		rasterizer.ClosePath()
 	}
 
+	// Capture offsets into src offset
+	dx, dy := drect.Min.X-orig.X, drect.Min.Y-orig.Y
 	sp.X += dx
 	sp.Y += dy
 
@@ -88,7 +91,7 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, src ima
 	}
 
 	// Process clip mask - obtain rasterizer mask and intersect it against the clip mask
-	nmask := image.NewAlpha(drect)
+	nmask := image.NewAlpha16(drect)
 	mp.X += dx
 	mp.Y += dy
 	rasterizer.Draw(nmask, drect, mask, mp)
