@@ -58,14 +58,12 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, src ima
 	rasterizer := vector.NewRasterizer(size.X, size.Y)
 	rasterizer.DrawOp = op
 
-	// Process paths translated by -drect.Min since mp is {0, 0} in the vectorizer
+	// Process paths translated by -drect.Min since mp is {0, 0} in the rasterizer
 	minx, miny := float32(drect.Min.X), float32(drect.Min.Y)
 
 	for _, path := range shape.paths {
 		// Omit paths outside drect
-		prect := path.Bounds() // shape.Bounds() will have caused these to be generated already
-		prect = drect.Intersect(prect)
-		if prect.Empty() {
+		if drect.Intersect(path.Bounds()).Empty() {
 			continue
 		}
 

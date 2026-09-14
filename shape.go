@@ -68,6 +68,7 @@ func (s *Shape) AlphaMask(alpha color.Alpha16) *image.Alpha16 {
 }
 
 // Contains returns true if the points are contained within the shape, false otherwise.
+// Uses the shape's mask to perform the lookup.
 func (s *Shape) Contains(pts ...[]float64) bool {
 	rect := s.Bounds()
 	mask := s.Mask()
@@ -96,7 +97,7 @@ func NewShape(paths ...*Path) *Shape {
 }
 
 // AddPaths adds paths to the shape.
-func (s *Shape) AddPaths(paths ...*Path) {
+func (s *Shape) AddPaths(paths ...*Path) *Shape {
 	for _, p := range paths {
 		if p == nil {
 			continue
@@ -111,13 +112,15 @@ func (s *Shape) AddPaths(paths ...*Path) {
 	}
 	s.bbox = nil
 	s.mask = nil
+	return s
 }
 
 // AddShapes adds the paths from the supplied shapes to this shape.
-func (s *Shape) AddShapes(shapes ...*Shape) {
+func (s *Shape) AddShapes(shapes ...*Shape) *Shape {
 	for _, shape := range shapes {
 		s.AddPaths(shape.Paths()...)
 	}
+	return s
 }
 
 // Paths returns a shallow copy of the paths contained by this shape.
@@ -179,6 +182,7 @@ func (s *Shape) String() string {
 }
 
 // PointInShape returns true if the point is contained within any path within the shape.
+// Uses the path's PointInPath method.
 func (s *Shape) PointInShape(pt []float64) bool {
 	for _, path := range s.paths {
 		if path.PointInPath(pt) {
