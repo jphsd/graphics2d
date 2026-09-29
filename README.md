@@ -237,7 +237,7 @@ method.
 The mask image can be further manipulated or used for clipping prior to [DrawMask](https://pkg.go.dev/image/draw#DrawMask)
 being called.
 An example is provided in this [gist](https://gist.github.com/jphsd/ee4fe6d918d23257c1eb83da8a3a388f),
-which shows a watercolor like effect of dye pooling at a brush stroke's edge
+which shows a watercolor like effect of pigment pooling at a brush stroke's edge
 by applying a blur to the mask,
 inverting it,
 and then masking it with the original mask.
