@@ -12,11 +12,14 @@ This package is not intended as a full SVG implementation.
 It simply provides a way to output the paths and shapes created
 in [graphics2d](https://pkg.go.dev/github.com/jphsd/graphics2d)
 as SVG.
-The separate [xml/svg](https://pkg.go.dev/github.com/jphsd/xml/svg)
+
+A separate [xml/svg](https://pkg.go.dev/github.com/jphsd/xml/svg)
 package provides ways of converting an SVG document into
 a [Renderable](https://pkg.go.dev/github.com/jphsd/graphics2d#Renderable).
+See this [example](https://github.com/jphsd/xml/blob/master/svg/cmd/svgrender.go),
+which will render an SVG file as an image.
 
-## 2. MarshallXML
+## 2. Marshal XML
 
 [Path](https://pkg.go.dev/github.com/jphsd/graphics2d#Path)
 and [Shape](https://pkg.go.dev/github.com/jphsd/graphics2d#Shape)
