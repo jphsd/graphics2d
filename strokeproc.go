@@ -44,7 +44,7 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 	// Need to switch the direction of the LHS path
 	lhs = lhs.Reverse()
 
-	if p.closed {
+	if p.Closed() {
 		// Process has already performed the last join
 		rhs.Close()
 		lhs.Close()

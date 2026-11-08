@@ -35,7 +35,7 @@ func (cp CurveProc) Process(p *Path) []*Path {
 		points[i] = step[len(step)-1]
 	}
 
-	if p.closed && util.EqualsP(points[0], points[ns-1]) {
+	if p.Closed() && util.EqualsP(points[0], points[ns-1]) {
 		ns--
 	}
 
@@ -53,7 +53,7 @@ func (cp CurveProc) Process(p *Path) []*Path {
 		mp[ns-1] = util.Centroid(points[ns-1], points[0])
 
 		// Create path
-		if p.closed {
+		if p.Closed() {
 			res = append(res, NewPath(mp[0]))
 		} else {
 			res = append(res, NewPath(points[0]))
@@ -64,7 +64,7 @@ func (cp CurveProc) Process(p *Path) []*Path {
 			c2 := Lerp(cp.Scale, mp[i], points[i])
 			res[0].AddStep(c1, c2, mp[i])
 		}
-		if p.closed {
+		if p.Closed() {
 			c1 := Lerp(cp.Scale, mp[ns-2], points[ns-1])
 			c2 := Lerp(cp.Scale, mp[ns-1], points[ns-1])
 			res[0].AddStep(c1, c2, mp[ns-1])
@@ -83,7 +83,7 @@ func (cp CurveProc) Process(p *Path) []*Path {
 		mp[ns-1] = util.Centroid(points[ns-1], points[0])
 
 		// Create path
-		if p.closed {
+		if p.Closed() {
 			res = append(res, NewPath(mp[0]))
 		} else {
 			res = append(res, NewPath(points[0]))
@@ -92,7 +92,7 @@ func (cp CurveProc) Process(p *Path) []*Path {
 		for i := 1; i < ns-1; i++ {
 			res[0].AddStep(points[i], mp[i])
 		}
-		if p.closed {
+		if p.Closed() {
 			res[0].AddStep(points[ns-1], mp[ns-1])
 			res[0].AddStep(points[0], mp[0])
 			res[0].Close()
@@ -105,7 +105,7 @@ func (cp CurveProc) Process(p *Path) []*Path {
 		for i := 1; i < ns-1; i++ {
 			ops[i] = []float64{(points[i+1][0] - points[i-1][0]) / 2, (points[i+1][1] - points[i-1][1]) / 2}
 		}
-		if p.closed {
+		if p.Closed() {
 			ops[0] = []float64{(points[1][0] - points[ns-1][0]) / 2, (points[1][1] - points[ns-1][1]) / 2}
 			ops[ns-1] = []float64{(points[0][0] - points[ns-2][0]) / 2, (points[0][1] - points[ns-2][1]) / 2}
 		} else {
@@ -115,7 +115,7 @@ func (cp CurveProc) Process(p *Path) []*Path {
 
 		// Create path
 		res = append(res, NewPath(points[0]))
-		if p.closed {
+		if p.Closed() {
 			for i := 0; i < ns-1; i++ {
 				c1, c2 := cp.calcControlOpp(points[i], ops[i], points[i+1], ops[i+1])
 				res[0].AddStep(c1, c2, points[i+1])

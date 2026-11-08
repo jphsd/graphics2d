@@ -31,14 +31,14 @@ func (j JitterProc) Process(p *Path) []*Path {
 		dx, dy := part[end][0]-part[0][0], part[end][1]-part[0][1]
 		l := math.Hypot(dx, dy)
 		nx, ny := dy/l, -dx/l
-		if p.closed && i == 0 {
+		if p.Closed() && i == 0 {
 			// Jitter first if closed
 			dl := l * (rand.Float64()*2 - 1) * j.Perc / 2
 			part[0][0] += nx * dl
 			part[0][1] += ny * dl
 			res = NewPath(part[0])
 		}
-		if i != np-1 || p.closed {
+		if i != np-1 || p.Closed() {
 			dl := l * (rand.Float64()*2 - 1) * j.Perc / 2
 			part[end][0] += nx * dl
 			part[end][1] += ny * dl
@@ -46,7 +46,7 @@ func (j JitterProc) Process(p *Path) []*Path {
 		}
 	}
 
-	if p.closed {
+	if p.Closed() {
 		res.Close()
 	}
 
@@ -75,17 +75,17 @@ func (sp CircularJitterProc) Process(p *Path) []*Path {
 	for i := range np {
 		part := parts[i]
 		end := len(part) - 1
-		if p.closed && i == 0 {
+		if p.Closed() && i == 0 {
 			part[0] = rjitter(part[0], sp.Radius)
 			res = NewPath(part[0])
 		}
-		if i != np-1 || p.closed {
+		if i != np-1 || p.Closed() {
 			part[end] = rjitter(part[end], sp.Radius)
 		}
 		res.AddStep(part[1:]...)
 	}
 
-	if p.closed {
+	if p.Closed() {
 		res.Close()
 	}
 
