@@ -15,41 +15,50 @@ type JitterProc struct {
 func (j JitterProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	np := len(parts)
-	if np == 0 {
+	if np == 0 || len(parts[0]) == 1 {
 		return []*Path{p}
 	}
 
-	// Path start and end are left unchanged
-	res := NewPath(parts[0][0])
-	if len(parts[0]) == 1 {
+	if p.Closed() {
+		// Jitter start point
+		part := parts[0]
+		end := len(part) - 1
+		dx, dy := part[end][0]-part[0][0], part[end][1]-part[0][1]
+		l := math.Hypot(dx, dy)
+		nx, ny := dy/l, -dx/l
+		dl := l * (rand.Float64()*2 - 1) * j.Perc / 2
+		part[0][0] += nx * dl
+		part[0][1] += ny * dl
+		res := NewPath(part[0])
+		// first point = last point
+		for i := range np - 1 {
+			part = parts[i]
+			end = len(part) - 1
+			dx, dy = part[end][0]-part[0][0], part[end][1]-part[0][1]
+			l = math.Hypot(dx, dy)
+			nx, ny = dy/l, -dx/l
+			dl = l * (rand.Float64()*2 - 1) * j.Perc / 2
+			part[end][0] += nx * dl
+			part[end][1] += ny * dl
+			res.AddStep(part[1:]...)
+		}
+		res.Close()
 		return []*Path{res}
 	}
 
-	for i := range np {
+	// Leave first and last points unchanged
+	res := NewPath(parts[0][0])
+	for i := range np - 1 {
 		part := parts[i]
 		end := len(part) - 1
 		dx, dy := part[end][0]-part[0][0], part[end][1]-part[0][1]
 		l := math.Hypot(dx, dy)
 		nx, ny := dy/l, -dx/l
-		if p.Closed() && i == 0 {
-			// Jitter first if closed
-			dl := l * (rand.Float64()*2 - 1) * j.Perc / 2
-			part[0][0] += nx * dl
-			part[0][1] += ny * dl
-			res = NewPath(part[0])
-		}
-		if i != np-1 || p.Closed() {
-			dl := l * (rand.Float64()*2 - 1) * j.Perc / 2
-			part[end][0] += nx * dl
-			part[end][1] += ny * dl
-			res.AddStep(part[1:]...)
-		}
+		dl := l * (rand.Float64()*2 - 1) * j.Perc / 2
+		part[end][0] += nx * dl
+		part[end][1] += ny * dl
+		res.AddStep(part[1:]...)
 	}
-
-	if p.Closed() {
-		res.Close()
-	}
-
 	return []*Path{res}
 }
 
@@ -62,33 +71,34 @@ type CircularJitterProc struct {
 func (sp CircularJitterProc) Process(p *Path) []*Path {
 	parts := p.Parts()
 	np := len(parts)
-	if np == 0 {
+	if np == 0 || len(parts[0]) == 1 {
 		return []*Path{p}
 	}
 
-	// Path start and end are left unchanged
-	res := NewPath(parts[0][0])
-	if len(parts[0]) == 1 {
+	if p.Closed() {
+		// Jitter start point
+		part := parts[0]
+		part[0] = rjitter(part[0], sp.Radius)
+		res := NewPath(part[0])
+		// first point = last point
+		for i := range np - 1 {
+			part = parts[i]
+			end := len(part) - 1
+			part[end] = rjitter(part[end], sp.Radius)
+			res.AddStep(part[1:]...)
+		}
+		res.Close()
 		return []*Path{res}
 	}
 
-	for i := range np {
+	// Leave first and last points unchanged
+	res := NewPath(parts[0][0])
+	for i := range np - 1 {
 		part := parts[i]
 		end := len(part) - 1
-		if p.Closed() && i == 0 {
-			part[0] = rjitter(part[0], sp.Radius)
-			res = NewPath(part[0])
-		}
-		if i != np-1 || p.Closed() {
-			part[end] = rjitter(part[end], sp.Radius)
-		}
+		part[end] = rjitter(part[end], sp.Radius)
 		res.AddStep(part[1:]...)
 	}
-
-	if p.Closed() {
-		res.Close()
-	}
-
 	return []*Path{res}
 }
 
