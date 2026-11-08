@@ -182,21 +182,6 @@ func (p *Path) Steps() [][][]float64 {
 	return p.steps[:]
 }
 
-// Part represents a path step with the previous step's end point prepended.
-type Part [][]float64
-
-// String converts a part into a string.
-func (p Part) String() string {
-	var res strings.Builder
-	for i, pt := range p {
-		if i != 0 {
-			res.WriteString(" ")
-		}
-		res.WriteString(fmt.Sprintf("%.2f,%.2f", pt[0], pt[1]))
-	}
-	return res.String()
-}
-
 // AddParts adds parts to the path and returns it.
 func (p *Path) AddParts(parts ...Part) *Path {
 	for i, part := range parts {
@@ -211,7 +196,7 @@ func (p *Path) AddParts(parts ...Part) *Path {
 }
 
 // Parts returns the steps of a path, each prepended with its start.
-func (p *Path) Parts() []Part {
+func (p *Path) Parts() Parts {
 	n := len(p.steps)
 	if n == 0 {
 		return nil
@@ -220,9 +205,9 @@ func (p *Path) Parts() []Part {
 	if n == 1 {
 		// This is a point
 		// Deep copy
-		return []Part{{{cp[0], cp[1]}}}
+		return Parts{{{cp[0], cp[1]}}}
 	}
-	parts := make([]Part, n-1, n)
+	parts := make(Parts, n-1, n)
 	for i := 1; i < n; i++ {
 		part := toPart(cp, p.steps[i])
 		parts[i-1] = part
@@ -232,6 +217,16 @@ func (p *Path) Parts() []Part {
 		parts = append(parts, Part{cp, p.steps[0][0]})
 	}
 	return parts
+}
+
+// Deep copy
+func toPart(cp []float64, pts [][]float64) Part {
+	res := make(Part, len(pts)+1)
+	res[0] = []float64{cp[0], cp[1]}
+	for i, pt := range pts {
+		res[i+1] = []float64{pt[0], pt[1]}
+	}
+	return res
 }
 
 // Close marks the path as closed.
@@ -247,28 +242,6 @@ func (p *Path) Close() *Path {
 // Closed returns true if the path is closed.
 func (p *Path) Closed() bool {
 	return p.closed
-}
-
-// PartsToPath constructs a new path by concatenating the parts.
-func PartsToPath(parts ...Part) *Path {
-	if len(parts) == 0 {
-		return nil
-	}
-
-	res := NewPath(parts[0][0])
-	if len(parts[0]) == 1 {
-		return res
-	}
-
-	for i, part := range parts {
-		for j, pt := range part {
-			if InvalidPoint(pt) {
-				panic(fmt.Sprintf("invalid point (NaN) in part %d,%d", i, j))
-			}
-		}
-		res.AddStep(part[1:]...)
-	}
-	return res
 }
 
 // InvalidPoint checks that both values are valid (i.e. not NaN)
@@ -291,7 +264,7 @@ func (p *Path) Flatten(d float64) *Path {
 	cp := res[0][0]
 	// For all remaining steps in path
 	for i := 1; i < len(sp.steps); i++ {
-		fp := flattenPart(d2, toPart(cp, sp.steps[i]))
+		fp := toPart(cp, sp.steps[i]).flatten(d2)
 		for _, ns := range fp {
 			// ns length is always 2
 			res = append(res, Part{ns[1]})
@@ -305,62 +278,6 @@ func (p *Path) Flatten(d float64) *Path {
 	path.parent = p
 	p.flattened = path
 	return path
-}
-
-// Deep copy
-func toPart(cp []float64, pts [][]float64) Part {
-	res := make(Part, len(pts)+1)
-	res[0] = []float64{cp[0], cp[1]}
-	for i, pt := range pts {
-		res[i+1] = []float64{pt[0], pt[1]}
-	}
-	return res
-}
-
-// flattenPart successively splits the part until the control points are within d2 of the line
-// joing the part start with the part end. Returns a list of line parts.
-func flattenPart(d2 float64, part Part) []Part {
-	if cpWithinD2(d2, part) {
-		return []Part{{part[0], part[len(part)-1]}}
-	}
-	lr := util.SplitCurve(part, 0.5)
-	res := append([]Part{}, flattenPart(d2, lr[0])...)
-	res = append(res, flattenPart(d2, lr[1])...)
-	return res
-}
-
-func cpWithinD2(d2 float64, part Part) bool {
-	// First and last are end points
-	l := len(part)
-	if l == 2 {
-		// Trivial case
-		return true
-	}
-	start, cpts, end := part[0], part[1:l-1], part[l-1]
-	for _, cp := range cpts {
-		pd2, _, _ := util.DistanceToLineSquared(start, end, cp)
-		if pd2 > d2 {
-			return false
-		}
-	}
-
-	return true
-}
-
-// FlattenPart works by subdividing the curve until its control points are within d^2 (d squared)
-// of the line through the end points.
-func FlattenPart(d float64, part Part) []Part {
-	return flattenPart(d*d, part)
-}
-
-// PartLength returns the approximate length of a part by flattening it to the supplied degree of flatness.
-func PartLength(d float64, part Part) float64 {
-	parts := flattenPart(d*d, part)
-	sum := 0.0
-	for _, part := range parts {
-		sum += util.DistanceE(part[0], part[1])
-	}
-	return sum
 }
 
 // BoundingBox calculates a bounding box that the Path is guaranteed to fit within. It's unlikely to
@@ -444,15 +361,15 @@ func (p *Path) Simplify() *Path {
 	if p.simplified != nil {
 		return p.simplified
 	}
-	res := []Part{}
+	res := Parts{}
 	parts := p.Parts()
 	for _, part := range parts {
 		if len(part) > 2 {
 			// Split based on extremities
-			nparts := SimplifyExtremities(part)
+			nparts := part.SimplifyExtremities()
 			for _, npart := range nparts {
 				// check simplified parts are simple
-				res = append(res, SimplifyPart(npart)...)
+				res = append(res, npart.Simplify()...)
 			}
 		} else {
 			res = append(res, part)
@@ -468,103 +385,9 @@ func (p *Path) Simplify() *Path {
 	return path
 }
 
-// SimplifyExtremities chops curve into pieces based on maxima, minima and inflections in x and y.
-func SimplifyExtremities(part Part) []Part {
-	tvals := util.CalcExtremities(part)
-	nt := len(tvals)
-	if nt < 3 {
-		return []Part{part}
-	}
-	// Convert tvals to relative tvals
-	rtvals := make([]float64, nt)
-	lt := 0.0
-	ll := 1.0
-	for i := range nt {
-		if i == 0 {
-			// Reset
-			lt = tvals[i]
-			ll = 1 - lt
-			rtvals[i] = lt
-			continue
-		}
-		t := tvals[i]
-		d := t - lt
-		rtvals[i] = d / ll
-		lt = t
-		ll -= d
-	}
-
-	rhs := part
-	res := make([]Part, nt-1)
-	for i := 1; i < nt-1; i++ {
-		lr := util.SplitCurve(rhs, rtvals[i])
-		res[i-1] = lr[0]
-		rhs = lr[1]
-	}
-	res[nt-2] = rhs
-	return res
-}
-
-// SimplifyPart recursively cuts the curve in half until CPSafe is
-// satisfied.
-func SimplifyPart(part Part) []Part {
-	if CPSafe(part) {
-		return []Part{part}
-	}
-	lr := util.SplitCurve(part, 0.5)
-	res := append([]Part{}, SimplifyPart(lr[0])...)
-	res = append(res, SimplifyPart(lr[1])...)
-	return res
-}
-
-// SafeFraction if greater than 0 causes Simplify to perform a check of the mid-point against
-// the part centroid. If the two are within SafeFraction of the distance from p[0] to the centroid
-// then no further subdivision of the curve is performed.
-var SafeFraction float64 = -1
-
-// CPSafe returns true if all the control points are on the same side of
-// the line formed by start and the last part points and the point at t = 0.5 is close
-// to the centroid of the part.
-func CPSafe(part Part) bool {
-	n := len(part)
-	if n < 3 {
-		// Either a point or line
-		return true
-	}
-
-	start := part[0]
-	end := part[n-1]
-	side := util.CrossProduct(start, end, part[1]) < 0
-	for i := 2; i < n-1; i++ {
-		if (util.CrossProduct(start, end, part[i]) < 0) != side {
-			return false
-		}
-	}
-
-	if n == 3 {
-		return true
-	}
-
-	if SafeFraction > 0 {
-		// Check mid-point against centroid
-		// scale against distance between p0 and centroid
-		centroid := util.Centroid(part...)
-		hp := util.DeCasteljau(part, 0.5)
-		p0dx := centroid[0] - part[0][0]
-		p0dy := centroid[1] - part[0][1]
-		p0ds := p0dx*p0dx + p0dy*p0dy
-		hpdx := centroid[0] - hp[0]
-		hpdy := centroid[1] - hp[1]
-		hpds := hpdx*hpdx + hpdy*hpdy
-		return math.Sqrt(hpds) < math.Sqrt(p0ds)*SafeFraction
-	}
-
-	return true
-}
-
 // Reverse returns a new path describing the current path in reverse order (i.e start and end switched).
 func (p *Path) Reverse() *Path {
-	path := PartsToPath(ReverseParts(p.Parts())...)
+	path := PartsToPath(p.Parts().Reverse()...)
 
 	// If other aspects have already been calculated - reverse them too
 	if p.flattened != nil {
@@ -587,28 +410,6 @@ func (p *Path) Reverse() *Path {
 	path.parent = p.parent
 
 	return path
-}
-
-// ReverseParts reverses the order (and points) of the supplied part slice.
-func ReverseParts(parts []Part) []Part {
-	n := len(parts)
-	res := make([]Part, n)
-	for i, j := 0, n-1; i < n; i++ {
-		res[i] = ReversePoints(parts[j])
-		j--
-	}
-	return res
-}
-
-// [pts][x/y]
-func ReversePoints(cp Part) Part {
-	n := len(cp)
-	res := make(Part, n)
-	for i, j := 0, n-1; i < n; i++ {
-		res[i] = cp[j]
-		j--
-	}
-	return res
 }
 
 // [part][start/end][normalized x/y]
@@ -653,52 +454,13 @@ func unit(dx, dy float64) (float64, float64) {
 	return dx / d, dy / d
 }
 
-// PartsIntersection returns the location of where the two parts intersect or nil. Assumes the parts
-// are the result of simplification. Uses a brute force approach for curves with d as the flattening
-// value.
-func PartsIntersection(part1, part2 Part, d float64) []float64 {
-	// Test bounding boxes first
-	bb1, bb2 := util.BoundingBox(part1...), util.BoundingBox(part2...)
-	if !util.BBOverlap(bb1, bb2) {
-		return nil
-	}
-
-	// Flatten and calculate bounding boxes for part2
-	fparts1, fparts2 := FlattenPart(d, part1), FlattenPart(d, part2)
-	bbs2 := make([][][]float64, len(fparts2))
-	for i, part := range fparts2 {
-		bbs2[i] = util.BoundingBox(part...)
-	}
-
-	// Test each line in part1 against lines in part2 until we find an intersection
-	for _, part := range fparts1 {
-		bb1 = util.BoundingBox(part...)
-		s1, e1 := part[0], part[len(part)-1]
-		for j, bbp2 := range bbs2 {
-			if !util.BBOverlap(bb1, bbp2) {
-				continue
-			}
-			// Bounding boxes of lines overlap - see if they intersect
-			s2, e2 := fparts2[j][0], fparts2[j][len(fparts2[j])-1]
-			tvals, err := util.IntersectionTValsP(s1, e1, s2, e2)
-			if err != nil || tvals[0] < 0 || tvals[0] > 1 || tvals[1] < 0 || tvals[1] > 1 {
-				continue
-			}
-			//return []float64{util.Lerp(tvals[0], s1[0], e1[0]), util.Lerp(tvals[0], s1[1], e1[1])}
-			return Lerp(tvals[0], s1, e1)
-		}
-	}
-
-	return nil
-}
-
 // Length returns the approximate length of a path by flattening it to the desired degree
 // and summing the line steps.
 func (p *Path) Length(flat float64) float64 {
 	parts := p.Parts()
 	sum := 0.0
 	for _, part := range parts {
-		sum += PartLength(flat, part)
+		sum += part.Length(flat)
 	}
 	return sum
 }
@@ -726,7 +488,7 @@ func (p *Path) ProjectPoint(pt []float64) ([]float64, float64, float64) {
 	// points.
 	c, ppt, bt, bd := -1, []float64{}, 0.0, math.MaxFloat64 // Best fit so far
 	for i, part := range parts {
-		pp, d, t := bs(pt, 0, d[i], 1, d[i+1], part)
+		pp, d, t := part.bs(pt, 0, d[i], 1, d[i+1])
 		if d < bd {
 			bd = d
 			c = i
@@ -741,46 +503,6 @@ func (p *Path) ProjectPoint(pt []float64) ([]float64, float64, float64) {
 func dist2(a, b []float64) float64 {
 	dx, dy := b[0]-a[0], b[1]-a[1]
 	return dx*dx + dy*dy
-}
-
-// Returns closest point on part to pt, dist2 and t [0-1]
-func bs(pt []float64, ts, ds, te, de float64, part Part) ([]float64, float64, float64) {
-	dt := te - ts
-	if dt < 0.00001 {
-		prj := util.DeCasteljau(part, ts)
-		return prj, ds, ts
-	}
-
-	t := []float64{ts, ts + dt/4, ts + dt/2, ts + 3*dt/4, te}
-	dl := dist2(pt, util.DeCasteljau(part, t[1]))
-	dm := dist2(pt, util.DeCasteljau(part, t[2]))
-	dr := dist2(pt, util.DeCasteljau(part, t[3]))
-	d := []float64{ds, dl, dm, dr, de}
-	nd := len(d)
-
-	ci, cd := 0, d[0]
-	for i := 1; i < nd; i++ {
-		if d[i] < cd {
-			ci = i
-			cd = d[i]
-		}
-	}
-	if ci == 0 {
-		// Only search t[0] to t[1]
-		return bs(pt, t[0], d[0], t[1], d[1], part)
-	}
-	if ci == nd-1 {
-		// Only search t[3] to t[4]
-		return bs(pt, t[3], d[3], t[4], d[4], part)
-	}
-
-	// Search both t[ci-1] to t[ci] and t[ci] to t[ci+1]
-	pl, d1, tl := bs(pt, t[ci-1], d[ci-1], t[ci], d[ci], part)
-	pr, d2, tr := bs(pt, t[ci], d[ci], t[ci+1], d[ci+1], part)
-	if d1 < d2 {
-		return pl, d1, tl
-	}
-	return pr, d2, tr
 }
 
 // PointInPath returns if a point is contained within a closed path according to the
@@ -806,11 +528,6 @@ func (p *Path) PolyLine() ([][]float64, bool) {
 		}
 	}
 	return poly, p.closed
-}
-
-// Lerp performs a linear interpolation between two points.
-func Lerp(t float64, p1, p2 []float64) []float64 {
-	return []float64{util.Lerp(t, p1[0], p2[0]), util.Lerp(t, p1[1], p2[1])}
 }
 
 /*

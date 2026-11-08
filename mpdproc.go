@@ -32,7 +32,7 @@ func (m MPDProc) Process(p *Path) []*Path {
 		return []*Path{p}
 	}
 
-	nparts := []Part{}
+	nparts := Parts{}
 	for _, part := range parts {
 		a := part[0]
 		b := part[len(part)-1]

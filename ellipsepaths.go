@@ -253,7 +253,7 @@ func IrregularEllipse(c []float64, rx1, rx2, ry1, ry2, disp, xang float64) *Path
 	ang := HalfPi
 	var offs float64
 
-	parts := []Part{}
+	parts := Parts{}
 	parts = append(parts, EllipticalArc([]float64{0, 0}, rx1, ry1, offs, ang, 0, ArcOpen).Parts()...)
 	offs += ang
 	parts = append(parts, EllipticalArc([]float64{0, 0}, rx2, ry1, offs, ang, 0, ArcOpen).Parts()...)
@@ -348,7 +348,7 @@ func Nellipse(l float64, foci ...[]float64) *Path {
 	}
 
 	// Reverse points and calc the second set (ie reversed face tangents)
-	rellipsesR, rellipsesL := calcEllipses(ReversePoints(foci), l, true)
+	rellipsesR, rellipsesL := calcEllipses(Part(foci).ReversePoints(), l, true)
 
 	// Fix point reversal in ellipses and swap intercepts
 	for i, ellip := range rellipsesR {

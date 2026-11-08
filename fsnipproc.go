@@ -110,7 +110,7 @@ func (sp *FSnipProc) Process(p *Path) []*Path {
 	pi := 0
 	cur, end := parts[pi][0], parts[pi][1]
 	avail := math.Hypot(end[0]-cur[0], end[1]-cur[1])
-	sparts := []Part{}
+	sparts := Parts{}
 
 	// Turn parts into snip paths
 	res := []*Path{}

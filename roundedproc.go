@@ -15,7 +15,7 @@ func (rp RoundedProc) Process(p *Path) []*Path {
 		return []*Path{p}
 	}
 
-	res := []Part{}
+	res := Parts{}
 	for i, part := range parts {
 		if len(part) != 2 {
 			res = append(res, part)

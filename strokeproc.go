@@ -14,10 +14,10 @@ type StrokeProc struct {
 	PostSideProc PathProcessor
 	Width        float64 // Default
 	// point(pt, r) []part
-	PointFunc func([]float64, float64) []Part
+	PointFunc func([]float64, float64) Parts
 	// cap(part1, pt, part2) []part
-	CapStartFunc func(Part, []float64, Part) []Part
-	CapEndFunc   func(Part, []float64, Part) []Part
+	CapStartFunc func(Part, []float64, Part) Parts
+	CapEndFunc   func(Part, []float64, Part) Parts
 }
 
 // Process implements the PathProcessor interface and will return either one or two paths
@@ -54,7 +54,7 @@ func (sp *StrokeProc) Process(p *Path) []*Path {
 	// Path is open, construct end caps and concatenate RHS with LHS, return it
 	rhsp, lhsp := rhs.Parts(), lhs.Parts()
 
-	both := make([]Part, 0, len(rhsp)+len(lhsp)+2)
+	both := make(Parts, 0, len(rhsp)+len(lhsp)+2)
 	both = append(both, rhsp...)
 
 	rhsl := rhsp[len(rhsp)-1]
@@ -90,9 +90,9 @@ func NewStrokeProc(w float64) *StrokeProc {
 // separately for each side of the stroke. This allows the stroke to be offset to the left or right
 // of the path being processed.
 func NewStrokeProcExt(rw, lw float64,
-	jf func(Part, []float64, Part) []Part,
+	jf func(Part, []float64, Part) Parts,
 	d float64,
-	cf func(Part, []float64, Part) []Part) *StrokeProc {
+	cf func(Part, []float64, Part) Parts) *StrokeProc {
 	if rw < 0 {
 		rw = -rw
 	}

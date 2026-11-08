@@ -105,9 +105,9 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 	if np == 0 {
 		return []*Path{p}
 	}
-	fparts := make([][]Part, np) // part:subparts:points:xy
+	fparts := make([]Parts, np) // part:subparts:points:xy
 	for i, part := range parts {
-		fparts[i] = FlattenPart(sp.Flatten, part)
+		fparts[i] = part.Flatten(sp.Flatten)
 	}
 	lparts := getLengths(fparts)
 
@@ -165,9 +165,9 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 	// This way we preserve the original curves.
 	cht = convTVals(chind, cht)
 	res := make([]*Path, 0, npp+1)
-	rem := parts[0]    // part remaining after last split
-	pind := 0          // current index into parts
-	pparts := []Part{} // parts collected towards next path
+	rem := parts[0]   // part remaining after last split
+	pind := 0         // current index into parts
+	pparts := Parts{} // parts collected towards next path
 
 	for i := range npp {
 		p, t := chind[i], cht[i]
@@ -193,7 +193,7 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 			res = append(res, lp)
 			rem = pieces[1]
 		}
-		pparts = []Part{}
+		pparts = Parts{}
 	}
 
 	// Handle remaining path
@@ -208,7 +208,7 @@ func (sp *SnipProc) Process(p *Path) []*Path {
 }
 
 // part:lineseg:cumpartlen/len
-func getLengths(parts [][]Part) [][][]float64 {
+func getLengths(parts []Parts) [][][]float64 {
 	res := make([][][]float64, len(parts))
 	for i, part := range parts {
 		sumPart := 0.0

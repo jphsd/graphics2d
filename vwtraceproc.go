@@ -21,7 +21,7 @@ func (s VWTraceProc) Process(p *Path) []*Path {
 	fsp := NewFSnipProc(2, []float64{s.Flatten}, 0)
 	fsp.Flatten = s.Flatten
 	paths := p.Process(fsp)
-	parts := []Part{}
+	parts := Parts{}
 	for _, path := range paths {
 		parts = append(parts, path.Parts()...)
 	}

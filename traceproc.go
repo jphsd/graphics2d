@@ -8,7 +8,7 @@ package graphics2d
 type TraceProc struct {
 	Width    float64
 	Flatten  float64
-	JoinFunc func(Part, []float64, Part) []Part
+	JoinFunc func(Part, []float64, Part) Parts
 }
 
 // NewTraceProc creates a trace path processor with width w, the bevel join and butt cap types.
@@ -35,10 +35,10 @@ func (tp TraceProc) Process(p *Path) []*Path {
 
 // ProcessParts returns the processed path as a slice of parts, rather a path so other path
 // processors don't have to round trip path -> parts -> path -> parts (e.g. StrokeProc).
-func (tp TraceProc) ProcessParts(p *Path) []Part {
+func (tp TraceProc) ProcessParts(p *Path) Parts {
 	// A point isn't traceable.
 	if len(p.Steps()) == 1 {
-		return []Part{}
+		return Parts{}
 	}
 
 	w := tp.Width
@@ -62,7 +62,7 @@ func (tp TraceProc) ProcessParts(p *Path) []Part {
 	}
 
 	// Calculate the path by LineTransforming the parts and handling the joins
-	rhs := make([]Part, n)
+	rhs := make(Parts, n)
 	for i := range n {
 		part := parts[i]
 		ln := len(part) - 1
@@ -76,7 +76,7 @@ func (tp TraceProc) ProcessParts(p *Path) []Part {
 	}
 
 	// Compute the joins
-	nrhs := make([]Part, 0, 2*n)
+	nrhs := make(Parts, 0, 2*n)
 	nrhs = append(nrhs, rhs[0])
 	for i := 1; i < n; i++ {
 		last := nrhs[len(nrhs)-1]
