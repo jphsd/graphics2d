@@ -3,7 +3,6 @@ package graphics2d
 import (
 	"image"
 	"image/color"
-	"image/draw"
 )
 
 // Renderable represents a set of shapes and the images to fill them. In other words, enough information to be
@@ -79,7 +78,7 @@ func (r *Renderable) AddRenderable(rend *Renderable, xfm Transform) *Renderable 
 }
 
 // Render renders the shapes in the renderable with their respective fillers after being transformed.
-func (r *Renderable) Render(img draw.Image, xfm Transform) {
+func (r *Renderable) Render(img Image, xfm Transform) {
 	for i, shape := range r.Shapes {
 		clip := r.Clips[i]
 		if xfm != nil {
@@ -96,7 +95,7 @@ func (r *Renderable) Render(img draw.Image, xfm Transform) {
 	}
 }
 
-func RenderRenderable(img draw.Image, rend *Renderable, xfm Transform) {
+func RenderRenderable(img Image, rend *Renderable, xfm Transform) {
 	rend.Render(img, xfm)
 }
 

@@ -48,7 +48,7 @@ func (s *Shape) Bounds() image.Rectangle {
 	return image.Rectangle{image.Point{fx, fy}, image.Point{cx, cy}}
 }
 
-// Mask returns an Alpha image defined by the shape's bounds, containing the result
+// Mask returns an Alpha16 image defined by the shape's bounds, containing the result
 // of rendering the shape.
 func (s *Shape) Mask() *image.Alpha16 {
 	if s.mask != nil {
@@ -58,8 +58,8 @@ func (s *Shape) Mask() *image.Alpha16 {
 	return s.mask
 }
 
-// AlphaMask returns an Alpha image defined by the shape's bounds, containing the result
-// of rendering the shape using the supplied alpha value [0,0xff].
+// AlphaMask returns an Alpha16 image defined by the shape's bounds, containing the result
+// of rendering the shape using the supplied alpha value [0,0xffff].
 func (s *Shape) AlphaMask(alpha color.Alpha16) *image.Alpha16 {
 	srect := s.Bounds()
 	mask := image.NewAlpha16(srect)

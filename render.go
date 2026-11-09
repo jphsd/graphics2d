@@ -11,21 +11,21 @@ import (
 )
 
 // RenderColoredShape renders the supplied shape with the fill color into the destination image.
-func RenderColoredShape(dst draw.Image, shape *Shape, fill color.Color) {
+func RenderColoredShape(dst Image, shape *Shape, fill color.Color) {
 	RenderShape(dst, shape, image.NewUniform(fill))
 }
 
 // RenderShape renders the supplied shape with the src image into the destination image.
-func RenderShape(dst draw.Image, shape *Shape, src image.Image) {
+func RenderShape(dst Image, shape *Shape, src image.Image) {
 	r := dst.Bounds()
-	RenderShapeExt(dst, r, shape, src, r.Min, nil, image.Point{}, draw.Over)
+	RenderShapeExt(dst, r, shape, src, r.Min, nil, image.Point{}, Over)
 }
 
 // RenderClippedShape renders the supplied shape with the src image into the destination image
 // as masked by the clip shape.
-func RenderClippedShape(dst draw.Image, shape, clip *Shape, src image.Image) {
+func RenderClippedShape(dst Image, shape, clip *Shape, src image.Image) {
 	r := dst.Bounds()
-	RenderShapeExt(dst, r, shape, src, r.Min, clip.Mask(), r.Min, draw.Over)
+	RenderShapeExt(dst, r, shape, src, r.Min, clip.Mask(), r.Min, Over)
 }
 
 // DefaultRenderFlatten is the standard curve flattening value.
@@ -36,7 +36,7 @@ var RenderFlatten = DefaultRenderFlatten
 
 // RenderShapeExt renders the supplied shape with the src and clip images into
 // the destination image region using op.
-func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, src image.Image, sp image.Point, mask image.Image, mp image.Point, op draw.Op) {
+func RenderShapeExt(dst Image, drect image.Rectangle, shape *Shape, src image.Image, sp image.Point, mask image.Image, mp image.Point, op Op) {
 	orig := drect.Min
 
 	// To avoid unnecessary work, reduce the rasterizer size to the shape width and height
@@ -56,7 +56,7 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, src ima
 	// Make rasterizer, note rasterizer has implicit r.Min of {0, 0}
 	size := drect.Size()
 	rasterizer := vector.NewRasterizer(size.X, size.Y)
-	rasterizer.DrawOp = op
+	rasterizer.DrawOp = draw.Op(op)
 
 	// Process paths translated by -drect.Min since mp is {0, 0} in the rasterizer
 	minx, miny := float32(drect.Min.X), float32(drect.Min.Y)
@@ -93,15 +93,25 @@ func RenderShapeExt(dst draw.Image, drect image.Rectangle, shape *Shape, src ima
 	mp.X += dx
 	mp.Y += dy
 	rasterizer.Draw(nmask, drect, mask, mp)
-	draw.DrawMask(dst, drect, src, sp, nmask, drect.Min, op)
+	DrawMask(dst, drect, src, sp, nmask, drect.Min, op)
 }
 
-// Draw is a wrapper around draw.Draw that uses a Uniform color as the src.
-func Draw(dst draw.Image, rect image.Rectangle, col color.Color, op draw.Op) {
-	draw.Draw(dst, rect, &image.Uniform{col}, image.Point{}, op)
+// Draw is a wrapper around draw.Draw since attempting to alias it didn't work.
+func Draw(dst Image, rect image.Rectangle, src image.Image, sp image.Point, op Op) {
+	draw.Draw(dst, rect, src, sp, draw.Op(op))
 }
 
-// DrawMask is a wrapper around draw.DrawMask that uses a Uniform color as the src.
-func DrawMask(dst draw.Image, rect image.Rectangle, col color.Color, mask image.Image, mp image.Point, op draw.Op) {
-	draw.DrawMask(dst, rect, &image.Uniform{col}, image.Point{}, mask, mp, op)
+// DrawMask is a wrapper around draw.DrawMask since attempting to alias it didn't work.
+func DrawMask(dst Image, rect image.Rectangle, src image.Image, sp image.Point, mask image.Image, mp image.Point, op Op) {
+	draw.DrawMask(dst, rect, src, sp, mask, mp, draw.Op(op))
+}
+
+// DrawColor is a wrapper around Draw that uses a Uniform color as the src.
+func DrawColor(dst Image, rect image.Rectangle, col color.Color, op Op) {
+	Draw(dst, rect, &image.Uniform{col}, image.Point{}, op)
+}
+
+// DrawColorMask is a wrapper around DrawMask that uses a Uniform color as the src.
+func DrawColorMask(dst Image, rect image.Rectangle, col color.Color, mask image.Image, mp image.Point, op Op) {
+	DrawMask(dst, rect, &image.Uniform{col}, image.Point{}, mask, mp, op)
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/jphsd/graphics2d/image"
 	"golang.org/x/image/font/gofont/gobold"
 	"golang.org/x/image/font/sfnt"
-	"image/draw"
 	"math/rand"
 )
 
@@ -26,7 +25,7 @@ func Example_splash() {
 	img := image.NewRGBA(1000, 200, color.Transparent)
 	for i, _ := range bg {
 		rect := image.Rect(i*200, 0, i*200+200, 200)
-		draw.Draw(img, rect, bg[i], image.Point{}, draw.Src)
+		g2d.Draw(img, rect, bg[i], image.Point{}, g2d.Src)
 	}
 
 	// Load font and create shapes
