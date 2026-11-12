@@ -117,6 +117,12 @@ func (p *Path) ArcTo(p1, p2 []float64, r float64) *Path {
 	return p
 }
 
+// Start returns the first point in the path.
+func (p *Path) Start() []float64 {
+	pt := p.steps[0][0]
+	return []float64{pt[0], pt[1]}
+}
+
 // Current returns the last point in the path.
 func (p *Path) Current() []float64 {
 	var pt []float64
