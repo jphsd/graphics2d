@@ -27,6 +27,12 @@ func DrawColorMask(dst Image, rect image.Rectangle, col color.Color, mask image.
 	DrawMask(dst, rect, &image.Uniform{col}, image.Point{}, mask, mp, op)
 }
 
+// NewRGBAFromColoredMask returns a new RGBA image with the same bounds as the mask,
+// filled by drawing the color through the mask.
+func NewRGBAFromColoredMask(col color.Color, mask image.Image) *image.RGBA {
+	return NewRGBAFromMask(&image.Uniform{col}, image.Point{}, mask)
+}
+
 // NewRGBAFromMask returns a new RGBA image with the same bounds as the mask,
 // filled by drawing the source through the mask.
 func NewRGBAFromMask(src image.Image, sp image.Point, mask image.Image) *image.RGBA {
