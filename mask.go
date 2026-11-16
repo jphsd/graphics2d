@@ -17,13 +17,13 @@ func DrawMask(dst Image, rect image.Rectangle, src image.Image, sp image.Point, 
 	draw.DrawMask(dst, rect, src, sp, mask, mp, draw.Op(op))
 }
 
-// DrawColor is a wrapper around Draw that uses a Uniform color as the src.
-func DrawColor(dst Image, rect image.Rectangle, col color.Color, op Op) {
+// DrawColored is a wrapper around Draw that uses a Uniform color as the src.
+func DrawColored(dst Image, rect image.Rectangle, col color.Color, op Op) {
 	Draw(dst, rect, &image.Uniform{col}, image.Point{}, op)
 }
 
-// DrawColorMask is a wrapper around DrawMask that uses a Uniform color as the src.
-func DrawColorMask(dst Image, rect image.Rectangle, col color.Color, mask image.Image, mp image.Point, op Op) {
+// DrawColoredMask is a wrapper around DrawMask that uses a Uniform color as the src.
+func DrawColoredMask(dst Image, rect image.Rectangle, col color.Color, mask image.Image, mp image.Point, op Op) {
 	DrawMask(dst, rect, &image.Uniform{col}, image.Point{}, mask, mp, op)
 }
 
