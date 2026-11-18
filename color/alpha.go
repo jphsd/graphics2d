@@ -1,7 +1,7 @@
 package color
 
-// ScaleAlpha provides an easy way to apply an alpha value to an existing color.
-func ScaleAlpha(col Color, alpha Color) RGBA64 {
+// Premul provides an easy way to apply an alpha value to an existing color.
+func Premul(col Color, alpha Color) RGBA64 {
 	r, g, b, a := col.RGBA()
 	_, _, _, aa := alpha.RGBA()
 	return RGBA64{
