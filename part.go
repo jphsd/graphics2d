@@ -76,13 +76,13 @@ func (part Part) cpWithinD2(d2 float64) bool {
 	return true
 }
 
-// FlattenPart works by subdividing the curve until its control points are within d^2 (d squared)
+// Flatten works by subdividing the curve until its control points are within d^2 (d squared)
 // of the line through the end points.
 func (part Part) Flatten(d float64) Parts {
 	return part.flatten(d * d)
 }
 
-// PartLength returns the approximate length of a part by flattening it to the supplied degree of flatness.
+// Length returns the approximate length of a part by flattening it to the supplied degree of flatness.
 func (part Part) Length(d float64) float64 {
 	parts := part.flatten(d * d)
 	sum := 0.0
@@ -129,7 +129,7 @@ func (part Part) SimplifyExtremities() Parts {
 	return res
 }
 
-// SimplifyPart recursively cuts the curve in half until CPSafe is
+// Simplify recursively cuts the curve in half until CPSafe is
 // satisfied.
 func (part Part) Simplify() Parts {
 	if part.CPSafe() {

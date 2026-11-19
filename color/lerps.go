@@ -18,7 +18,7 @@ func ColorRGBALerp(t float64, start, end Color) RGBA {
 	return RGBA{uint8(rt), uint8(gt), uint8(bt), uint8(at)}
 }
 
-// ColorRGBALerp calculates the color value at t [0,1] given a start and end color in RGB space.
+// ColorRGBA64Lerp calculates the color value at t [0,1] given a start and end color in RGB space.
 func ColorRGBA64Lerp(t float64, start, end Color) RGBA64 {
 	rs, gs, bs, as := start.RGBA() // uint32 [0,0xffff]
 	re, ge, be, ae := end.RGBA()

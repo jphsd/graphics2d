@@ -463,12 +463,30 @@ func unit(dx, dy float64) (float64, float64) {
 // Length returns the approximate length of a path by flattening it to the desired degree
 // and summing the line steps.
 func (p *Path) Length(flat float64) float64 {
-	parts := p.Parts()
+	fp := p.Flatten(flat)
+	parts := fp.Parts()
 	sum := 0.0
 	for _, part := range parts {
-		sum += part.Length(flat)
+		sum += util.DistanceE(part[0], part[len(part)-1])
 	}
 	return sum
+}
+
+// PointAt returns the point in the path that's d from the path start.
+// If d is greater than the path's length then nil is returned.
+func (p *Path) PointAt(d float64, flat float64) []float64 {
+	fp := p.Flatten(flat)
+	parts := fp.Parts()
+	sum := 0.0
+	for _, part := range parts {
+		pd := util.DistanceE(part[0], part[len(part)-1])
+		sum += pd
+		if sum > d {
+			t := 1 - (sum-d)/pd
+			return Lerp(t, part[0], part[len(part)-1])
+		}
+	}
+	return nil
 }
 
 // ProjectPoint returns the point, it's t on the path closest to pt and the distance^2.
